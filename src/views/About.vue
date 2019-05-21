@@ -13,15 +13,19 @@
 export default {
   computed: {
     threads() {
+      console.log('alalala')
       return this.$store.state.threads.length != 0
         ? this.$store.state.threads
-        : [{ thread: { title: "Erro" } }];
+        : { thread: { title: "Sem tags para mostrar" } };
     }
   },
   methods: {
     fillThreads() {
       this.$store.dispatch("getThreads");
     }
+  },
+  created() {
+    this.fillThreads()
   }
 };
 </script>
