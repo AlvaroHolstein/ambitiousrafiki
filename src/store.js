@@ -2,26 +2,24 @@ import Vue from "vue";
 import Vuex from "vuex";
 import axios from "axios"
 import users from "./store_module/users";
+import threads from "./store_module/threads"
+
 Vue.use(Vuex);
 
 export default new Vuex.Store({
   modules: {
-    users: users
+    users: users,
+    threads: threads
   },
   state: {
-    users: [],
-    threads: [],
     /**
-     * Tanto as answers como os comments só são carregados 
+     * Quando houver users pré carregados vêm para aqui,
+     * Nota: 
+     *  - No searchThing a primeira pesquisa é feita aqui, ou seja, 
+     *    antes de fazer o pedido verificar 
+     *  - As threads, answers e comments vão estar no store > module threads
      */
-    answers: [],
-    comments: [],
-    /**
-     * Variavel que vai guardar o user logado
-     */
-    loogedUser: {
-      notifications: []
-    },
+    users_root: [],
     /**
      * VAriáveis de comunicação com a API
      */
@@ -29,22 +27,9 @@ export default new Vuex.Store({
     port: ':420'
   },
   mutations: {
-    getThreads(state, payload) {
-      console.log(payload, "payload na MUTATION")
-      state.threads = payload
-    }
+
   },
   actions: {
-    getThreads(context) {
-      //Isto nem vai ser 
-      if (context.state.threads.length == 0) {
-        axios.get(`http://${context.state.address + context.state.port}/data-api/threads`)
-          .then(res => {
-            context.commit('getThreads', res.data)
-          })
-          .catch(err => console.log(err, "err no AXIOS"))
-      }
-      else console.log('Os users já estão preenchidos');
-    }
+
   }
 });
