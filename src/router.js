@@ -13,6 +13,15 @@ import viewProfile from "./views/ViewProfile.vue"
 import about from "@/views/About.vue"
 
 
+/**
+ * Páginas "Simples"
+ * Faq, Rankings, Tags, Badges
+ */
+import faq from "@/views/Faq.vue"
+import rankings from "@/views/Ranking.vue"
+import tags from "@/views/Tags.vue"
+import badges from "@/views/Badges.vue"
+
 Vue.use(Router);
 
 export default new Router({
@@ -26,16 +35,22 @@ export default new Router({
       component: Home
     },
     {
+      /**
+       * User List
+       */
       path: "/users",
       name: "users",
       component: users
     },
     {
+      /**
+       * ViewProfile
+       */
       path: "/viewProfile/:visiteduser",
       name: "ViewProfile",
-      component: viewProfile ,
+      component: viewProfile,
       children: [
-        {
+        { //About Tab
           path: "/about",
           name: "About",
           component: about
@@ -43,13 +58,33 @@ export default new Router({
       ]
     },
     {
-      path: "/about",
-      name: "about",
-      // route level code-splitting
-      // this generates a separate chunk (about.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () =>
-        import(/* webpackChunkName: "about" */ "./views/Aboutd.vue")
+      path: "/faq",
+      name: "faq",
+      component: faq
+    },
+    {
+      path: "/rankings",
+      name: "rankings",
+      component: rankings
+    },
+    {
+      path: "/tags",
+      name: "tags",
+      component: tags
+    },
+    {
+      path: "/badges",
+      name: "badges",
+      component: badges
     }
+    // {
+    //   path: "/about",
+    //   name: "about",
+    //   // route level code-splitting
+    //   // this generates a separate chunk (about.[hash].js) for this route
+    //   // which is lazy-loaded when the route is visited.
+    //   component: () =>
+    //     import(/* webpackChunkName: "about" */ "./views/Aboutd.vue")
+    // }
   ]
 });

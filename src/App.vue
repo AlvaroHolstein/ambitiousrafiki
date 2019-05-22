@@ -4,7 +4,7 @@
     <!-- <div id="nav">
       <router-link to="/">Home</router-link>|
       <router-link to="/about">About</router-link>
-    </div> -->
+    </div>-->
     <router-view/>
     <Footer/>
   </div>
@@ -13,11 +13,21 @@
 <script>
 import Navbar from "@/components/NavBar.vue";
 import Footer from "@/components/Footer.vue";
+import axios from "axios";
 
 export default {
   components: {
     Navbar,
     Footer
+  },
+  created() {
+    /**
+     * Por agora só os tags é que são carregados 
+     * para a store logo ao inicio,
+     * só se faz este pedido aqui
+     */
+    this.$store.dispatch('load_badges')
+
   }
 };
 </script>

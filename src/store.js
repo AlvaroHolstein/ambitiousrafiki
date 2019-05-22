@@ -20,6 +20,12 @@ export default new Vuex.Store({
      *  - As threads, answers e comments vão estar no store > module threads
      */
     users_root: [],
+
+    /**
+     * Badges
+     */
+    badges: [],
+
     /**
      * VAriáveis de comunicação com a API
      */
@@ -27,9 +33,16 @@ export default new Vuex.Store({
     port: ':420'
   },
   mutations: {
-
+    LOAD_BADGES(state, payload) {
+      state.badges = payload
+      console.log(state.badges, 'BADGES')
+    }
   },
   actions: {
-
+    load_badges({ commit , state}) {
+      axios.get(`http://${state.address + state.port}/data-api/badges`)
+        .then(res =>  commit('LOAD_BADGES', res.data))
+        .catch(err => console.log(err, "ERRO na ACTION load_badges"))
+    }
   }
 });
