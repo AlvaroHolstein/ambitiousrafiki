@@ -29,7 +29,7 @@ export default new Vuex.Store({
     /**
      * VAriáveis de comunicação com a API
      */
-    address: '192.168.1.83', //'172.23.116.246',
+    address: '172.23.116.246', // '192.168.1.83', 
     port: ':420'
   },
   mutations: {
@@ -39,9 +39,9 @@ export default new Vuex.Store({
     }
   },
   actions: {
-    load_badges({ commit , state}) {
+    load_badges({ commit, state }) {
       axios.get(`http://${state.address + state.port}/data-api/badges`)
-        .then(res =>  commit('LOAD_BADGES', res.data))
+        .then(res => commit('LOAD_BADGES', res.data))
         .catch(err => console.log(err, "ERRO na ACTION load_badges"))
     }
   }

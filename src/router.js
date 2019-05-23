@@ -15,12 +15,13 @@ import about from "@/views/About.vue"
 
 /**
  * Páginas "Simples"
- * Faq, Rankings, Tags, Badges
+ * Faq, Rankings, Tags, Badges, Contact us
  */
 import faq from "@/views/Faq.vue"
 import rankings from "@/views/Ranking.vue"
 import tags from "@/views/Tags.vue"
 import badges from "@/views/Badges.vue"
+import contact from "@/views/ContactUs.vue"
 
 Vue.use(Router);
 
@@ -76,6 +77,11 @@ export default new Router({
       path: "/badges",
       name: "badges",
       component: badges
+    },
+    {
+      path: "/cantactus",
+      name: "contactus",
+      component: contact
     }
     // {
     //   path: "/about",
