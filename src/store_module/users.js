@@ -18,7 +18,9 @@ const users = {
     },
     actions: {
         // Pedido à API para o user e notificações que vai ser para o login
-
+        a() {
+            console.log('alalalalalalalalalalalalala')
+        }
     },
     getters: {
 

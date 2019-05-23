@@ -22,12 +22,14 @@ export default {
   },
   created() {
     /**
-     * Por agora só os tags é que são carregados 
+     * Por agora só os tags é que são carregados
      * para a store logo ao inicio,
      * só se faz este pedido aqui
      */
     this.$store.dispatch('load_badges')
-
+    console.log(this.$store)
+    this.$store.dispatch('users/a')
+    this.$store.dispatch('threads/getAnswers', 1)
   }
 };
 </script>

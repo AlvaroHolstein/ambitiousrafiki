@@ -29,7 +29,7 @@ export default new Vuex.Store({
     /**
      * VAriáveis de comunicação com a API
      */
-    address: '172.23.116.246', // '192.168.1.83', 
+    address: '192.168.1.83', // '172.23.116.246', 
     port: ':420'
   },
   mutations: {
@@ -44,5 +44,8 @@ export default new Vuex.Store({
         .then(res => commit('LOAD_BADGES', res.data))
         .catch(err => console.log(err, "ERRO na ACTION load_badges"))
     }
+  },
+  getters: {
+    getIp: state => state.address + state.port
   }
 });

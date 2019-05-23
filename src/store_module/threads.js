@@ -1,29 +1,66 @@
+import axios from "axios";
+
 const threads = {
+    namespaced: true,
     state: {
-        threads: [],
+        threads_: [],
         /**
          * Tanto as answers como os comments só são carregados 
+         * na página da thread
          */
         answers: [],
         comments: [],
     },
     mutations: {
-        getThreads(state, payload) {
+        getInitialThreads(state, payload) {
             console.log(payload, "payload na MUTATION")
-            state.threads = payload
+            state.threads_ = payload
+        },
+        /**
+         * Answers
+         */
+        getAnswers(state, payload) {
+
+        },
+        /**
+         * Comments
+         */
+        getComments(state, payload) {
+
         }
     },
     actions: {
-        getThreads(context) {
+        getInitialThreads({state, commit, rootGetters}, qty=10) {
             //Isto nem vai ser 
-            if (context.state.threads.length == 0) {
-                axios.get(`http://${context.state.address + context.state.port}/data-api/threads`)
+            console.log('ulululululuullulululul')
+            if (state.threads_.length == 0) {
+                axios.get(`http://${rootGetters.getIp}/data-api/threads?qty=${qty}`)
                     .then(res => {
-                        context.commit('getThreads', res.data)
+                        console.log(res.data, `Initial ${qty} threads`)
+                        commit('getInitialThreads', res.data)
                     })
                     .catch(err => console.log(err, "err no AXIOS"))
             }
             else console.log('Os users já estão preenchidos');
+        },
+        /**
+         * Get Answers
+         */
+        getAnswers({ commit, rootGetters }, id_thread) {
+            axios.get(`http://${rootGetters.getIp}/data-api/threads/${id_thread}`)
+            .then(res => {
+                // TODO: 
+                console.log(res.data)
+            })
+            // console.log(rootGetters, 'LELELELELEL')
+        },
+        /**
+         * getComments
+         */
+        getComments({ commit }, id_ans) {
+            console.log('comments')
         }
     }
 }
+
+export default threads;

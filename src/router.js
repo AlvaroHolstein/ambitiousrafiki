@@ -1,6 +1,5 @@
 import Vue from "vue";
 import Router from "vue-router";
-import Home from "./views/Home.vue";
 
 /**
  * Mostrar todos os Users
@@ -9,10 +8,13 @@ import users from "@/views/Users.vue"
 /**
  * View Profile
  */
-import viewProfile from "./views/ViewProfile.vue"
+import viewProfile from "@/views/ViewProfile.vue"
 import about from "@/views/About.vue"
 
-
+/**
+ * Home & Catalog
+ */
+import home from "@/views/Home.vue" 
 /**
  * Páginas "Simples"
  * Faq, Rankings, Tags, Badges, Contact us
@@ -33,7 +35,7 @@ export default new Router({
        */
       path: "/",
       name: "home",
-      component: Home
+      component: home
     },
     {
       /**

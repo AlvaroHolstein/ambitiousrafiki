@@ -8,12 +8,10 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@johmun/vue-tags-input": "^2.0.1",
+    "apexcharts": "^3.1.0",
     "axios": "^0.18.0",
     "core-js": "^2.6.5",
-    "vue": "^2.6.10",
-    "vue-router": "^3.0.3",
-    "vuex": "^3.0.1",
-    "apexcharts": "^3.1.0",
     "emailjs": "^2.2.0",
     "jquery": "^3.3.1",
     "mongoose": "^5.5.1",
@@ -21,8 +19,11 @@
     "quill-image-drop-module": "^1.0.3",
     "quill-image-resize-module": "^1.0.0",
     "sweetalert2": "^7.31.1",
+    "vue": "^2.6.10",
     "vue-apexcharts": "^1.2.8",
-    "vue2-editor": "^2.6.6"
+    "vue-router": "^3.0.3",
+    "vue2-editor": "^2.6.6",
+    "vuex": "^3.0.1"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.7.0",
