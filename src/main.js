@@ -6,11 +6,11 @@ import bootstrap from "./assets/bootstrap.min.css"
 import axios from "axios"
 
 Vue.config.productionTip = false;
+Vue.prototype.$http = axios;
 
 new Vue({ //Para aceder a estas propriedades tem que see usar o this.$<nome> ou só $<nome>
   router,
   store,
   bootstrap,
-  axios,
   render: h => h(App)
 }).$mount("#app");

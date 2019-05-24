@@ -1,9 +1,8 @@
 import Vue from "vue";
 import Vuex from "vuex";
-import axios from "axios"
 import users from "./store_module/users";
 import threads from "./store_module/threads"
-
+import axios from "axios";
 Vue.use(Vuex);
 
 export default new Vuex.Store({

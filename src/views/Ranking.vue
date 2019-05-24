@@ -16,7 +16,7 @@
             v-bind:key="user.id"
             v-bind:class="{'table-active':(user.id==userid)}"
           >
-            <td scope="row">{{cont + 1}}</td> 
+            <td scope="row">{{cont + 1}}</td>
             <td>{{user.name}}</td>
             <td>{{user.experience}}</td>
             <td>{{user.course}}</td>
@@ -28,8 +28,6 @@
 </template>
 
 <script>
-import axios from "axios";
-
 export default {
   data() {
     return {
@@ -38,17 +36,17 @@ export default {
     };
   },
   created() {
-    axios
+    this.$http
       .get(
         `http://${this.$store.state.address +
           this.$store.state.port}/data-api/users/rankings`
       )
-      .then(res => this.users = res.data)
+      .then(res => (this.users = res.data))
       .catch(err => console.log(err));
   },
   computed: {
     orderedUsers() {
-      console.log(this.users, "Mudei os Users rankings")
+      console.log(this.users, "Mudei os Users rankings");
       return this.users;
     }
   }

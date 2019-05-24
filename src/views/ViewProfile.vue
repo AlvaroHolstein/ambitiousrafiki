@@ -126,11 +126,20 @@ export default {
   },
   created() {
     //Ir buscar o user
-    let id = this.$;
+    // let id = this.$;
 
     // Ir buscar o resto ao Profile.vue
   },
-  computed: {}
+  computed: {
+    user() {
+      console.log(this.$router.params.userid, "Router params no viewProfile")
+      this.$http.get(`http://${this.$store.getters.getIp}/data-api/users/${this.$router.params.userid}`)
+      .then(res => {
+        console.log(res.data, "Find user in USER PROFILE")
+        return res.data
+      }).catch(err => console.log(err, "ERRO no find user no computed user"))
+    }
+  }
 };
 </script>
 <style>

@@ -9,9 +9,14 @@
         <option>Tag</option>
         <option>Keyword</option>
       </select>
-      <p v-if="searchBy=='Tag'">
-        Search By Tag
+      <div
+        id="findByTag"
+        v-if="searchBy=='Tag'"
+        class="text-center d-flex flex-column justify-content-center"
+      >
+        <p class="p-2">Search By Tag</p>
         <vue-tags-input
+          class="p-2 mx-auto"
           id="inputTags"
           v-model="tag"
           :tags="tags"
@@ -19,19 +24,23 @@
           :max-tags="1"
           @tags-changed="newTags => tags = newTags"
         />
-      </p>
-      <p v-if="searchBy=='Keyword'">
-        Search By Keyword
+      </div>
+      <div
+        id="findByKeyword"
+        v-if="searchBy=='Keyword'"
+        class="text-center d-flex flex-column justify-content-center"
+      >
+        <p class="p-2">Search By Keyword</p>
+        <br>
         <input
+          class="p-2 mx-auto"
           type="text"
-          class="form-control"
           style="width:49%;"
           v-model="keyword"
           placeholder="Search By Keyword"
         >
-      </p>
+      </div>
     </div>
-    <!--        -->
     <br>
     <div class="table-responsive">
       <table class="table table-striped table-hover table-bordered">
@@ -52,15 +61,18 @@
             </td>
             <td>
               <!-- v-bind:src="" -->
-              <img class="img-fluid pic">
+              <img v-bind:src="thread.userInfo.photo" class="img-fluid pic">
             </td>
             <td>{{thread.views}}</td>
 
             <td>{{thread.upvotes}}</td>
-            <td>{{thread.date}}</td>
+            <td>{{thread.date | filterDate}}</td>
           </tr>
         </tbody>
       </table>
+      <div class="text-center">
+        <button v-on:click="moreThreads()" class="btn btn-outline-dark">View More</button>
+      </div>
     </div>
 
     <!-- <div
@@ -101,7 +113,6 @@
 </template>
 <script>
 import VueTagsInput from "@johmun/vue-tags-input";
-import axios from "axios";
 
 export default {
   components: {
@@ -113,12 +124,20 @@ export default {
       tag: "",
       tags: [],
       keyword: "",
-      autocompleteItems: this.$store.state.tags,
-      threads: this.$store.state.threads
+      autoComleteTags: [],
+      threads: this.$store.state.threads,
+      totalThreads: 2
     };
   },
   created() {
-    this.$store.dispatch("threads/getInitialThreads");
+    this.$store.dispatch("threads/getInitialThreads", 2);
+
+    this.$http
+      .get(`http://${this.$store.getters.getIp}/data-api/tags`)
+      .then(res => {
+        console.log(res.data, "TAGS no CATALOG");
+        this.autoComleteTags = res.data;
+      });
   },
   updated() {
     if (this.searchBy == "All") {
@@ -142,32 +161,69 @@ export default {
     this.$store.dispatch("search_tag", "");
   },
   computed: {
+    autocompleteItems() {
+      return this.autoComleteTags;
+    },
     filteredItems() {
       return this.autocompleteItems.filter(i => {
         return i.text.toLowerCase().indexOf(this.tag.toLowerCase()) !== -1;
       });
     },
     filteredThreads() {
-      
-      console.log(this.$store.state.threads.threads_);
-      return this.$store.state.threads.threads_.filter(thread => {
-        if (this.tags.length == 1) {
-          console.log("Entra");
-
-          if (thread.tags.find(tag => tag.text == this.tag)) {
-            return true;
+      console.log(
+        this.$store.state.threads.threads_,
+        "filteredThreads catalog.vue"
+      );
+      return this.$store.state.threads.threads_.filter((thread, cont) => {
+        if (cont + 1 <= this.totalThreads) {
+          if (this.tags.length == 1) {
             console.log("Entra");
-          }
-        } else if (this.keyword != "") {
-          if (thread.title.toLowerCase().includes(this.keyword.toLowerCase()))
+
+            if (thread.tags.find(tag => tag.text == this.tag)) {
+              return true;
+              console.log("Entra");
+            }
+          } else if (this.keyword != "") {
+            if (thread.title.toLowerCase().includes(this.keyword.toLowerCase()))
+              return true;
+          } else if (this.keyword == "" && this.tags.length == 0) {
             return true;
-        } else if (this.keyword == "" && this.tags.length == 0) {
-          return true;
+          }
         }
       });
     }
   },
   methods: {
+    moreThreads() {
+      /* Array para guardar os id's das threads que já temos
+       * que depois vai ser enviado para a API,
+       * as threads que forem carregadas aqui no Catalog
+       * vão ficar na store, mas as threads que forem carregadas na SearchThing
+       * fica só no próprio componente.
+       * Enviar o numero de threads a ir buscar pelo body.
+       */
+      let alreadyHere = this.$store.state.threads.threads_.map(
+        (thread, cont) => {
+          return thread.id;
+        }
+      );
+      console.log(alreadyHere);
+      this.$http
+        .post(
+          `http://${this.$store.getters.getIp}/data-api/threads/findAndExclude`,
+          {
+            exclude: alreadyHere,
+            qty: 1
+          }
+        )
+        .then(res => {
+          console.log(res.data, "Mostrar Mais Threads");
+          this.totalThreads += res.data.length;
+          for (let i = 0; i < res.data.length; i++) {
+            this.$store.state.threads.threads_.push(res.data[i]);
+          }
+        });
+    },
     incrementar(id) {
       this.$router.push({
         name: "thread",
@@ -180,6 +236,14 @@ export default {
     getUserById(id) {
       console.log("tá");
       return this.$store.getters.getUsers.filter(user => user.id == id)[0];
+    }
+  },
+  filters: {
+    filterDate: function(value) {
+      if (!value) return "Sem data";
+
+      let date = value.split("T")[0].split("-");
+      return `${date[2]}/${date[1]}/${date[0]}`;
     }
   }
 };
@@ -252,5 +316,21 @@ th {
 td > a.title {
   color: blue;
   cursor: pointer;
+}
+.pic {
+  width: 50px;
+  height: 50px;
+  border-radius: 25px;
+  border: 4px solid rgb(0, 89, 255);
+}
+#findByKeyword,
+#findByTag {
+  background-color: #ddd9d9;
+  padding-bottom: 10px;
+  margin-top: 10px;
+}
+#findByKeyword > input,
+#findByTag > input {
+  width: 70%;
 }
 </style>

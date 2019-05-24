@@ -13,7 +13,6 @@
 <script>
 import Navbar from "@/components/NavBar.vue";
 import Footer from "@/components/Footer.vue";
-import axios from "axios";
 
 export default {
   components: {
@@ -27,9 +26,12 @@ export default {
      * só se faz este pedido aqui
      */
     this.$store.dispatch('load_badges')
-    console.log(this.$store)
-    this.$store.dispatch('users/a')
-    this.$store.dispatch('threads/getAnswers', 1)
+    
+    // this.$http.get(`http://${this.$store.getters.getIp}/data-api/threads`).then(res => console.log(res.data))
+    
+    // console.log(this.$store)
+    // this.$store.dispatch('users/a')
+    // this.$store.dispatch('threads/getAnswers', 1)
   }
 };
 </script>

@@ -12,9 +12,15 @@ import viewProfile from "@/views/ViewProfile.vue"
 import about from "@/views/About.vue"
 
 /**
- * Home & Catalog
+ * Home (Dentro do Home é que estão os componentes Catalog e Related)
  */
 import home from "@/views/Home.vue" 
+
+/**
+ * Login Page
+ */
+import login from "@/views/Login.vue"
+
 /**
  * Páginas "Simples"
  * Faq, Rankings, Tags, Badges, Contact us
@@ -49,13 +55,13 @@ export default new Router({
       /**
        * ViewProfile
        */
-      path: "/viewProfile/:visiteduser",
+      path: "/viewProfile/:userid",
       name: "ViewProfile",
       component: viewProfile,
       children: [
         { //About Tab
           path: "/about",
-          name: "About",
+          name: "about",
           component: about
         }
       ]
@@ -84,6 +90,11 @@ export default new Router({
       path: "/cantactus",
       name: "contactus",
       component: contact
+    },
+    {
+      path: "/login",
+      name: "login",
+      component: login
     }
     // {
     //   path: "/about",

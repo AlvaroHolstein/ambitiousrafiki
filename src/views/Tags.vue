@@ -22,15 +22,14 @@
   </div>
 </template>
 <script>
-import axios from "axios";
 export default {
   data() {
     return {
       tags_: []
-    }
+    };
   },
   created() {
-    axios
+    this.$http
       .get(
         `http://${this.$store.state.address +
           this.$store.state.port}/data-api/tags`

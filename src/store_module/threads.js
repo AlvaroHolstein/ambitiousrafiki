@@ -30,9 +30,10 @@ const threads = {
         }
     },
     actions: {
-        getInitialThreads({state, commit, rootGetters}, qty=10) {
-            //Isto nem vai ser 
-            console.log('ulululululuullulululul')
+        /**
+         * TAmbém pode ser usado para pedir X threads de cada vez
+         */
+        getInitialThreads({ state, commit, rootGetters }, qty = 10) {
             if (state.threads_.length == 0) {
                 axios.get(`http://${rootGetters.getIp}/data-api/threads?qty=${qty}`)
                     .then(res => {
@@ -48,10 +49,10 @@ const threads = {
          */
         getAnswers({ commit, rootGetters }, id_thread) {
             axios.get(`http://${rootGetters.getIp}/data-api/threads/${id_thread}`)
-            .then(res => {
-                // TODO: 
-                console.log(res.data)
-            })
+                .then(res => {
+                    // TODO: 
+                    console.log(res.data)
+                })
             // console.log(rootGetters, 'LELELELELEL')
         },
         /**

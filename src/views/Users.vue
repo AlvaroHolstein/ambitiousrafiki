@@ -37,7 +37,6 @@
 </template>
 
 <script>
-import axios from "axios";
 export default {
   /**
    * Os Users aqui carregados vão precisar apenas
@@ -55,10 +54,11 @@ export default {
        * Vai mandar sempre para o mesmo about, depois lá é que se vai
        * ver se quem está a ver o perfil é o próprio
        */
+      console.log(userid, "USERID no USERS")
       this.$router.push({
-        name: "About",
+        name: "viewProfile",
         params: {
-          visiteduserid: userid
+          userid: userid
         }
       });
     },
@@ -91,14 +91,14 @@ export default {
       console.log(users.length, "Users na página Users > filterUserse");
 
       if (users.length == 0) {
-        axios
+        this.$http
           .get(
             `http://${this.$store.state.address +
               this.$store.state.port}/data-api/users`
           )
           .then(res => {
             this.$store.state.users_root = res.data;
-            console.log(res.data, 'res')
+            console.log(res.data, "res");
             return this.filterUsers(this.$store.state.users_root);
           })
           .catch(err => {

@@ -48,7 +48,7 @@ import Catalog from "@/components/Catalog.vue";
 // document.getElementById('containerHome').
 export default {
   components: {
-    Catalog,
+    Catalog
     // Related
   },
   data() {
@@ -58,13 +58,15 @@ export default {
     };
   },
   created() {
-    this.viewedThreads = this.$store.getters.getThreads.sort((a, b) => {
+    // Para que servia isto
+    //Most viewd????
+    this.viewedThreads = this.$store.state.threads.threads_.sort((a, b) => {
       if (a.views > b.views) return -1;
       if (a.views < b.views) return 1;
       else return 0;
     });
     // this.viewedThreads.length = 5;
-    this.hotTopics = this.$store.getters.getThreads.map(thread => {
+    this.hotTopics = this.$store.state.threads.threads_.map(thread => {
       let newObj = {
         id: thread.id,
         title: thread.title,
