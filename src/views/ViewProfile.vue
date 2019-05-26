@@ -2,14 +2,17 @@
   <div class="container">
     <div class="header row" style="margin-bottom: 40px;">
       <div class="col-md-4 text-center">
-        <img :src="imageSrc" class="picture img-fluid">
+        <img :src="user.picture" class="picture img-fluid">
       </div>
       <div class="col-md-5">
         <h1>{{user.name}}</h1>
         <span>Level:{{user.level}}</span>
 
         <div class="progress">
-          <div :style="{'width': getUserProgress(user.id)}" class="progress-bar progress-bar-info"></div>
+          <div
+            :style="{'width': getUserProgress}"
+            class="progress-bar progress-bar-info"
+          ></div>
         </div>
       </div>
       <div class="col-md-3">
@@ -27,27 +30,20 @@
     <!-- Routing for the user info (caredo que bom inglês) -->
     <ul class="nav nav-tabs" id="nav" style="margin-bottom:1em">
       <li class="nav-item">
-        <router-link
-          :to="{name:'AboutMe'}"
-          :class="{'nav-link':true}"
-        >About {{ownProfile ? 'Me' : ''}}</router-link>
+        <button class="btn btn-primary" v-on:click="ulIndex = 1">About</button>
       </li>
-      <li v-if="$store.state.user" class="nav-item">
-        <!-- TODO: -->
+
+      <li class="nav-item">
+        <button class="btn btn-primary" v-on:click="ulIndex = 2">User Badges</button>
+      </li>
+      <!--
+        <li v-if="$store.state.user" class="nav-item">
         <router-link
           :to="{name:'MyThreads'}"
           :class="{'nav-link':true}"
         >{{ownProfile ? 'My Threads' : 'User Threads'}}</router-link>
       </li>
-      <li class="nav-item">
-        <!-- TODO: -->
-        <router-link
-          :to="{name:'MyBadges'}"
-          :class="{'nav-link':true}"
-        >{{ownProfile ? 'My Badges' : 'User Badges'}}</router-link>
-      </li>
-      <li class="nav-item">
-        <!-- TODO: -->
+       <li class="nav-item">
         <router-link
           v-show="ownProfile"
           :to="{name:'MyRankings'}"
@@ -55,32 +51,46 @@
         >My Ranking</router-link>
       </li>
       <li class="nav-item">
-        <!-- TODO: -->
         <router-link
           v-show="ownProfile"
           :to="{name:'EditProfile'}"
           :class="{'nav-link':true}"
         >Edit Profile</router-link>
-      </li>
+        </li>
+      -->
     </ul>
     <transition name="fade" mode="out-in">
-      <router-view id="router-view"></router-view>
+      <about v-bind:user="user" v-if="ulIndex == 1"/>
+      <!-- <userBadges v-if="ulIndex == 2"/> -->
+      <!-- <div v-if="ulIndex == 1">
+        <h1>1</h1>
+      </div>
+      <div v-if="ulIndex == 2">
+        <h1>2</h1>
+      </div>-->
     </transition>
   </div>
 </template>
 
 <script>
 import VueApexCharts from "vue-apexcharts";
+import about from "@/components/About.vue";
+// import userBadges from "@/components/MyBadges.vue";
+
 export default {
   components: {
-    apexchart: VueApexCharts
+    apexchart: VueApexCharts,
+    about
+    // userBadges
   },
   data() {
     return {
       // users: this.$store.getters.getUsers,
+      user: {},
       ownProfile: false,
       progress: 0, // Vai estar a ser atualizado dentro do created depois de se ter o user
       imageSrc: "", // Isto vai se buscar ao user
+      ulIndex: 1,
       /**
        * Charts:
        * - Mudar estas variáveis para serem as que estão na store (vão estar TODO: )
@@ -125,19 +135,57 @@ export default {
     };
   },
   created() {
-    //Ir buscar o user
-    // let id = this.$;
-
-    // Ir buscar o resto ao Profile.vue
+    this.fetchUser();
+    this.checkIndex;
   },
   computed: {
-    user() {
-      console.log(this.$router.params.userid, "Router params no viewProfile")
-      this.$http.get(`http://${this.$store.getters.getIp}/data-api/users/${this.$router.params.userid}`)
-      .then(res => {
-        console.log(res.data, "Find user in USER PROFILE")
-        return res.data
-      }).catch(err => console.log(err, "ERRO no find user no computed user"))
+    checkIndex() {
+      console.log(this.ulIndex);
+      return this.ulIndex;
+    },
+    getUserProgress() {
+      console.log(this.user.experience % 100, "EXPERIENCE");
+      if (this.user.experience) return this.user.experience % 100;
+    }
+  },
+  methods: {
+    fetchUser() {
+      /**
+       * FAzer a confirmação se é um user logado
+       * a ver o seu próprio perfil ou não,
+       * por agora está a fazer a mesma coisa para todos.
+       */
+      console.log(this.$route.params.userid, "Router params no viewProfile");
+      this.$http
+        .get(
+          `http://${this.$store.getters.getIp}/data-api/users/${
+            this.$route.params.userid
+          }`
+        )
+        .then(res => {
+          console.log(res.data, "Find user in USER PROFILE");
+          let {
+            id,
+            name,
+            picture,
+            year,
+            upvotes,
+            course,
+            description,
+            experience
+          } = res.data;
+          this.user = new this.$store.state.users.userClass(
+            id,
+            name,
+            experience,
+            description,
+            year,
+            course,
+            picture
+          );
+          console.log(this.user, "User depois de passar pela class");
+        })
+        .catch(err => console.log(err, "ERRO no find user no computed user"));
     }
   }
 };

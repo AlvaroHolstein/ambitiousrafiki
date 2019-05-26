@@ -9,12 +9,12 @@ import users from "@/views/Users.vue"
  * View Profile
  */
 import viewProfile from "@/views/ViewProfile.vue"
-import about from "@/views/About.vue"
+
 
 /**
  * Home (Dentro do Home é que estão os componentes Catalog e Related)
  */
-import home from "@/views/Home.vue" 
+import home from "@/views/Home.vue"
 
 /**
  * Login Page
@@ -55,16 +55,31 @@ export default new Router({
       /**
        * ViewProfile
        */
-      path: "/viewProfile/:userid",
-      name: "ViewProfile",
+      path: "/viewProfile/:userid/",
+      name: "viewProfile",
       component: viewProfile,
-      children: [
-        { //About Tab
-          path: "/about",
+      /*children: [
+        { // About Tab
+          path: "/",
           name: "about",
           component: about
+        },
+        { // Badges Tab
+          path: "/badges",
+          name: "badges",
+          component: userBadges
+        } 
+        { // Ranking Tab
+          path: "/ranking",
+          name: "ranking",
+          component: ranking
+        },
+        { //Edit Profile Tab
+          path: "/editProfile",
+          name: "editProfile",
+          component: editProfile
         }
-      ]
+  ]*/
     },
     {
       path: "/faq",
