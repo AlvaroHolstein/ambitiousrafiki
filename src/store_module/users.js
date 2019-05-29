@@ -4,7 +4,7 @@ class User {
          * Ver se não é preciso melhorar esta class.
          */
         id,
-        nome,
+        name,
         exp,
         desc,
         year,
@@ -17,7 +17,7 @@ class User {
     ) {
         //fazer nos getter's a atribuição de badges, level e rank
         this.id = id; //Não vai ser preciso fazer o getId aqui, porque já é feito nos dois sitios onde os utilizadores são adicionados
-        this.name = nome;
+        this.name = name;
         this.email = mail;
         this.experience = exp;
         this.level = this.getLevel();
@@ -99,12 +99,12 @@ class User {
         /* Vai ter que returnar um numero */
         let total = 0;
 
-        total += threadsArr.filter(th => th.userid == this.id).length;
-        total += commentsArr.filter(cm => cm.idUser == this.id).length;
-        total += answersArr.filter(ans => ans.idUser == this.id).length;
+        total += threadsArr.filter(th => th.userInfo.userid == this.id).length;
+        total += commentsArr.filter(cm => cm.userInfo.userid == this.id).length;
+        total += answersArr.filter(ans => ans.userInfo.userid == this.id).length;
         return total;
     }
-    
+
     tamanhoMaximo() {
         if (this.notifications.length == 6) this.notifications.shift();
     }
@@ -118,13 +118,19 @@ const users = {
          * vai se ver se o loggedUser é diferente de null 
          */
         loggedUser: null,
-        notifications: [] //As notificações só vão ser preenchidas na mutation getLoggedUser
+        // notifications: [] //As notificações só vão ser preenchidas na mutation getLoggedUser
     },
     mutations: {
         // Preencher o loggedUser e as notifications
-        getLoggedUser(state, payload) {
-            state.loggedUser = payload.user
-            state.notifications = payload.notifications
+        setLoggedUser(state, payload) {
+            console.log(payload, "PAYLOAD NO SETLOGGEDUSER!!!!!!!!!!!!!")
+            let {id, name, mail, description, experience, course, year, follow, notifications, picture, upvotes} = payload
+            state.loggedUser = new User(id, name, experience, description, year, course, picture, follow, upvotes, mail, notifications)
+            console.log(state.loggedUser, "LOGGED USEER !!!!!?!?!?!?!?!?!!?!?!? ")
+            // state.notifications = payload.notifications
+        },
+        unLoggeUser(state) {
+            state.loggedUser = null
         }
     },
     actions: {

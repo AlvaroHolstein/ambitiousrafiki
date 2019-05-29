@@ -10,6 +10,10 @@ import users from "@/views/Users.vue"
  */
 import viewProfile from "@/views/ViewProfile.vue"
 
+/**
+ * View thread
+ */
+import viewThread from "@/views/Thread.vue"
 
 /**
  * Home (Dentro do Home é que estão os componentes Catalog e Related)
@@ -42,6 +46,11 @@ export default new Router({
       path: "/",
       name: "home",
       component: home
+    },
+    {
+      path: "/thread/:threadid",
+      name: "thread",
+      component: viewThread
     },
     {
       /**

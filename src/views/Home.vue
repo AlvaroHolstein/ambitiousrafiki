@@ -57,7 +57,7 @@ export default {
       hotTopics: []
     };
   },
-  created() {
+ /* created() {
     // Para que servia isto
     //Most viewd????
     this.viewedThreads = this.$store.state.threads.threads_.sort((a, b) => {
@@ -95,7 +95,7 @@ export default {
       if (a.points < b.points) return 1;
       else return 0;
     });
-  },
+  },*/
   methods: {
     goToThread(id) {
       this.$router.push({

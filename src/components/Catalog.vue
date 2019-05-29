@@ -57,7 +57,7 @@
           <tr v-for="(thread) in filteredThreads" v-bind:key="thread.id">
             <td>
               <!-- v-on:click="" -->
-              <a class="title">{{thread.title}}</a>
+              <a v-on:click="goToThread(thread.id)" class="title">{{thread.title}}</a>
             </td>
             <td>
               <!-- v-bind:src="" -->
@@ -236,6 +236,14 @@ export default {
     getUserById(id) {
       console.log("tá");
       return this.$store.getters.getUsers.filter(user => user.id == id)[0];
+    },
+    goToThread(id) {
+      this.$router.push({
+        name: "thread",
+        params: {
+          threadid: id
+        }
+      })
     }
   },
   filters: {

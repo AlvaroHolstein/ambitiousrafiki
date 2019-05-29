@@ -31,15 +31,150 @@
         <li class="nav-item">
           <router-link :to="{ name: 'tags' }" :class="{ 'nav-link': true }">Tags</router-link>
         </li>
+        <li v-if="$store.state.users.loggedUser != null" class="nav-item">
+          <a v-on:click="goToUserProfile()" class="nav-link pointer">Profile</a>
+        </li>
+        <li>
+          <hr>
+          <!-- Estilizar este hr, e confirmar se funciona mesmo -->
+        </li>
       </ul>
-      <ul class="navbar-nav ml-auto">
+      <ul v-if="$store.state.users.loggedUser == null" class="navbar-nav ml-auto">
         <li class="nav-item">
           <router-link :to="{ name: 'login' }" :class="{ 'nav-link': true }">Login</router-link>
         </li>
       </ul>
+      <!-- <div  class="navbar-collapse collapse w-100 order-3 dual-collapse2"> -->
+      <ul v-else class="navbar-nav ml-auto">
+        <li class="nav-item">
+          <img
+            v-bind:src="loginUser.picture"
+            alt="Ups"
+            class="rounded-circle"
+            style="height: 35px; width: auto;"
+          >
+        </li>
+        <li class="nav-item">
+          <div class="dropdown dropleft">
+            <a
+              class="nav-link"
+              data-toggle="dropdown"
+              role="button"
+              style="height:20px;border-radius: 50%;"
+            >
+              <!-- O span vai se mostrar se houver notificações e o innerHTML do "sino" Vai ser o numero de notificações -->
+              <span class="point">
+                <i class="fas fa-bell" style="color: #60CAE2;">{{notificationsLength}}</i>
+              </span>
+            </a>
+            <div id="drops" class="dropdown-menu">
+              <div
+                v-for="(noti, cont) of loginUser.notifications"
+                v-bind:key="cont"
+                v-on:click="seenNotification(noti.id)"
+              >
+                <router-link
+                  v-bind:to="{name: 'thread', params: {threadid: noti.idThread}}"
+                  class="dropdown-item"
+                  v-bind:class="{ 'bgNoti': noti.visto, 'textNoti': noti.visto }"
+                >
+                  <i class="far fa-flag ii"></i>
+                  <!-- <span class="userName">{{users.find(us => us.id == noti.idUserFirst).name}}</span> -->
+                  {{noti.text}}
+                </router-link>
+              </div>
+              <!-- <a href class="dropdown-item">oaoakodk</a>
+              <a href class="dropdown-item">BOas</a>
+              <span class="vermais text-right" v-on:click="verMais()">Ver Mais</span>-->
+              <div class="dropdwon-divider"></div>
+              <div id="dropdown-footer" class="dropdown-item">
+                <ul class="list-inline">
+                  <li class="list-inline-item helpers point">
+                    <!-- <router-link
+                        :to="{ name: 'ViewMore' }"
+                        :class="{ 'nav-link': true }"
+                      >View More</router-link>
+                    </li>-->
+                  </li>
+                  <li
+                    v-on:click="markAsRead()"
+                    class="list-inline-item helpers point"
+                  >Marcar como Lido</li>
+                  <!-- Isto podia ficar com um icone de mesnsagem aberta e com um helper -->
+                </ul>
+              </div>
+            </div>
+          </div>
+        </li>
+        <li class="nav-item point" @click="logout">
+          <a class="nav-link pointer">Logout</a>
+        </li>
+      </ul>
+      <!-- </div> -->
     </div>
   </nav>
 </template>
+
+<script>
+export default {
+  data() {
+    return {};
+  },
+  created() {
+    console.log(this.loginUser);
+  },
+  methods: {
+    seenNotification(id) {
+      console.log(id, "seenNotification");
+    },
+    markAsRead() {
+      console.log("markasread");
+    },
+    logout() {
+      /**
+       * Pedido à API que deve apagar a cookie login,
+       * e depois por o loggedUser a null
+       */
+
+      this.$http({
+        url: `http://${this.$store.getters.getIp}/auth-api/logout`,
+        headers: {
+          "Set-Cookie": 
+        }
+      })
+        .then(res => {
+          if (res.data.auth == false) {
+            this.$store.commit("users/unLoggeUser");
+            this.$router.push({
+              name: "home"
+            })
+          }
+        });
+      console.log("logout");
+    },
+    goToUserProfile() {
+      this.$router.push({
+        name: "viewProfile",
+        params: {
+          userid: this.$store.state.users.loggedUser.id
+        }
+      })
+    }
+  },
+  computed: {
+    loginUser() {
+      return this.$store.state.users.loggedUser;
+    },
+    notificationsLength() {
+      if (this.$store.state.users.loggedUser != null) {
+        return this.$store.state.users.loggedUser.notifications.filter(not => {
+          not.visto == false;
+        }).length;
+      }
+    }
+  }
+};
+</script>
 
 <style>
 /* .navi {
@@ -47,6 +182,9 @@
 } */
 nav {
   margin-bottom: 2rem;
+}
+.pointer:hover {
+  cursor: pointer;
 }
 /* .navLogo {
   width: 100px;

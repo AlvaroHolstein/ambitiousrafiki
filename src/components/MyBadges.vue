@@ -67,6 +67,14 @@ export default {
     };
   },
   created() {
+    /**
+     * secalhar basta enviar o userId 
+     * em vez do objeto user
+     */
+    console.log(user, "User nos MyBadges")
+    async function getItems() {
+      let userThreads = this.$http.get(`http://${this.$store.getters.getIp}/threads/userThreads/${this.user.id}`)
+    }
     // console.log(this.$store.getters.getloginID);
     /*let user = this.$store.getters.getUsers.filter(
       user => user.id == this.$store.getters.getloginID
