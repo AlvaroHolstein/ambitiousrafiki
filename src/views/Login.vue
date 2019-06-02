@@ -168,6 +168,7 @@ export default {
           }
         })
         .catch(err => {
+          Swal.fire("Credencias Erradas", "Username ou password erradas", "error")
           console.log(err, "Erro ao fazer Login");
         });
     },

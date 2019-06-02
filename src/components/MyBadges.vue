@@ -60,7 +60,10 @@
   </div>
 </template>
 <script>
+import axios from "axios";
+
 export default {
+  props: ["user"],
   data() {
     return {
       myBadges: []
@@ -68,63 +71,48 @@ export default {
   },
   created() {
     /**
-     * secalhar basta enviar o userId 
+     * secalhar basta enviar o userId
      * em vez do objeto user
      */
-    console.log(user, "User nos MyBadges")
+    // console.log(this.$props.user, "User nos MyBadges");
+    let theUser = this.$props.user;
+    let ip = this.$store.getters.getIp;
+    let allBadges = this.$store.state.badges;
+    // console.log(theUser, "USER");
+    function fillBadges(badges) {
+      this.myBadges = badges;
+    }
     async function getItems() {
-      let userThreads = this.$http.get(`http://${this.$store.getters.getIp}/threads/userThreads/${this.user.id}`)
+      let userThreads = await axios
+        .get(`http://${ip}/data-api/threads/userThreads/${theUser.id}`)
+        .then(res => res.data);
+      let userAnswers = await axios
+        .get(`http://${ip}/data-api/userAnswers/${theUser.id}`)
+        .then(res => res.data);
+      let userComments = await axios
+        .get(`http://${ip}/data-api/userComments/${theUser.id}`)
+        .then(res => res.data);
+      // console.log(userThreads, "UserThreads MYBADGES");
+      // console.log(userAnswers, "Answers MYBADGES");
+      // console.log(userComments, "Comments MYBADGES");
+
+      // console.log(theUser.badges, "User Badges")
+      return theUser.getBadges(
+        allBadges,
+        userThreads,
+        userComments,
+        userAnswers
+      );
     }
-    // console.log(this.$store.getters.getloginID);
-    /*let user = this.$store.getters.getUsers.filter(
-      user => user.id == this.$store.getters.getloginID
-    )[0];
-
-    let auxUser = new this.$store.state.Userclass(
-      user.id,
-      user.name,
-      user.password,
-      user.email,
-      user.exp,
-      user.desc,
-      user.picture,
-      user.follow,
-      user.skill
-    );
-
-    console.log(this.$store.state.Userclass);
-    console.log(user);
-
-    auxUser.badges = auxUser.getBadges(
-      this.$store.getters.getBadges,
-      this.$store.getters.getThreads,
-      this.$store.getters.getComments,
-      this.$store.getters.getAnswers
-    );
-    console.log(auxUser);*/
-
-    // this.myBadges = auxUser.badges.filter();
-
-    /*for (let i of auxUser.badges) {
-      for (let badge of this.$store.state.badges) {
-        if (i == badge.id) this.myBadges.push(badge);
-      }
-    }
-    console.log(this.myBadges);*/
-
-    // console.log(allBadges);
-    // console.log(badges);
-    // for (let i = 0; i < allBadges.length; i++) {
-    //   // console.log(allBadges[i]);
-    //   for (let j = 0; j < badges.length; j++) {
-    //     if (allBadges[i].id == badges[j]) {
-    //       console.log("Deu");
-    //       this.myBadges.push(allBadges[i]);
-    //     }
-    //   }
-    // }
-    // console.log(this.myBadges);
-  }
+    getItems().then(res => {
+      this.myBadges = this.$store.state.badges.filter(badge => {
+        for (let i = 0; i < res.length; i++) {
+          if (res[i] == badge.id) return true;
+        }
+      });
+    });
+  },
+  methods: {}
 };
 </script>
 <style>

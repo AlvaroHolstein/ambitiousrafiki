@@ -75,8 +75,11 @@ class User {
         for (let badge of badgesArr) {
             let gravar = false;
 
-            console.log(badge);
-            if (badge.goal <= this.exp && badge.category == "rank") {
+            console.log(badge, "badge");
+            console.log(this.experience, "experience");
+            console.log(badge.goal)
+            if (badge.goal <= this.experience && badge.category == "rank") {
+                console.log('alalalalalal')
                 gravar = true;
             }
 
@@ -90,8 +93,7 @@ class User {
                 badges.push(badge.id);
             }
         }
-        console.log(this.badges);
-        console.log(this.exp);
+        console.log(badges);
         return badges;
     }
 
@@ -102,6 +104,7 @@ class User {
         total += threadsArr.filter(th => th.userInfo.userid == this.id).length;
         total += commentsArr.filter(cm => cm.userInfo.userid == this.id).length;
         total += answersArr.filter(ans => ans.userInfo.userid == this.id).length;
+        console.log(total, "total user class")
         return total;
     }
 
@@ -129,7 +132,8 @@ const users = {
             console.log(state.loggedUser, "LOGGED USEER !!!!!?!?!?!?!?!?!!?!?!? ")
             // state.notifications = payload.notifications
         },
-        unLoggeUser(state) {
+        unLoggedUser(state) {
+            console.log(state, "unLoggedUser")
             state.loggedUser = null
         }
     },

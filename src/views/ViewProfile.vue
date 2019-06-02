@@ -37,29 +37,17 @@
       <li class="nav-item">
         <button class="btn btn-primary" v-on:click="ulIndex = 3">My Threads</button>
       </li>
-      <!--
-       <li class="nav-item">
-        <router-link
-          v-show="ownProfile"
-          :to="{name:'MyRankings'}"
-          :class="{'nav-link':true}"
-        >My Ranking</router-link>
+      <li v-if="ownProfile" class="nav-item">
+        <button class="btn btn-primary" v-on:click="ulIndex = 4">Ranking</button>
       </li>
-      <li class="nav-item">
-        <router-link
-          v-show="ownProfile"
-          :to="{name:'EditProfile'}"
-          :class="{'nav-link':true}"
-        >Edit Profile</router-link>
-        </li>
-      -->
-      <li v-if="ownProfile == true">elelele</li>
-      <li v-if="ownProfile == true">alalalal</li>
+      <li v-if="ownProfile" class="nav-item">
+        <button class="btn btn-primary" v-on:click="ulIndex = 5">Edit Profile</button>
+      </li>
     </ul>
     <transition name="fade" mode="out-in">
       <!-- Ver se é melhor usar o v-if ou v-show -->
       <about v-bind:user="user" v-if="ulIndex == 1"/>
-      <!-- <userBadges v-if="ulIndex == 2"/> -->
+      <userBadges v-bind:user="user" v-if="ulIndex == 2"/>
       <myThreads v-bind:threads="userThreads" v-if="ulIndex == 3"/>
       <!-- <div v-if="ulIndex == 1">
         <h1>1</h1>
@@ -75,14 +63,14 @@
 import VueApexCharts from "vue-apexcharts";
 import about from "@/components/About.vue";
 import myThreads from "@/components/MyThreads.vue";
-// import userBadges from "@/components/MyBadges.vue";
+import userBadges from "@/components/MyBadges.vue";
 
 export default {
   components: {
     apexchart: VueApexCharts,
     about,
-    myThreads
-    // userBadges
+    myThreads,
+    userBadges
   },
   data() {
     return {
@@ -100,7 +88,6 @@ export default {
       userThreads: [],
       userAnswers: [],
       userComments: [],
-      ownProfile: false,
       progress: 0, // Vai estar a ser atualizado dentro do created depois de se ter o user
       imageSrc: "", // Isto vai se buscar ao user
       ulIndex: 1,
@@ -161,6 +148,20 @@ export default {
     getUserProgress() {
       // console.log(typeof this.user.experience, "EXPERIENCE");
       if (this.user.experience) return this.user.experience % 100;
+    },
+    ownProfile() {
+      /**
+       * Saber se o user está a ver o seu próprio perfil,
+       * comparando o loggedUser com o user que foi carregado
+       */
+
+      console.log(this.user, this.$store.state.users.loggedUser, "users");
+      if (this.$store.state.users.loggedUser != null) {
+        if (this.user.id == this.$store.state.users.loggedUser.id) {
+          return true;
+        }
+      }
+      return false
     }
   },
   methods: {
@@ -198,7 +199,7 @@ export default {
             course,
             picture
           );
-          console.log(this.user, "User depois de passar pela class");
+
           /**
            * Tem que vir para aqui para esperar pelo user,
            * ou seja,
@@ -206,17 +207,6 @@ export default {
            * ir buscar as answers e os comments
            */
           this.getThreads(this.user.id);
-
-          /**
-           * Saber se o user está a ver o seu próprio perfil,
-           * comparando o loggedUser com o user que foi carregado
-           */
-
-          if(this.$store.state.users.loggedUser != null) {
-            if(this.user.id == this.$store.state.users.loggedUser.id) {
-              this.ownProfile = true
-            }
-          }
         })
         .catch(err => console.log(err, "ERRO no find user no computed user"));
     },
@@ -290,6 +280,9 @@ export default {
 }
 .fitWindow {
   height: calc(100vh - 200px);
+}
+ul#nav li {
+  margin-right: 2px;
 }
 </style>
 

@@ -64,7 +64,7 @@ export default new Router({
       /**
        * ViewProfile
        */
-      path: "/viewProfile/:userid/",
+      path: "/viewProfile/:userid",
       name: "viewProfile",
       component: viewProfile,
       /*children: [

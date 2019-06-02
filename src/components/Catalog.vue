@@ -158,7 +158,7 @@ export default {
     console.log(this.tags.length);
   },
   beforeDestroy() {
-    this.$store.dispatch("search_tag", "");
+    // this.$store.dispatch("search_tag", "");
   },
   computed: {
     autocompleteItems() {

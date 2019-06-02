@@ -23,7 +23,7 @@
                         <li class="list-inline-item">
                           <i class="fa fa-folder-o text-danger"></i>
                           <a href="#">
-                            <small>{{thread.date}}</small>
+                            <small>{{thread.date | filterDate}}</small>
                             <p></p>
                             <!-- Isto e o <p> de cima vão sair, é só para ver o id da thread -->
                           </a>
@@ -77,7 +77,7 @@
                         <div class="col-md-auto">
                           <a href="#" title>
                             <img
-                              v-bind:src="user.foto"
+                              v-bind:src="  thread.userInfo.photo"
                               alt="Author image"
                               class="rounded-circle"
                               style="width:100px"
@@ -87,14 +87,12 @@
                         <div class="col">
                           <div class="auth-title">
                             <h4 class="author h4">
-                              <router-link
-                                v-bind:to="{name: 'viewprofile', params: {visiteduserid: user.id}}"
-                              >{{user.name}}</router-link>
+                              <span v-on:click="goToUser()">{{thread.userInfo.name}}</span>
                             </h4>
                             <ul class="list-unstyled list-inline">
                               <li class="list-inline-item">
                                 Rank:
-                                <span class="rank">{{user.rank[1]}}</span>
+                                <span class="rank">{{thread.userInfo.rank}}</span>
                               </li>
                               <li class="list-inline-item">
                                 <a
@@ -125,11 +123,12 @@
         <hr class="devilhr">
         <div>
           <!-- Respostas e Comentários -->
-          <div class="card" v-for="(ans, cont) in threadAns" v-bind:key="cont">
+          <div class="card" v-for="(ans, cont) in answers" v-bind:key="cont">
             <div class="card-body">
               <div class="row">
                 <div class="col-md-2">
-                  <img v-bind:src="userFoto(ans.idUser)" class="img img-rounded img-fluid">
+                  <img v-bind:src="ans.userInfo.photo" class="img img-rounded img-fluid">
+                  <!-- <p class="text-secondary text-center">15 Minutes Ago</p> -->
                 </div>
                 <div class="col-md-10">
                   <p>
@@ -137,7 +136,7 @@
                       class="float-left"
                       href="https://maniruzzaman-akash.blogspot.com/p/contact.html"
                     >
-                      <strong>{{userNome(ans.idUser)}}</strong>
+                      <strong>{{ans.userInfo.name}}</strong>
                     </a>
                   </p>
                   <div class="clearfix"></div>
@@ -147,7 +146,7 @@
                       v-show="!threadFechada()"
                       v-bind:id="ans.id"
                       class="float-right btn btn-outline-primary ml-2"
-                      v-on:click="commentAnswer(ans.id, ans.idUser)"
+                      v-on:click="commentAnswer(ans.id, ans.userInfo.id)"
                     >
                       <i class="fa fa-reply" v-bind:id="ans.id"></i>
                     </a>
@@ -164,6 +163,7 @@
                     >
                       <i class="fas fa-caret-up">|</i>
                       <i class="fas fa-sort-down"></i>
+                      <!-- <i v-bind:id="ans.id" v-bind:class="arrowCommentDirection"></i> -->
                     </a>
                   </p>
                 </div>
@@ -180,15 +180,19 @@
                       <div class="row">
                         <div class="col-md-2">
                           <img src class="img img-rounded img-fluid">
+                          <!-- <p class="text-secondary text-center">15 Minutes Ago</p> -->
                         </div>
                         <div class="col-md-10">
                           <p>
                             <a href>
-                              <strong>{{userNome(com.idUser)}}</strong>
+                              <strong>{{com.userInfo.name}}</strong>
                             </a>
                           </p>
                           <p>{{com.text}}</p>
                           <p>
+                            <!-- <a class="float-right btn btn-outline-primary ml-2">
+                            <i class="fa fa-reply"></i>
+                            </a>-->
                             <a
                               class="float-right btn text-white btn-success ml-2"
                               v-on:click="upvoteComment(com.id, ans.id)"
@@ -250,70 +254,6 @@
         </div>
       </form>
     </dialog>
-    <div v-bind:class="extraClass" style="padding: 5px">
-      <div class="col-md-9">
-        <div id="qusestion">
-          <h1>Questions</h1>
-          <br>
-          <br>
-          <br>
-          <br>
-          <div id="userInfo" class="container text-right" style="margin-bottom: 10px;">
-            <div class="text-right" style="padding-right: 0px; width: 200px">
-              <div class="card text-left" style="border: none;">
-                <div
-                  class="card-body"
-                  style="border: 1px solid lightgray;border-radius: 10px; padding: 3px;"
-                >
-                  <ul style="list-style-type: none;padding: 0px">
-                    <li>Joaquim David</li>
-                    <li>java</li>
-                    <li>exp</li>
-                  </ul>
-                </div>
-                <div
-                  class="card-footer text-muted"
-                  style="padding: 2px; border-radius: 10px"
-                >2 days ago</div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div id="answers" style="border-top: 1px solid black;">
-          <h1>Answers</h1>
-
-          <div class="row" style="border-bottom: 1px solid black;">
-            <div class="col-md-3" style="border-right: 1px solid black;">
-              <h1>"Profile"</h1>
-              <img src>
-            </div>
-            <div class="col-md-9">
-              <h1>Answer</h1>
-            </div>
-          </div>
-
-          <div class="row" style="border-bottom: 1px solid black;">
-            <div class="col-md-3" style="border-right: 1px solid black;  margin-top: 10px">
-              <h1>"Profile"</h1>
-              <img src>
-            </div>
-            <div class="col-md-9">
-              <h1>Answer</h1>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-3" style="border-left: 1px solid black">
-        <h1 class="text-center">Related</h1>
-        <ul style="list-style-type: none; padding: 0px">
-          <li
-            style="margin-bottom: 10px; border-bottom: 1px solid black"
-          >Lorem ipsum dolor sit amet consectetur adipisicing elit. Ea fuga sed beatae eligendi? Nihil ipsa, illo, alias ab dolorem repellendus quis aut sed illum ullam modi facilis quo voluptatum. Esse!</li>
-          <li>Lorem ipsum dolor sit amet consectetur adipisicing elit.</li>
-          <li>Ea fuga sed beatae eligendi? Nihil ipsa, illo, alias ab dolorem repellendus quis aut sed illum ullam modi facilis quo voluptatum. Esse!</li>
-        </ul>
-      </div>
-    </div>
   </div>
 </template>
   
@@ -321,17 +261,127 @@
 import Swal from "../../node_modules/sweetalert2/dist/sweetalert2.js";
 import "../../node_modules/sweetalert2/src/sweetalert2.scss";
 // import Related from "@/components/Related.vue";
+import axios from "axios";
 
 export default {
   components: {
     // Related
   },
   data() {
-    return {};
+    return {
+      threadF: null,
+      answersF: null,
+      commentsF: []
+    };
   },
-  created() {},
-  computed: {},
-  methods: {}
+  created() {
+    /**
+     * TEnho que ir buscar as:
+     * 1 thread
+     * as respostas,
+     * os comments,
+     * usar o user info em cada uma delas
+     */
+    console.log(this.$route.params.threadid);
+    /** Estas variáveis têm que estar fora da
+     * async function, porque dentro desta
+     * o (this) é undefined
+     */
+    let id = this.$route.params.threadid;
+    let ip = this.$store.getters.getIp;
+    /** Depois fazer um return de um objeto  */
+    /** get Thread */
+    this.$http.get(`http://${ip}/data-api/threads/${id}`).then(res => {
+      console.log();
+      this.threadF = res.data;
+    });
+
+    this.$http.get(`http://${ip}/data-api/threads/${id}/answers`).then(res => {
+      this.answersF = res.data;
+      for (let i = 0; i < this.answersF.length; i++) {
+        console.log(
+          this.answersF[i],
+          "Answer dentro do ciclo for para os comments"
+        );
+        this.$http
+          .get(
+            `http://${ip}/data-api/threads/${id}/answers/${
+              this.answersF[i].id
+            }/comments`
+          )
+          .then(res => {
+            for (let k = 0; k < res.data.length; k++) {
+              this.commentsF.push(res.data[k]);
+            }
+            console.log(this.commentsF, "commentários");
+          });
+      }
+    });
+  },
+  computed: {
+    thread() {
+      // this.$http
+      //   .get(
+      //     `http://${this.$store.getters.getIp}/data-api/threads/${
+      //       this.$route.params.threadid
+      //     }`
+      //   )
+      //   .then(res => {
+      //     console.log(res.data, "Thread no");
+      //   });
+      console.log(this.threadF, "THREAD!!!!!!!");
+      return this.threadF || { userInfo: {} };
+    },
+    answers() {
+      console.log(this.answersF, "ANSWER|!!!!!!");
+      return this.answersF || [{ userInfo: {} }];
+    },
+    comments() {
+      console.log(this.commentsF, "COMMENTS!!!!!!!");
+      return this.commentsF || [{ userInfo: {} }];
+    }
+  },
+  methods: {
+    /**
+     * Separar os métodos por aqueles que
+     * precisam que o user esteja logado
+     * dos que não é preciso
+     */
+    numberFollowers() {
+      console.log("numberofFoloows()");
+    },
+    seguir() {
+      console.log("seguir89");
+    },
+    threadFechada() {
+      console.log("threadFechada()");
+    },
+    upvoteThread() {},
+    showAnswerDiv() {},
+    textoResposta() {},
+    adicionarResposta() {},
+    upvoteComment() {},
+    commentAnswer() {},
+    replyUser() {},
+    commentToAnswer() {},
+    upvoteAns() {},
+    hideComments() {},
+    goToUser() {
+      console.log(this.threadF.userInfo.id, "USERRRRRRRRR a ir para o perfil")
+      this.$router.push({
+        name: "viewProfile",
+        params: { userid: this.threadF.userInfo.id }
+      });
+    }
+  },
+  filters: {
+    filterDate: function(value) {
+      if (!value) return "Sem data";
+
+      let date = value.split("T")[0].split("-");
+      return `${date[2]}/${date[1]}/${date[0]}`;
+    }
+  }
 };
 </script>
 

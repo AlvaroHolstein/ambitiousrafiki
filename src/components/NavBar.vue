@@ -34,6 +34,9 @@
         <li v-if="$store.state.users.loggedUser != null" class="nav-item">
           <a v-on:click="goToUserProfile()" class="nav-link pointer">Profile</a>
         </li>
+        <li v-if="toBeOrNotToBeAdmin" class="nav-item">
+          <a class="nav-link pointer">Back-Office</a>
+        </li>
         <li>
           <hr>
           <!-- Estilizar este hr, e confirmar se funciona mesmo -->
@@ -116,6 +119,8 @@
 </template>
 
 <script>
+import cookie from "cookie";
+
 export default {
   data() {
     return {};
@@ -135,22 +140,29 @@ export default {
        * Pedido à API que deve apagar a cookie login,
        * e depois por o loggedUser a null
        */
+      let parsedCookie = cookie.parse(document.cookie);
+      let cookieSerialized = cookie.serialize("login", parsedCookie.login);
 
       this.$http({
         url: `http://${this.$store.getters.getIp}/auth-api/logout`,
         headers: {
-          "Set-Cookie": 
+          "x-access-token": parsedCookie.login
         }
-      })
-        .then(res => {
-          if (res.data.auth == false) {
-            this.$store.commit("users/unLoggeUser");
-            this.$router.push({
-              name: "home"
-            })
-          }
-        });
-      console.log("logout");
+      }).then(res => {
+        if (res.data.auth == false) {
+          /**
+           * Já apaga a cookie e faz logout,
+           * maaaaaaas, não envia a cookie automaticamente.........
+           */
+          document.cookie = `login=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;`
+          this.$store.commit("users/unLoggedUser");
+          this.$router.push({
+            name: "home"
+          });
+        }
+      });
+      console.log(parsedCookie, "parsedCookie");
+      console.log(cookieSerialized, "logout");
     },
     goToUserProfile() {
       this.$router.push({
@@ -158,7 +170,7 @@ export default {
         params: {
           userid: this.$store.state.users.loggedUser.id
         }
-      })
+      });
     }
   },
   computed: {
@@ -171,6 +183,14 @@ export default {
           not.visto == false;
         }).length;
       }
+    },
+    toBeOrNotToBeAdmin() {
+      if(this.$store.state.users.loggedUser != null && this.$store.state.users.loggedUser.id == 1) {
+        console.log("É Admin, NAVBAr")
+        return true
+      }
+
+      return false;
     }
   }
 };

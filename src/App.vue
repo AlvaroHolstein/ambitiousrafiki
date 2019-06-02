@@ -13,6 +13,7 @@
 <script>
 import Navbar from "@/components/NavBar.vue";
 import Footer from "@/components/Footer.vue";
+import cookie from "cookie";
 
 export default {
   components: {
@@ -25,13 +26,39 @@ export default {
      * para a store logo ao inicio,
      * só se faz este pedido aqui
      */
-    this.$store.dispatch('load_badges')
-    
-    // this.$http.get(`http://${this.$store.getters.getIp}/data-api/threads`).then(res => console.log(res.data))
-    
-    // console.log(this.$store)
-    // this.$store.dispatch('users/a')
-    // this.$store.dispatch('threads/getAnswers', 1)
+    this.$store.dispatch("load_badges");
+
+    /**
+     * Tem que se ver se existe alguma cookie de login
+     * e caso haja, mandar essa cookie para o servidor
+     * para ver se o token ainda é válido
+     */
+    let parsedCookie = cookie.parse(document.cookie);
+    console.log(parsedCookie, "Parsed Cokiie no App.vue");
+    if (parsedCookie.login != undefined) {
+      this.$http({
+        url: `http://${this.$store.getters.getIp}/auth-api/keepLogged`,
+        headers: {
+          "x-access-token": parsedCookie.login
+        }
+      })
+        .then(res => {
+          console.log(res.data)
+          if (res.data.auth == true) {
+            this.$http.get(`http://${this.$store.getters.getIp}/data-api/users/${res.data.userId}`)
+            .then(resp => {
+              this.$store.commit("users/setLoggedUser", resp.data)
+            }).catch(err => {
+              if(err) throw err
+            });
+          }
+        })
+        .catch(err => {
+          document.cookie = `login=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;`;
+          this.$store.state.users.loggedUser = null;
+          console.log("A cookie foi limpa porque o token já não é válido");
+        });
+    }
   }
 };
 </script>
