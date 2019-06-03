@@ -1,7 +1,7 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import users from "./store_module/users";
-import threads from "./store_module/threads"
+import threads from "./store_module/threads";
 import axios from "axios";
 Vue.use(Vuex);
 
@@ -13,9 +13,9 @@ export default new Vuex.Store({
   state: {
     /**
      * Quando houver users pré carregados vêm para aqui,
-     * Nota: 
-     *  - No searchThing a primeira pesquisa é feita aqui, ou seja, 
-     *    antes de fazer o pedido verificar 
+     * Nota:
+     *  - No searchThing a primeira pesquisa é feita aqui, ou seja,
+     *    antes de fazer o pedido verificar
      *  - As threads, answers e comments vão estar no store > module threads
      */
     users_root: [],
@@ -28,20 +28,21 @@ export default new Vuex.Store({
     /**
      * VAriáveis de comunicação com a API
      */
-    address: '192.168.1.83', // '172.23.116.246'
-    port: ':420'
+    address: "192.168.1.74", // '172.23.116.246'
+    port: ":420"
   },
   mutations: {
     LOAD_BADGES(state, payload) {
-      state.badges = payload
-      console.log(state.badges, 'BADGES')
+      state.badges = payload;
+      console.log(state.badges, "BADGES");
     }
   },
   actions: {
     load_badges({ commit, state }) {
-      axios.get(`http://${state.address + state.port}/data-api/badges`)
-        .then(res => commit('LOAD_BADGES', res.data))
-        .catch(err => console.log(err, "ERRO na ACTION load_badges"))
+      axios
+        .get(`http://${state.address + state.port}/data-api/badges`)
+        .then(res => commit("LOAD_BADGES", res.data))
+        .catch(err => console.log(err, "ERRO na ACTION load_badges"));
     }
   },
   getters: {

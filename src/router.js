@@ -4,36 +4,37 @@ import Router from "vue-router";
 /**
  * Mostrar todos os Users
  */
-import users from "@/views/Users.vue"
+import users from "@/views/Users.vue";
 /**
  * View Profile
  */
-import viewProfile from "@/views/ViewProfile.vue"
+import viewProfile from "@/views/ViewProfile.vue";
 
 /**
  * View thread
  */
-import viewThread from "@/views/Thread.vue"
+import viewThread from "@/views/Thread.vue";
 
 /**
  * Home (Dentro do Home é que estão os componentes Catalog e Related)
  */
-import home from "@/views/Home.vue"
+import home from "@/views/Home.vue";
 
 /**
  * Login Page
  */
-import login from "@/views/Login.vue"
+import login from "@/views/Login.vue";
 
 /**
  * Páginas "Simples"
- * Faq, Rankings, Tags, Badges, Contact us
+ * Faq, Rankings, Tags, Badges, Contact us,Stats
  */
-import faq from "@/views/Faq.vue"
-import rankings from "@/views/Ranking.vue"
-import tags from "@/views/Tags.vue"
-import badges from "@/views/Badges.vue"
-import contact from "@/views/ContactUs.vue"
+import faq from "@/views/Faq.vue";
+import rankings from "@/views/Ranking.vue";
+import tags from "@/views/Tags.vue";
+import badges from "@/views/Badges.vue";
+import contact from "@/views/ContactUs.vue";
+import stats from "@/views/stats.vue";
 
 Vue.use(Router);
 
@@ -66,7 +67,7 @@ export default new Router({
        */
       path: "/viewProfile/:userid",
       name: "viewProfile",
-      component: viewProfile,
+      component: viewProfile
       /*children: [
         { // About Tab
           path: "/",
@@ -95,6 +96,7 @@ export default new Router({
       name: "faq",
       component: faq
     },
+    { path: "/stats", name: "stats", component: stats },
     {
       path: "/rankings",
       name: "rankings",
