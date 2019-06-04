@@ -20,10 +20,10 @@
                           </a>
                         </li>
 
-                        <li class="list-inline-item">
+                        <li class="news-title">
                           <i class="fa fa-folder-o text-danger"></i>
                           <a href="#">
-                            <small>{{thread.date | filterDate}}</small>
+                            <small>asked {{thread.date | filterDate}}</small>
                             <p></p>
                             <!-- Isto e o <p> de cima vão sair, é só para ver o id da thread -->
                           </a>
@@ -38,9 +38,24 @@
                     <hr>
                     <div class="news-footer">
                       <div class="news-likes">
+                        <span>
+                          <a
+                            class="btn text-white btn-success ml-2"
+                            v-on:click="upvoteThread(thread.id)"
+                          >
+                            <i
+                              class="fas fa-thumbs-up"
+                            >{{thread.upvotes == 0 ? '' : thread.upvotes}}</i>
+                            Upvote
+                          </a>
+                        </span>
+                        {{numberUpvotes}}
+                        <!--<li class="list-inline-item"></li>
                         <button type="button" class="btn btn-outline-secondary">
                           <i class="fa fa-thumbs-o-up text-success"></i>
-                          <span class="badge"> <strong>{{numberUpvotes}}</strong></span>
+                          <span class="badge">
+                            <strong>{{numberUpvotes}}</strong>
+                          </span>
                         </button>
                         <button
                           type="button"
@@ -51,7 +66,7 @@
                           <span class="badge">
                             <strong>{{numberFollowers}}</strong>
                           </span>
-                        </button>
+                        </button>-->
                         <button
                           class="btn btn-primary"
                           style="margin-left: 5px;"
@@ -60,7 +75,9 @@
                           <span class="badge">
                             <i class="fas fa-heart"></i>
                           </span>
+                          Follow
                         </button>
+                        {{numberFollowers}}
                       </div>
                     </div>
                     <hr>
@@ -68,7 +85,7 @@
                       <h5>Tags</h5>
                       <button
                         type="button"
-                        class="btn btn-sm btn-secondary"
+                        class="btn btn-sm btn-secondary btn-tag"
                         v-for="(tag, cont) in thread.tags"
                         v-bind:key="cont"
                       >{{tag.text}}</button>
@@ -348,15 +365,11 @@ export default {
       return true;
     },
     numberFollowers() {
-      /** Total follwers */
-      if (this.threadF != null && this.threadF.follow > 0)
-        return "Followers " + this.threadF.follow;
-      return "No followers";
+      return  this.threadF.follow;
     },
     numberUpvotes() {
-      if (this.threadF != null && this.threadF.upvotes > 0) return "Upvotes " + this.threadF.upvotes;
-      
-      return "No Upvotes"
+
+      return  this.threadF.upvotes;
     }
   },
   methods: {
@@ -379,10 +392,10 @@ export default {
 
     /** Dar toogle aos comentários (dá para usar jQuery)  */
     hideComments(event, ansid) {
-      console.log(event.target, $)
-      let coms = $(`#${ansid}`)
-      console.log(coms)
-      coms.toogle()
+      console.log(event.target, $);
+      let coms = $(`#${ansid}`);
+      console.log(coms);
+      coms.toogle();
     },
     /** Ir para um determinado user */
     goToUser() {
@@ -410,6 +423,18 @@ export default {
 <style>
 img {
   width: 100%;
+}
+.news-title {
+  text-align: left;
+}
+.news-content {
+  text-align: left;
+}
+.news-tags {
+  text-align: left;
+}
+.btn-tag {
+  margin-right: 2px;
 }
 .card-inner {
   margin-left: 4rem;
