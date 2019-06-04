@@ -36,11 +36,65 @@
                       <p v-html="thread.question"></p>
                     </div>
                     <hr>
-                    <div class="news-footer">
+                    <div class="news-tags">
+                      <h5>Tags</h5>
+                      <button
+                        type="button"
+                        class="btn btn-sm btn-secondary btn-tag"
+                        v-for="(tag, cont) in thread.tags"
+                        v-bind:key="cont"
+                      >{{tag.text}}</button>
+                    </div>
+                    <hr>
+                    <!-- TRY 
+                    <div class="col-md-6 buttons-section">
+                      <button
+                        class="btn text-white btn-success"
+                        v-on:click="upvoteThread(thread.id)"
+                      >
+                        <i class="fas fa-thumbs-up">{{thread.upvotes == 0 ? '' : thread.upvotes}}</i>
+
+                        Upvote
+                      </button>
+                      {{numberUpvotes}}
+                      <button
+                        class="btn btn-primary"
+                        style="margin-left: 5px;"
+                        v-on:click="seguir"
+                      >
+                        <span class="badge">
+                          <i class="fas fa-heart"></i>
+                        </span>
+                        Follow
+                      </button>
+                      {{numberFollowers}}
+                    </div>
+                    <div class="col-md-6 user-section">
+                      <a href="#" title>
+                        <img
+                          v-bind:src="  thread.userInfo.photo"
+                          alt="Author image"
+                          class="rounded-circle"
+                          style="width:100px"
+                        >
+                      </a>
+                      <h4 class="author h4">
+                        <span v-on:click="goToUser()">{{thread.userInfo.name}}</span>
+                      </h4>
+                      <ul class="list-unstyled list-inline">
+                        <li class="list-inline-item">
+                          Rank:
+                          <span class="rank">{{thread.userInfo.rank}}</span>
+                        </li>
+                      </ul>
+                    </div>
+                    -->
+                    <!-- -->
+                    <div>
                       <div class="news-likes">
                         <span>
                           <a
-                            class="btn text-white btn-success ml-2"
+                            class="btn text-white btn-success"
                             v-on:click="upvoteThread(thread.id)"
                           >
                             <i
@@ -50,23 +104,6 @@
                           </a>
                         </span>
                         {{numberUpvotes}}
-                        <!--<li class="list-inline-item"></li>
-                        <button type="button" class="btn btn-outline-secondary">
-                          <i class="fa fa-thumbs-o-up text-success"></i>
-                          <span class="badge">
-                            <strong>{{numberUpvotes}}</strong>
-                          </span>
-                        </button>
-                        <button
-                          type="button"
-                          style="margin-left: 5px;"
-                          class="btn btn-outline-secondary"
-                        >
-                          <i class="fa fa-thumbs-o-up text-success"></i>
-                          <span class="badge">
-                            <strong>{{numberFollowers}}</strong>
-                          </span>
-                        </button>-->
                         <button
                           class="btn btn-primary"
                           style="margin-left: 5px;"
@@ -79,20 +116,8 @@
                         </button>
                         {{numberFollowers}}
                       </div>
-                    </div>
-                    <hr>
-                    <div class="news-tags">
-                      <h5>Tags</h5>
-                      <button
-                        type="button"
-                        class="btn btn-sm btn-secondary btn-tag"
-                        v-for="(tag, cont) in thread.tags"
-                        v-bind:key="cont"
-                      >{{tag.text}}</button>
-                    </div>
-                    <hr>
-                    <div class="news-author">
-                      <div class="row">
+
+                      <div class="row news-author">
                         <div class="col-md-auto">
                           <a href="#" title>
                             <img
@@ -113,12 +138,11 @@
                                 Rank:
                                 <span class="rank">{{thread.userInfo.rank}}</span>
                               </li>
-                           
                             </ul>
                           </div>
                         </div>
                       </div>
-                    </div>
+                    </div><!-- -->
                   </div>
                 </div>
               </div>
@@ -130,7 +154,11 @@
             <h1>This thread is closed!</h1>
           </div>
         </div>
-        <hr class="devilhr">
+        <br>
+        <div class="news-title">
+          <h3>Answers</h3>
+        </div>
+
         <div>
           <!-- Respostas e Comentários -->
           <div class="card" v-for="(ans, cont) in answers" v-bind:key="cont">
@@ -356,11 +384,10 @@ export default {
       return true;
     },
     numberFollowers() {
-      return  this.threadF.follow;
+      return this.threadF.follow;
     },
     numberUpvotes() {
-
-      return  this.threadF.upvotes;
+      return this.threadF.upvotes;
     }
   },
   methods: {
@@ -383,10 +410,10 @@ export default {
 
     /** Dar toogle aos comentários (dá para usar jQuery)  */
     hideComments(event, ansid) {
-      console.log(event.target, $)
-      let coms = $(`#${ansid}_wrapper.theWrapper`)
-      console.log(coms)
-      coms.toggle()
+      console.log(event.target, $);
+      let coms = $(`#${ansid}_wrapper.theWrapper`);
+      console.log(coms);
+      coms.toggle();
     },
     /** Ir para um determinado user */
     goToUser() {
@@ -414,6 +441,41 @@ export default {
 <style>
 img {
   width: 100%;
+}
+@media (max-width: 576px) {
+  .news-author {
+    float:left !important;
+    text-align: left;
+    margin-top: 15px
+  }
+
+  .auth-title {
+    text-align: left !important;
+    margin-top: 5px;
+    padding-right: 0;
+  }
+
+
+}
+.user-section {
+  text-align: right;
+  display:inline-block;
+}
+div.buttons-section {
+  text-align: left;
+  padding: 0px;
+  display:inline-block;
+}
+
+.news-likes {
+  float: left !important;
+  margin-top: 20px;
+}
+.auth-title {
+  text-align: right;
+}
+div.news-author {
+  float: right;
 }
 .news-title {
   text-align: left;
