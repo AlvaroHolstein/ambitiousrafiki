@@ -40,7 +40,7 @@
                       <div class="news-likes">
                         <button type="button" class="btn btn-outline-secondary">
                           <i class="fa fa-thumbs-o-up text-success"></i>
-                          <span class="badge">Upvotes {{thread.upvotes}}</span>
+                          <span class="badge"> <strong>{{numberUpvotes}}</strong></span>
                         </button>
                         <button
                           type="button"
@@ -48,7 +48,9 @@
                           class="btn btn-outline-secondary"
                         >
                           <i class="fa fa-thumbs-o-up text-success"></i>
-                          <span class="badge">Followers {{numberFollowers()}}</span>
+                          <span class="badge">
+                            <strong>{{numberFollowers}}</strong>
+                          </span>
                         </button>
                         <button
                           class="btn btn-primary"
@@ -115,7 +117,7 @@
             </div>
           </div>
         </div>
-        <div class="card threadFechada" v-show="threadFechada()">
+        <div class="card threadFechada" v-show="threadFechada">
           <div class="card-body text-center">
             <h1>This thread is closed!</h1>
           </div>
@@ -143,7 +145,7 @@
                   <p>{{ans.answer}}</p>
                   <p>
                     <a
-                      v-show="!threadFechada()"
+                      v-show="!threadFechada"
                       v-bind:id="ans.id"
                       class="float-right btn btn-outline-primary ml-2"
                       v-on:click="commentAnswer(ans.id, ans.userInfo.id)"
@@ -211,7 +213,7 @@
             </div>
           </div>
         </div>
-        <div class="row" v-show="showAnswerDiv == true && !threadFechada()==true">
+        <div class="row" v-show="isLoggedIn == true && !threadFechada==true">
           <div class="col-md-12 text-left">
             <h4>Answer</h4>
             <textarea
@@ -261,7 +263,7 @@
 import Swal from "../../node_modules/sweetalert2/dist/sweetalert2.js";
 import "../../node_modules/sweetalert2/src/sweetalert2.scss";
 // import Related from "@/components/Related.vue";
-import axios from "axios";
+import $ from "jquery";
 
 export default {
   components: {
@@ -319,16 +321,10 @@ export default {
     });
   },
   computed: {
+    /** é estas computed's que devolvem a informação que
+     * se foi buscar à api na created().
+     */
     thread() {
-      // this.$http
-      //   .get(
-      //     `http://${this.$store.getters.getIp}/data-api/threads/${
-      //       this.$route.params.threadid
-      //     }`
-      //   )
-      //   .then(res => {
-      //     console.log(res.data, "Thread no");
-      //   });
       console.log(this.threadF, "THREAD!!!!!!!");
       return this.threadF || { userInfo: {} };
     },
@@ -339,40 +335,66 @@ export default {
     comments() {
       console.log(this.commentsF, "COMMENTS!!!!!!!");
       return this.commentsF || [{ userInfo: {} }];
+    },
+    isLoggedIn() {
+      /** Computed que verifica se o user está logado e mostra os respetivos div's */
+      if (this.$store.state.users.loggedUser != null) return true;
+      return false;
+    },
+    threadFechada() {
+      if (this.threadF != null && this.threadF.closeDate == null) {
+        return false;
+      }
+      return true;
+    },
+    numberFollowers() {
+      /** Total follwers */
+      if (this.threadF != null && this.threadF.follow > 0)
+        return "Followers " + this.threadF.follow;
+      return "No followers";
+    },
+    numberUpvotes() {
+      if (this.threadF != null && this.threadF.upvotes > 0) return "Upvotes " + this.threadF.upvotes;
+      
+      return "No Upvotes"
     }
   },
   methods: {
-    /**
-     * Separar os métodos por aqueles que
-     * precisam que o user esteja logado
-     * dos que não é preciso
-     */
-    numberFollowers() {
-      console.log("numberofFoloows()");
-    },
+    /** É preciso estar logado */
+    /** Follow/Unfollow */
     seguir() {
       console.log("seguir89");
     },
-    threadFechada() {
-      console.log("threadFechada()");
-    },
-    upvoteThread() {},
-    showAnswerDiv() {},
+    /** Respostas/Comentários */
     textoResposta() {},
     adicionarResposta() {},
-    upvoteComment() {},
     commentAnswer() {},
     replyUser() {},
     commentToAnswer() {},
+    /** Upvotes */
     upvoteAns() {},
-    hideComments() {},
+    upvoteComment() {},
+    upvoteThread() {},
+    /** Não é preciso estar logado */
+
+    /** Dar toogle aos comentários (dá para usar jQuery)  */
+    hideComments(event, ansid) {
+      console.log(event.target, $)
+      let coms = $(`#${ansid}`)
+      console.log(coms)
+      coms.toogle()
+    },
+    /** Ir para um determinado user */
     goToUser() {
-      console.log(this.threadF.userInfo.id, "USERRRRRRRRR a ir para o perfil")
+      console.log(this.threadF.userInfo.id, "USERRRRRRRRR a ir para o perfil");
       this.$router.push({
         name: "viewProfile",
         params: { userid: this.threadF.userInfo.id }
       });
-    }
+    },
+    /** Funções para dar trigger aos Swals */
+    successSwal() {},
+    errorSwal() {}
   },
   filters: {
     filterDate: function(value) {
