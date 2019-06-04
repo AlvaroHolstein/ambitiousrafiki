@@ -63,7 +63,10 @@ class User {
 
         // console.log(trueRank);
         // console.log(rank);
-        return [rank, trueRank];
+        return {
+            rank:rank,
+            trueRank:trueRank
+        };
     }
     getBadges(badgesArr, threadsArr, commentsArr, answersArr) {
         let badges = [];

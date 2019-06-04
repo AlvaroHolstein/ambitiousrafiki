@@ -60,6 +60,7 @@
 <script>
 import { VueEditor, Quill } from "vue2-editor";
 import VueTagsInput from "@johmun/vue-tags-input";
+import cookie from "cookie";
 //Tentar utilizar o quill
 export default {
   components: {
@@ -86,11 +87,12 @@ export default {
     };
   },
   created() {
-    this.$http.get(`http://${this.$store.getters.getIp}/data-api/tags`)
-    .then(res => {
-      console.log(res.data, "LAS TAGS !!!!!!!!")
-      this.autocompleteItems = res.data
-    })
+    this.$http
+      .get(`http://${this.$store.getters.getIp}/data-api/tags`)
+      .then(res => {
+        console.log(res.data, "LAS TAGS !!!!!!!!");
+        this.autocompleteItems = res.data;
+      });
   },
   updated() {
     if (this.focusAt === "title") {
@@ -141,29 +143,37 @@ export default {
             .length == 0
         ) {
           console.log("Esta Tag Não Existe: " + this.tags[i].text);
-          this.autocompleteItems.push({
-            id: this.getLastID() + 1,
+          this.$http.post(`http://${this.$store.getters.getIp}/data-api/tags`, {
             text: this.tags[i].text
           });
         }
       }
-      this.$store.dispatch("update_tags", this.autocompleteItems);
-      this.$store.dispatch("add_thread", {
-        id: 0,
-        userid: this.$store.getters.getloginID,
-        question: this.content,
-        title: this.title,
-        tags: this.tags,
-        idGroup: null,
-        upvotes: 0,
-        date: new Date().toISOString().split("T")[0],
-        views: 0,
-        course: "",
-        closeDate: null
-      });
+      let data = {
+        thread: {
+          user: {
+            userid: this.$store.state.users.loggedUser.id,
+            photo: this.$store.state.users.loggedUser.picture,
+            name: this.$store.state.users.loggedUser.name,
+            rank: this.$store.state.users.loggedUser.rank.trueRank
+          },
+          question: this.content,
+          title: this.title,
+          tags: this.tags
+        }
+      };
+      let parsedCookie = cookie.parse(document.cookie);
+      console.log(parsedCookie.login, "Parsed Cokiie no App.vue");
+      let headers = {
+        "x-access-token": parsedCookie.login
+      };
+      this.$http.post(
+        `http://${this.$store.getters.getIp}/data-api/threads`,
+        data,{
+        headers: headers
+        });
       this.$router.push({
-        name: "AboutMe",
-        params: { userid: this.$store.getters.getloginID }
+        name: "viewProfile",
+        params: { userid: this.$store.state.users.loggedUser.id }
       });
     }
   },
