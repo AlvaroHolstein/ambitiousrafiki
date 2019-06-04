@@ -113,16 +113,7 @@
                                 Rank:
                                 <span class="rank">{{thread.userInfo.rank}}</span>
                               </li>
-                              <li class="list-inline-item">
-                                <a
-                                  class="float-right btn text-white btn-success ml-2"
-                                  v-on:click="upvoteThread(thread.id)"
-                                >
-                                  <i
-                                    class="fas fa-thumbs-up"
-                                  >| {{thread.upvotes == 0 ? '' : thread.upvotes}}</i>
-                                </a>
-                              </li>
+                           
                             </ul>
                           </div>
                         </div>
