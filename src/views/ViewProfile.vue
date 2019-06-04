@@ -2,14 +2,17 @@
   <div class="container">
     <div class="header row" style="margin-bottom: 40px;">
       <div class="col-md-4 text-center">
-        <img :src="user.picture" class="picture img-fluid">
+        <img :src="user.picture" class="picture img-fluid" />
       </div>
       <div class="col-md-5">
-        <h1>{{user.name}}</h1>
-        <span>Level:{{user.level}}</span>
+        <h1>{{ user.name }}</h1>
+        <span>Level:{{ user.level }}</span>
 
         <div class="progress">
-          <div :style="{'width': getUserProgress}" class="progress-bar progress-bar-info"></div>
+          <div
+            :style="{ width: getUserProgress }"
+            class="progress-bar progress-bar-info"
+          ></div>
         </div>
       </div>
       <div class="col-md-3">
@@ -31,24 +34,33 @@
       </li>
 
       <li class="nav-item">
-        <button class="btn btn-primary" v-on:click="ulIndex = 2">User Badges</button>
+        <button class="btn btn-primary" v-on:click="ulIndex = 2">
+          User Badges
+        </button>
       </li>
 
       <li class="nav-item">
-        <button class="btn btn-primary" v-on:click="ulIndex = 3">My Threads</button>
+        <button class="btn btn-primary" v-on:click="ulIndex = 3">
+          My Threads
+        </button>
       </li>
       <li v-if="ownProfile" class="nav-item">
-        <button class="btn btn-primary" v-on:click="ulIndex = 4">Ranking</button>
+        <button class="btn btn-primary" v-on:click="ulIndex = 4">
+          Ranking
+        </button>
       </li>
       <li v-if="ownProfile" class="nav-item">
-        <button class="btn btn-primary" v-on:click="ulIndex = 5">Edit Profile</button>
+        <button class="btn btn-primary" v-on:click="ulIndex = 5">
+          Edit Profile
+        </button>
       </li>
     </ul>
     <transition name="fade" mode="out-in">
       <!-- Ver se é melhor usar o v-if ou v-show -->
-      <about v-bind:user="user" v-if="ulIndex == 1"/>
-      <userBadges v-bind:user="user" v-if="ulIndex == 2"/>
-      <myThreads v-bind:threads="userThreads" v-if="ulIndex == 3"/>
+      <about v-bind:user="user" v-if="ulIndex == 1" />
+      <userBadges v-bind:user="user" v-if="ulIndex == 2" />
+      <myThreads v-bind:threads="userThreads" v-if="ulIndex == 3" />
+      <edit v-bind:user="user" v-if="ulIndex == 5" />
       <!-- <div v-if="ulIndex == 1">
         <h1>1</h1>
       </div>
@@ -64,13 +76,14 @@ import VueApexCharts from "vue-apexcharts";
 import about from "@/components/About.vue";
 import myThreads from "@/components/MyThreads.vue";
 import userBadges from "@/components/MyBadges.vue";
-
+import edit from "@/components/editProfile.vue";
 export default {
   components: {
     apexchart: VueApexCharts,
     about,
     myThreads,
-    userBadges
+    userBadges,
+    edit
   },
   data() {
     return {
@@ -145,6 +158,7 @@ export default {
       console.log(this.ulIndex);
       return this.ulIndex;
     },
+    // eslint-disable-next-line vue/return-in-computed-property
     getUserProgress() {
       // console.log(typeof this.user.experience, "EXPERIENCE");
       if (this.user.experience) return this.user.experience % 100;
@@ -161,7 +175,7 @@ export default {
           return true;
         }
       }
-      return false
+      return false;
     }
   },
   methods: {
@@ -185,6 +199,7 @@ export default {
             name,
             picture,
             year,
+            // eslint-disable-next-line no-unused-vars
             upvotes,
             course,
             description,
@@ -238,6 +253,7 @@ export default {
         console.log(res.data, "Answers ");
       });
     },
+    // eslint-disable-next-line no-unused-vars
     getComments(answerid) {}
   }
 };
@@ -285,4 +301,3 @@ ul#nav li {
   margin-right: 2px;
 }
 </style>
-
