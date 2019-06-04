@@ -39,7 +39,7 @@ export default {
     this.$http
       .get(
         `http://${this.$store.state.address +
-          this.$store.state.port}/data-api/users/rankings`
+          this.$store.state.port}/data-api/users/userByRank/rankings`
       )
       .then(res => (this.users = res.data))
       .catch(err => console.log(err));

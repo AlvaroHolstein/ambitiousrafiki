@@ -63,7 +63,10 @@ class User {
 
         // console.log(trueRank);
         // console.log(rank);
-        return [rank, trueRank];
+        return {
+            rank:rank,
+            trueRank:trueRank
+        };
     }
     getBadges(badgesArr, threadsArr, commentsArr, answersArr) {
         let badges = [];
@@ -135,6 +138,16 @@ const users = {
         unLoggedUser(state) {
             console.log(state, "unLoggedUser")
             state.loggedUser = null
+        },
+        changeFollow(state, payload) {
+            console.log(payload, "payload no users.js changeFollow()")
+            if(payload.type == "add") {
+                state.loggedUser.follow.push(payload.id)
+            }
+            else {
+                let index = state.loggedUser.follow.findIndex(fol => fol == payload.id)
+                state.loggedUser.splice(index, 1)
+            }
         }
     },
     actions: {

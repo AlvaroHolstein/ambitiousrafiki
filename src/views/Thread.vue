@@ -300,6 +300,7 @@ import Swal from "../../node_modules/sweetalert2/dist/sweetalert2.js";
 import "../../node_modules/sweetalert2/src/sweetalert2.scss";
 // import Related from "@/components/Related.vue";
 import $ from "jquery";
+import cookie from "cookie";
 
 export default {
   components: {
@@ -384,9 +385,11 @@ export default {
       return true;
     },
     numberFollowers() {
+      if(this.threadF == null) return 0;
       return this.threadF.follow;
     },
     numberUpvotes() {
+      if(this.threadF == null) return 0;
       return this.threadF.upvotes;
     }
   },
@@ -394,7 +397,75 @@ export default {
     /** É preciso estar logado */
     /** Follow/Unfollow */
     seguir() {
-      console.log("seguir()");
+      //Como só dá para seguir a thread, usar o threadF.id
+      /**
+       * Chamada à API para incrementar follow na thread e
+       * meter um objecto no array follow do user,
+       * também fazer notificação
+       */
+
+      if (this.confirmAuth()) {
+        /** Follow/Unfollow */
+        let save = true;
+        let { follow } = this.$store.state.users.loggedUser;
+        console.log(follow, "DEstructured follow from USER!!!!");
+
+        for (let i = 0; i < follow.length; i++) {
+          if (follow[i] == this.threadF.id) {
+            save = false;
+          }
+        }
+
+        if (save) {
+          /** Thread */
+          let loginCookie = cookie.parse(document.cookie).login;
+          console.log(loginCookie, "Login COOKIE !!!!!!!!");
+          this.threadF.follow++;
+          this.$http
+            .put(
+              `http://${this.$store.getters.getIp}/data-api/threads/${
+                this.threadF.id
+              }/follow`
+            )
+            .then(res => console.log("Followed"));
+          /** User
+           *  Altera-se o loggedUser e manda-se lho para a BD
+           */
+          this.$store.commit("users/changeFollow", {
+            type: "add",
+            id: this.threadF.id
+          });
+          this.$http({
+            url: `http://${this.$store.getters.getIp}/data-api/users/${
+              this.$store.state.users.loggedUser.id
+            }`,
+            method: "put",
+            data: {
+              user: this.$store.state.users.loggedUser.id
+            },
+            headers: {
+              "x-access-token": loginCookie
+            }
+          }).then(res => console.log("updated USer"));
+        } else {
+          this.threadF.follow--;
+          this.$store.commit("users/changeFollow", {
+            type: "remove",
+            id: this.threadF.id
+          });
+          this.$http
+            .put(
+              `http://${this.$store.getters.getIp}/data-api/threads/${
+                this.threadF.id
+              }/unfollow`
+            )
+            .then(res =>
+              console.log(save, "Já seguiste, VAi ficar com menos 1 follow")
+            );
+        }
+      } else {
+        this.errorSwal();
+      }
     },
     /** Respostas/Comentários */
     textoResposta() {},
@@ -410,9 +481,7 @@ export default {
 
     /** Dar toogle aos comentários (dá para usar jQuery)  */
     hideComments(event, ansid) {
-      console.log(event.target, $);
       let coms = $(`#${ansid}_wrapper.theWrapper`);
-      console.log(coms);
       coms.toggle();
     },
     /** Ir para um determinado user */
@@ -423,9 +492,35 @@ export default {
         params: { userid: this.threadF.userInfo.id }
       });
     },
+    confirmAuth() {
+      //Working
+      if (this.$store.state.users.loggedUser != null) {
+        return true;
+      }
+      return false;
+    },
     /** Funções para dar trigger aos Swals */
-    successSwal() {},
-    errorSwal() {}
+    successSwal(msg) {
+      Swal({
+        text: msg,
+        type: "success"
+      });
+    },
+    errorSwal(msg) {
+      Swal({
+        title: "Ocorreu um erro",
+        type: "error",
+        text: msg
+      });
+    },
+    /** Funções de chamada À API */
+    changeUser(user) {
+      console.log(user, "USER changeUser()");
+      this.$http({
+        url: `http://${this.$store.getters.getIp}/data-api/user/${user.id}`,
+        data: user
+      });
+    }
   },
   filters: {
     filterDate: function(value) {
