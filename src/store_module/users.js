@@ -64,32 +64,69 @@ class User {
         // console.log(trueRank);
         // console.log(rank);
         return {
-            rank:rank,
-            trueRank:trueRank
+            rank: rank,
+            trueRank: trueRank
         };
     }
     getBadges(badgesArr, threadsArr, commentsArr, answersArr) {
         let badges = [];
         this.badges = [];
         // console.log(threadsArr);
-        let tr = this.getThreads(threadsArr, commentsArr, answersArr); //Isto depois vai substituir a batota
-        console.log(tr);
+        let all = this.getThreads(threadsArr, commentsArr, answersArr); //Isto depois vai substituir a batota
+        let numThreads = this.getTotThreads(threadsArr)
+        let numAnswers = this.getTotAnswers(answersArr)
+        let numComments = this.getTotComments(commentsArr)
+        console.log(all);
         // let batota = 20;
+
+        function badgeComparisson(goal, acutal) {
+            if(actual >= goal) gravar = true
+        }
         for (let badge of badgesArr) {
             let gravar = false;
 
             console.log(badge, "badge");
             console.log(this.experience, "experience");
             console.log(badge.goal)
+
             if (badge.goal <= this.experience && badge.category == "rank") {
                 console.log('alalalalalal')
                 gravar = true;
             }
 
+            /**
+             * Os badges do tipo help vão ter um campo 
+             * chamado specific (nome a mudar), para separar os badges
+             * de responder 10 vezes ou criar 10 threads por exemplo
+             * os valores do specific vão ser: 
+             *  - answers
+             *  - threads
+             *  - comments
+             *  - all
+             *  - (acrescentar mais)
+             */
             if (badge.category == "help") {
-                if (badge.goal <= tr) {
-                    gravar = true;
+                switch(badge.specific) {
+                    case "answers":
+                        badgeComparisson(badge.goal, numAnswers)
+                        break;
+                    
+                    case "threads": 
+                        badgeComparisson(badge.goal, numThreads)
+                    break;
+
+                    case "comments": 
+                        badgeComparisson(badge.goal, numComments)
+                    break;
+
+                    case "all":
+                    badgeComparisson(badge.goal, all)
+                    break;
+
                 }
+                // if (badge.goal <= all) {, por agora não vai ser usado
+                //     gravar = true;
+                // }
             }
 
             if (gravar) {
@@ -110,7 +147,15 @@ class User {
         console.log(total, "total user class")
         return total;
     }
-
+    getTotThreads(arr) {
+        return arr.filter(th => th.userInfo.userid == this.id).length;
+    }
+    getTotAnswers(arr) {
+        return arr.filter(ans => ans.userInfo.userid == this.id).length;
+    }
+    getTotComments(arr) {
+        return arr.filter(com => com.userInfo.userid == this.id).length;
+    }
     tamanhoMaximo() {
         if (this.notifications.length == 6) this.notifications.shift();
     }
@@ -130,7 +175,7 @@ const users = {
         // Preencher o loggedUser e as notifications
         setLoggedUser(state, payload) {
             console.log(payload, "PAYLOAD NO SETLOGGEDUSER!!!!!!!!!!!!!")
-            let {id, name, mail, description, experience, course, year, follow, notifications, picture, upvotes} = payload
+            let { id, name, mail, description, experience, course, year, follow, notifications, picture, upvotes } = payload
             state.loggedUser = new User(id, name, experience, description, year, course, picture, follow, upvotes, mail, notifications)
             console.log(state.loggedUser, "LOGGED USEER !!!!!?!?!?!?!?!?!!?!?!? ")
             // state.notifications = payload.notifications
@@ -141,12 +186,12 @@ const users = {
         },
         changeFollow(state, payload) {
             console.log(payload, "payload no users.js changeFollow()")
-            if(payload.type == "add") {
+            if (payload.type == "add") {
                 state.loggedUser.follow.push(payload.id)
             }
             else {
                 let index = state.loggedUser.follow.findIndex(fol => fol == payload.id)
-                state.loggedUser.splice(index, 1)
+                state.loggedUser.follow.splice(index, 1)
             }
         }
     },

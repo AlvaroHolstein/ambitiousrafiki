@@ -72,7 +72,7 @@
             </a>
             <div id="drops" class="dropdown-menu">
               <div
-                v-for="(noti, cont) of loginUser.notifications"
+                v-for="(noti, cont) of loginUserNotifications"
                 v-bind:key="cont"
                 v-on:click="seenNotification(noti.id)"
               >
@@ -154,7 +154,7 @@ export default {
            * Já apaga a cookie e faz logout,
            * maaaaaaas, não envia a cookie automaticamente.........
            */
-          document.cookie = `login=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;`
+          document.cookie = `login=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;`;
           this.$store.commit("users/unLoggedUser");
           this.$router.push({
             name: "home"
@@ -179,18 +179,31 @@ export default {
     },
     notificationsLength() {
       if (this.$store.state.users.loggedUser != null) {
-        return this.$store.state.users.loggedUser.notifications.filter(not => {
-          not.visto == false;
-        }).length;
+        if (this.$store.state.users.loggedUser.notifications.length > 0 && this.$store.state.users.loggedUser.notifications[0] != null) {
+          return this.$store.state.users.loggedUser.notifications.filter(
+            not => {
+              not.visto == false;
+            }
+          ).length;
+        }
       }
     },
     toBeOrNotToBeAdmin() {
-      if(this.$store.state.users.loggedUser != null && this.$store.state.users.loggedUser.id == 1) {
-        console.log("É Admin, NAVBAr")
-        return true
+      if (
+        this.$store.state.users.loggedUser != null &&
+        this.$store.state.users.loggedUser.id == 1
+      ) {
+        console.log("É Admin, NAVBAr");
+        return true;
       }
 
       return false;
+    },
+    loginUserNotifications() {
+      if (this.$store.state.users.loggedUser.notifications.length > 0 && this.$store.state.users.loggedUser.notifications[0] != null)
+        return this.$store.state.users.loggedUser.notifications;
+
+      return [{}]
     }
   }
 };
