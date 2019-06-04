@@ -163,11 +163,11 @@
                   <p>
                     <a
                       v-show="!threadFechada"
-                      v-bind:id="ans.id"
+                      v-bind:id="ans.id + '_anchor'"
                       class="float-right btn btn-outline-primary ml-2"
                       v-on:click="commentAnswer(ans.id, ans.userInfo.id)"
                     >
-                      <i class="fa fa-reply" v-bind:id="ans.id"></i>
+                      <i class="fa fa-reply" v-bind:id="ans.id + '_icon'"></i>
                     </a>
                     <a
                       class="float-right btn text-white btn-success ml-2"
@@ -176,7 +176,7 @@
                       <i class="fas fa-thumbs-up">| {{ans.upvotes == 0 ? '' : ans.upvotes}}</i>
                     </a>
                     <a
-                      v-bind:id="ans.id"
+                      v-bind:id="ans.id + '_hide'"
                       class="float-right btn text-white btn-danger"
                       v-on:click="hideComments($event, ans.id)"
                     >
@@ -188,7 +188,7 @@
                 </div>
               </div>
               <div v-bind:class="ans.id">
-                <div v-bind:id="ans.id" class="theWrapper">
+                <div v-bind:id="ans.id + '_wrapper'" class="theWrapper">
                   <div
                     class="card card-inner"
                     v-for="com in comments"
@@ -376,7 +376,7 @@ export default {
     /** É preciso estar logado */
     /** Follow/Unfollow */
     seguir() {
-      console.log("seguir89");
+      console.log("seguir()");
     },
     /** Respostas/Comentários */
     textoResposta() {},
@@ -392,10 +392,10 @@ export default {
 
     /** Dar toogle aos comentários (dá para usar jQuery)  */
     hideComments(event, ansid) {
-      console.log(event.target, $);
-      let coms = $(`#${ansid}`);
-      console.log(coms);
-      coms.toogle();
+      console.log(event.target, $)
+      let coms = $(`#${ansid}_wrapper.theWrapper`)
+      console.log(coms)
+      coms.toggle()
     },
     /** Ir para um determinado user */
     goToUser() {

@@ -7,18 +7,21 @@
     </div>-->
     <router-view/>
     <Footer/>
+    <searchThing />
   </div>
 </template>
 
 <script>
 import Navbar from "@/components/NavBar.vue";
 import Footer from "@/components/Footer.vue";
+import searchThing from "@/components/searchThing.vue";
 import cookie from "cookie";
 
 export default {
   components: {
     Navbar,
-    Footer
+    Footer,
+    searchThing
   },
   created() {
     /**

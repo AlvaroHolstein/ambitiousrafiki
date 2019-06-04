@@ -15,6 +15,9 @@ import viewProfile from "@/views/ViewProfile.vue";
  */
 import viewThread from "@/views/Thread.vue";
 
+/** Create Thread */
+import createThread from "@/views/CreateThread.vue";
+
 /**
  * Home (Dentro do Home é que estão os componentes Catalog e Related)
  */
@@ -68,28 +71,6 @@ export default new Router({
       path: "/viewProfile/:userid",
       name: "viewProfile",
       component: viewProfile
-      /*children: [
-        { // About Tab
-          path: "/",
-          name: "about",
-          component: about
-        },
-        { // Badges Tab
-          path: "/badges",
-          name: "badges",
-          component: userBadges
-        } 
-        { // Ranking Tab
-          path: "/ranking",
-          name: "ranking",
-          component: ranking
-        },
-        { //Edit Profile Tab
-          path: "/editProfile",
-          name: "editProfile",
-          component: editProfile
-        }
-  ]*/
     },
     {
       path: "/faq",
@@ -121,6 +102,11 @@ export default new Router({
       path: "/login",
       name: "login",
       component: login
+    },
+    {
+      path: "/createThread",
+      name: "createThread",
+      component: createThread
     }
     // {
     //   path: "/about",
