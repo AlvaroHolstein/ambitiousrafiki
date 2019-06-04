@@ -404,7 +404,7 @@ export default {
        * também fazer notificação
        */
 
-      if (this.confirmAuth()) {
+      if (this.confirmAuth() === true) {
         /** Follow/Unfollow */
         let save = true;
         let { follow } = this.$store.state.users.loggedUser;
@@ -464,7 +464,7 @@ export default {
             );
         }
       } else {
-        this.errorSwal();
+        this.errorSwal("Tens que estar autenticado para poderes dar follow");
       }
     },
     /** Respostas/Comentários */
@@ -494,6 +494,7 @@ export default {
     },
     confirmAuth() {
       //Working
+      console.log(this.$store.state.users.loggedUser, "lelels")
       if (this.$store.state.users.loggedUser != null) {
         return true;
       }
