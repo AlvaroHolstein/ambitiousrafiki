@@ -110,11 +110,11 @@ export default {
        */
       series: [
         {
-          name: "You",
+          name: "",
           data: []
         },
         {
-          name: "Average",
+          name: "",
           data: []
         }
       ],
@@ -153,6 +153,9 @@ export default {
 
     this.fetchUser();
   },
+  mounted() {
+    this.loadGraphs();
+  },
   computed: {
     checkIndex() {
       console.log(this.ulIndex);
@@ -160,8 +163,15 @@ export default {
     },
     // eslint-disable-next-line vue/return-in-computed-property
     getUserProgress() {
-      // console.log(typeof this.user.experience, "EXPERIENCE");
-      if (this.user.experience) return this.user.experience % 100;
+      console.log(this.user.experience, "EXPERIENCE");
+      if (this.user.experience) {
+        console.log(this.user.experience % 100);
+        if (this.user.experience % 100 == 0) {
+          return "1%";
+        } else {
+          return (this.user.experience % 100) + "%";
+        }
+      }
     },
     ownProfile() {
       /**
@@ -254,7 +264,260 @@ export default {
       });
     },
     // eslint-disable-next-line no-unused-vars
-    getComments(answerid) {}
+    getComments(answerid) {},
+    loadGraphs() {
+      console.log(this.$route.params.userid, "id de procura");
+      let logged = false;
+      let self = false;
+      if (this.$store.state.users.loggedUser != null) {
+        logged = true;
+        if (
+          this.$route.params.userid == this.$store.state.users.loggedUser.id
+        ) {
+          self = true;
+        }
+      }
+      console.log(logged, self);
+      if (logged && self) {
+        this.series[0].name = "You";
+        this.series[1].name = "Average";
+        //Começar a fazer o grafico
+        //User Upvotes
+        this.$http
+          .get(
+            `http://${this.$store.getters.getIp}/data-api/userupvotes/${
+              this.$route.params.userid
+            }`
+          )
+          .then(res => {
+            this.series[0].data.push(res.data / 100);
+          });
+
+        //Avg Upvotes
+        this.$http
+          .get(`http://${this.$store.getters.getIp}/data-api/avgupvotes`)
+          .then(res => {
+            this.series[1].data.push(res.data / 100);
+          });
+
+        //Numero de Threads
+        //User
+        this.$http
+          .get(
+            `http://${this.$store.getters.getIp}/data-api/userNumberThreads/${
+              this.$route.params.userid
+            }`
+          )
+          .then(res => {
+            this.series[0].data.push(res.data);
+          });
+        //Avg
+        this.$http
+          .get(`http://${this.$store.getters.getIp}/data-api/avgThreads/`)
+          .then(res => {
+            this.series[1].data.push(res.data);
+          });
+        //Numero de respostas
+
+        //User
+        this.$http
+          .get(
+            `http://${this.$store.getters.getIp}/data-api/userNumberAnswers/${
+              this.$route.params.userid
+            }`
+          )
+          .then(res => {
+            this.series[0].data.push(res.data);
+          });
+        //avg
+        this.$http
+          .get(`http://${this.$store.getters.getIp}/data-api/avgAnswers/`)
+          .then(res => {
+            this.series[1].data.push(res.data);
+          });
+        //Level
+
+        //User
+        this.$http
+          .get(
+            `http://${this.$store.getters.getIp}/data-api/userLevel/${
+              this.$route.params.userid
+            }`
+          )
+          .then(res => {
+            console.log("Nivel", res.data);
+            this.series[0].data.push(res.data);
+          });
+        //avg
+        this.$http
+          .get(`http://${this.$store.getters.getIp}/data-api/avgLevel`)
+          .then(res => {
+            this.series[1].data.push(res.data);
+          });
+      } else if (logged && !self) {
+        this.series[0].name = "You";
+        console.log("Este USER:", this.user.name);
+        this.$http
+          .get(
+            `http://${this.$store.getters.getIp}/data-api/users/${
+              this.$route.params.userid
+            }`
+          )
+          .then(res => {
+            console.log(res.data);
+            this.series[1].name = res.data.name;
+          })
+          .catch(err => console.log(err));
+
+        //Começar a fazer o grafico
+
+        //Numero Upvotes
+
+        //User
+        this.$http
+          .get(
+            `http://${this.$store.getters.getIp}/data-api/userupvotes/${
+              this.$store.state.users.loggedUser.id
+            }`
+          )
+          .then(res => {
+            this.series[0].data.push(res.data / 100);
+          });
+        //User Visitado
+        this.$http
+          .get(
+            `http://${this.$store.getters.getIp}/data-api/userupvotes/${
+              this.$route.params.userid
+            }`
+          )
+          .then(res => {
+            this.series[1].data.push(res.data / 100);
+          });
+        //Numero Threads
+        //User
+        this.$http
+          .get(
+            `http://${this.$store.getters.getIp}/data-api/userNumberThreads/${
+              this.$store.state.users.loggedUser.id
+            }`
+          )
+          .then(res => {
+            this.series[0].data.push(res.data);
+          });
+        //User Visitado
+        this.$http
+          .get(
+            `http://${this.$store.getters.getIp}/data-api/userNumberThreads/${
+              this.$route.params.userid
+            }`
+          )
+          .then(res => {
+            this.series[1].data.push(res.data);
+          });
+        //Numero  de respostas
+        //User
+        this.$http
+          .get(
+            `http://${this.$store.getters.getIp}/data-api/userNumberAnswers/${
+              this.$store.state.users.loggedUser.id
+            }`
+          )
+          .then(res => {
+            this.series[0].data.push(res.data);
+          });
+        //User Visitado
+        this.$http
+          .get(
+            `http://${this.$store.getters.getIp}/data-api/userNumberAnswers/${
+              this.$route.params.userid
+            }`
+          )
+          .then(res => {
+            this.series[1].data.push(res.data);
+          });
+        //Level
+
+        //User
+        this.$http
+          .get(
+            `http://${this.$store.getters.getIp}/data-api/userLevel/${
+              this.$store.state.users.loggedUser.id
+            }`
+          )
+          .then(res => {
+            console.log("Nivel", res.data);
+            this.series[0].data.push(res.data);
+          });
+        //User Visitado
+        this.$http
+          .get(
+            `http://${this.$store.getters.getIp}/data-api/userLevel/${
+              this.$route.params.userid
+            }`
+          )
+          .then(res => {
+            console.log("Nivel", res.data);
+            this.series[1].data.push(res.data);
+          });
+      } else {
+        this.series[0].name = "Log in Please";
+        this.$http
+          .get(
+            `http://${this.$store.getters.getIp}/data-api/users/${
+              this.$route.params.userid
+            }`
+          )
+          .then(res => {
+            console.log(res.data);
+            this.series[1].name = res.data.name;
+          })
+          .catch(err => console.log(err));
+
+        //Começar a fazer o gráfico
+
+        //Numero de Upvotes
+        this.$http
+          .get(
+            `http://${this.$store.getters.getIp}/data-api/userupvotes/${
+              this.$route.params.userid
+            }`
+          )
+          .then(res => {
+            this.series[1].data.push(res.data / 100);
+          });
+        //Numero de Threads
+        this.$http
+          .get(
+            `http://${this.$store.getters.getIp}/data-api/userNumberThreads/${
+              this.$route.params.userid
+            }`
+          )
+          .then(res => {
+            this.series[1].data.push(res.data);
+          });
+        //Numero de respostas
+        this.$http
+          .get(
+            `http://${this.$store.getters.getIp}/data-api/userNumberAnswers/${
+              this.$route.params.userid
+            }`
+          )
+          .then(res => {
+            this.series[1].data.push(res.data);
+          });
+        //Nivel
+        this.$http
+          .get(
+            `http://${this.$store.getters.getIp}/data-api/userLevel/${
+              this.$route.params.userid
+            }`
+          )
+          .then(res => {
+            console.log("Nivel", res.data);
+            this.series[1].data.push(res.data);
+          });
+      }
+    }
   }
 };
 </script>
