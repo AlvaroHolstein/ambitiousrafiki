@@ -1,6 +1,6 @@
 <template>
   <div class="span8">
-    <div v-for="thread in threads" v-bind:key="thread.id">
+    <div v-for="(thread, cont) in threads" v-bind:key="cont">
       <h4>
         <strong>
           <a>{{thread.title}}</a>
@@ -26,7 +26,7 @@
         |
         <i class="icon-tags"></i> Tags :
         <!--TAGS-->
-        <a v-for="tag in thread.tags" v-bind:key="tag.id">
+        <a v-for="(tag, cont) in thread.tags" v-bind:key="cont">
           <!---->
           <span class="label label-info">{{tag.text}}</span>
         </a>

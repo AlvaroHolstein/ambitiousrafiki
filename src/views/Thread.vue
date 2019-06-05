@@ -159,7 +159,7 @@
           <h3>Answers</h3>
         </div>
 
-        <div>
+        <div v-if="answers.length > 0">
           <!-- Respostas e Comentários -->
           <div class="card" v-for="(ans, cont) in answers" v-bind:key="cont">
             <div class="card-body">
@@ -249,6 +249,9 @@
             </div>
           </div>
         </div>
+        <div v-else>
+          <h1 class="text-center">Não há REspostas ainda</h1>
+        </div>
         <div class="row" v-show="isLoggedIn == true && !threadFechada==true">
           <div class="col-md-12 text-left">
             <h4>Answer</h4>
@@ -259,11 +262,11 @@
               rows="10"
               style="width: inherit"
               placeholder="Type your answer"
-              v-model="textoResposta"
+              v-model="answerText"
             ></textarea>
 
             <div class="text-right" style="margin-bottom: 15px;">
-              <button class="btn btn-outline-success" v-on:click="adicionarResposta">Answer</button>
+              <button class="btn btn-outline-success" v-on:click="addAnswer">Answer</button>
             </div>
           </div>
         </div>
@@ -310,7 +313,8 @@ export default {
     return {
       threadF: null,
       answersF: null,
-      commentsF: []
+      commentsF: [],
+      answerText: "" //TExto para a resposta
     };
   },
   created() {
@@ -396,7 +400,7 @@ export default {
   methods: {
     /** É preciso estar logado */
     /** Follow/Unfollow */
-    seguir() {
+    seguir() { // Feito
       //Como só dá para seguir a thread, usar o threadF.id
       /**
        * Chamada à API para incrementar follow na thread e
@@ -436,12 +440,12 @@ export default {
             id: this.threadF.id
           });
           this.$http({
-            url: `http://${this.$store.getters.getIp}/data-api/users/${
+            url: `http://${this.$store.getters.getIp}/data-api/users/noemail/${
               this.$store.state.users.loggedUser.id
             }`,
             method: "put",
             data: {
-              user: this.$store.state.users.loggedUser.id
+              user: this.$store.state.users.loggedUser
             },
             headers: {
               "x-access-token": loginCookie
@@ -461,15 +465,27 @@ export default {
             )
             .then(res =>
               console.log(save, "Já seguiste, VAi ficar com menos 1 follow")
-            );
+            ).catch(err => {
+              this.errorSwal("Ocorreu um erro na nossa API, por favor tenta seguir a thread mais tarde")
+            });
         }
       } else {
         this.errorSwal("Tens que estar autenticado para poderes dar follow");
       }
     },
     /** Respostas/Comentários */
-    textoResposta() {},
-    adicionarResposta() {},
+    addAnswer() {
+      /** Confirmar 1º se a resposta é vazia ou não */
+      if(this.answerText == false){
+        // answer vazia
+        this.errorSwal("Tens que escrever alguma coisa")
+      }
+      else {
+
+
+        //No fim fazer um Swal a dizer que a resposta foi gravada com sucesso
+      }
+    },
     commentAnswer() {},
     replyUser() {},
     commentToAnswer() {},

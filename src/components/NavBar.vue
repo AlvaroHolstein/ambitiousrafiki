@@ -42,7 +42,7 @@
           <!-- Estilizar este hr, e confirmar se funciona mesmo -->
         </li>
       </ul>
-      <ul v-if="$store.state.users.loggedUser == null" class="navbar-nav ml-auto">
+      <ul v-if="$store.state.users.loggedUser === null" class="navbar-nav ml-auto">
         <li class="nav-item">
           <router-link :to="{ name: 'login' }" :class="{ 'nav-link': true }">Login</router-link>
         </li>
@@ -126,7 +126,7 @@ export default {
     return {};
   },
   created() {
-    console.log(this.loginUser);
+    // console.log(this.loginUser);
   },
   methods: {
     seenNotification(id) {
