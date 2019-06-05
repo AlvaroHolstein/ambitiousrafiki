@@ -56,9 +56,9 @@
           <tr v-for="thread in filteredThreads" v-bind:key="thread.id">
             <td>
               <!-- v-on:click="" -->
-              <a v-on:click="goToThread(thread.id)" class="title">{{
-                thread.title
-              }}</a>
+              <a v-on:click="goToThread(thread.id)" class="title">
+                {{ thread.title }}
+              </a>
             </td>
             <td>
               <!-- v-bind:src="" -->
@@ -144,9 +144,6 @@ export default {
     if (this.$store.state.searchTag != "") {
       this.searchBy = "Tag";
       this.tag = this.$store.state.searchTag;
-      console.log("Esta é a nova tag", this.tag);
-      this.tags.push(this.tag);
-      console.log("Estas sao as tags", this.tags);
     }
   },
   updated() {
