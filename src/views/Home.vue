@@ -3,39 +3,19 @@
     <h1></h1>
     <div class="row">
       <div class="col-md-9">
-        <Catalog/>
+        <Catalog />
       </div>
       <div class="col-md-3" style="padding: 0 0 0 5">
         <h4 style="padding: 0 0 0 5; padding-inline-start: 20px">Hot Topics</h4>
-        <div class="fitText">
-          <div style="padding: 0 0 0 5; padding-inline-start: 20px" class="list-group">
-            <!-- Assim só aparece 5 threads -->
-            <a
-              style="width:100%"
-              class="list-group-item"
-              v-for="(thread,index) in hotTopics"
-              v-bind:key="thread.id"
-              @click="goToThread(thread.id)"
-              v-if="index<5"
-            >{{thread.title}}</a>
-          </div>
-        </div>
-        <h4 style="padding: 0 0 0 5; padding-inline-start: 20px">Most viewed Topics</h4>
-        <div class="fitText">
-          <div style="padding: 0 0 0 5; padding-inline-start: 20px" class="list-group">
-            <!-- Assim só aparece 5 threads -->
-            <a
-              style="width:100%"
-              class="list-group-item"
-              v-for="(thread,index) in viewedThreads"
-              v-bind:key="thread.id"
-              @click="goToThread(thread.id)"
-              v-if="index<5"
-            >{{thread.title}}</a>
-          </div>
-        </div>
-        <h3 style="padding: 0 0 0 5; padding-inline-start: 20px">Topics For You</h3>
-        <!-- <related></related> -->
+        <hotTopics></hotTopics>
+        <h4 style="padding: 0 0 0 5; padding-inline-start: 20px">
+          Most viewed Topics
+        </h4>
+        <mostViewed />
+        <h3 style="padding: 0 0 0 5; padding-inline-start: 20px">
+          Topics For You
+        </h3>
+        <related v-f="show"></related>
       </div>
     </div>
   </div>
@@ -43,21 +23,34 @@
 
 <script>
 import Catalog from "@/components/Catalog.vue";
-// import Related from "@/components/Related.vue";
+import hotTopics from "@/components/hotTopics.vue";
+import mostViewed from "@/components/mostViewed.vue";
+import Related from "@/components/recommended.vue";
 
 // document.getElementById('containerHome').
 export default {
   components: {
-    Catalog
-    // Related
+    Catalog,
+    hotTopics,
+    mostViewed,
+    Related
   },
   data() {
     return {
       viewedThreads: [],
-      hotTopics: []
+      hotTopics: [],
+      show: false
     };
   },
- /* created() {
+  created() {
+    if (this.$store.state.users.loggedUser !== null) {
+      //WHAT
+      if (this.$store.state.users.lastViewedThread.length != null) {
+        this.show = true;
+      }
+    }
+  },
+  /* created() {
     // Para que servia isto
     //Most viewd????
     this.viewedThreads = this.$store.state.threads.threads_.sort((a, b) => {

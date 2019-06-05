@@ -9,33 +9,33 @@
                 <div class="row">
                   <div class="col-md-12">
                     <div class="news-title">
-                      <h2>{{thread.title}}</h2>
+                      <h2>{{ thread.title }}</h2>
                     </div>
                     <div class="news-cats">
                       <ul class="list-unstyled list-inline mb-1">
                         <li class="list-inline-item">
                           <i class="fa fa-folder-o text-danger"></i>
                           <a href="#">
-                            <small>{{thread.course}}</small>
+                            <small>{{ thread.course }}</small>
                           </a>
                         </li>
 
                         <li class="news-title">
                           <i class="fa fa-folder-o text-danger"></i>
                           <a href="#">
-                            <small>asked {{thread.date | filterDate}}</small>
+                            <small>asked {{ thread.date | filterDate }}</small>
                             <p></p>
                             <!-- Isto e o <p> de cima vão sair, é só para ver o id da thread -->
                           </a>
                         </li>
                       </ul>
                     </div>
-                    <hr>
+                    <hr />
 
                     <div class="news-content">
                       <p v-html="thread.question"></p>
                     </div>
-                    <hr>
+                    <hr />
                     <div class="news-tags">
                       <h5>Tags</h5>
                       <button
@@ -43,9 +43,11 @@
                         class="btn btn-sm btn-secondary btn-tag"
                         v-for="(tag, cont) in thread.tags"
                         v-bind:key="cont"
-                      >{{tag.text}}</button>
+                      >
+                        {{ tag.text }}
+                      </button>
                     </div>
-                    <hr>
+                    <hr />
                     <!-- TRY 
                     <div class="col-md-6 buttons-section">
                       <button
@@ -97,13 +99,13 @@
                             class="btn text-white btn-success"
                             v-on:click="upvoteThread(thread.id)"
                           >
-                            <i
-                              class="fas fa-thumbs-up"
-                            >{{thread.upvotes == 0 ? '' : thread.upvotes}}</i>
+                            <i class="fas fa-thumbs-up">{{
+                              thread.upvotes == 0 ? "" : thread.upvotes
+                            }}</i>
                             Upvote
                           </a>
                         </span>
-                        {{numberUpvotes}}
+                        {{ numberUpvotes }}
                         <button
                           class="btn btn-primary"
                           style="margin-left: 5px;"
@@ -114,35 +116,40 @@
                           </span>
                           Follow
                         </button>
-                        {{numberFollowers}}
+                        {{ numberFollowers }}
                       </div>
 
                       <div class="row news-author">
                         <div class="col-md-auto">
                           <a href="#" title>
                             <img
-                              v-bind:src="  thread.userInfo.photo"
+                              v-bind:src="thread.userInfo.photo"
                               alt="Author image"
                               class="rounded-circle"
                               style="width:100px"
-                            >
+                            />
                           </a>
                         </div>
                         <div class="col">
                           <div class="auth-title">
                             <h4 class="author h4">
-                              <span v-on:click="goToUser()">{{thread.userInfo.name}}</span>
+                              <span v-on:click="goToUser()">{{
+                                thread.userInfo.name
+                              }}</span>
                             </h4>
                             <ul class="list-unstyled list-inline">
                               <li class="list-inline-item">
                                 Rank:
-                                <span class="rank">{{thread.userInfo.rank}}</span>
+                                <span class="rank">{{
+                                  thread.userInfo.rank
+                                }}</span>
                               </li>
                             </ul>
                           </div>
                         </div>
                       </div>
-                    </div><!-- -->
+                    </div>
+                    <!-- -->
                   </div>
                 </div>
               </div>
@@ -154,7 +161,7 @@
             <h1>This thread is closed!</h1>
           </div>
         </div>
-        <br>
+        <br />
         <div class="news-title">
           <h3>Answers</h3>
         </div>
@@ -165,7 +172,10 @@
             <div class="card-body">
               <div class="row">
                 <div class="col-md-2">
-                  <img v-bind:src="ans.userInfo.photo" class="img img-rounded img-fluid">
+                  <img
+                    v-bind:src="ans.userInfo.photo"
+                    class="img img-rounded img-fluid"
+                  />
                   <!-- <p class="text-secondary text-center">15 Minutes Ago</p> -->
                 </div>
                 <div class="col-md-10">
@@ -174,11 +184,11 @@
                       class="float-left"
                       href="https://maniruzzaman-akash.blogspot.com/p/contact.html"
                     >
-                      <strong>{{ans.userInfo.name}}</strong>
+                      <strong>{{ ans.userInfo.name }}</strong>
                     </a>
                   </p>
                   <div class="clearfix"></div>
-                  <p>{{ans.answer}}</p>
+                  <p>{{ ans.answer }}</p>
                   <p>
                     <a
                       v-show="!threadFechada"
@@ -192,7 +202,9 @@
                       class="float-right btn text-white btn-success ml-2"
                       v-on:click="upvoteAns(ans.id)"
                     >
-                      <i class="fas fa-thumbs-up">| {{ans.upvotes == 0 ? '' : ans.upvotes}}</i>
+                      <i class="fas fa-thumbs-up"
+                        >| {{ ans.upvotes == 0 ? "" : ans.upvotes }}</i
+                      >
                     </a>
                     <a
                       v-bind:id="ans.id + '_hide'"
@@ -217,16 +229,16 @@
                     <div class="card-body">
                       <div class="row">
                         <div class="col-md-2">
-                          <img src class="img img-rounded img-fluid">
+                          <img src class="img img-rounded img-fluid" />
                           <!-- <p class="text-secondary text-center">15 Minutes Ago</p> -->
                         </div>
                         <div class="col-md-10">
                           <p>
                             <a href>
-                              <strong>{{com.userInfo.name}}</strong>
+                              <strong>{{ com.userInfo.name }}</strong>
                             </a>
                           </p>
-                          <p>{{com.text}}</p>
+                          <p>{{ com.text }}</p>
                           <p>
                             <!-- <a class="float-right btn btn-outline-primary ml-2">
                             <i class="fa fa-reply"></i>
@@ -235,9 +247,12 @@
                               class="float-right btn text-white btn-success ml-2"
                               v-on:click="upvoteComment(com.id, ans.id)"
                             >
-                              <i
-                                class="fas fa-thumbs-up"
-                              >| {{com.upvotes == 0 ? '' : parseInt(com.upvotes)}}</i>
+                              <i class="fas fa-thumbs-up"
+                                >|
+                                {{
+                                  com.upvotes == 0 ? "" : parseInt(com.upvotes)
+                                }}</i
+                              >
                             </a>
                           </p>
                         </div>
@@ -252,7 +267,7 @@
         <div v-else>
           <h1 class="text-center">Não há REspostas ainda</h1>
         </div>
-        <div class="row" v-show="isLoggedIn == true && !threadFechada==true">
+        <div class="row" v-show="isLoggedIn == true && !threadFechada == true">
           <div class="col-md-12 text-left">
             <h4>Answer</h4>
             <textarea
@@ -266,13 +281,17 @@
             ></textarea>
 
             <div class="text-right" style="margin-bottom: 15px;">
-              <button class="btn btn-outline-success" v-on:click="addAnswer">Answer</button>
+              <button class="btn btn-outline-success" v-on:click="addAnswer">
+                Answer
+              </button>
             </div>
           </div>
         </div>
       </div>
       <div class="col-md-3">
-        <h3 style="padding: 0 0 0 5; padding-inline-start: 20px">Topics For You</h3>
+        <h3 style="padding: 0 0 0 5; padding-inline-start: 20px">
+          Topics For You
+        </h3>
         <!-- <related></related> -->
       </div>
     </div>
@@ -282,22 +301,32 @@
           Answer to
           <span
             style="font-weight: bold; font-family: verdana; color: rgb(255, 65, 99);"
-          >{{replyUser}}</span>
+            >{{ replyUser }}</span
+          >
         </h4>
-        <textarea placeholder="Comment..." name id="comentario" v-model="commentToAnswer"></textarea>
+        <textarea
+          placeholder="Comment..."
+          name
+          id="comentario"
+          v-model="commentToAnswer"
+        ></textarea>
         <div class="col-md-12 text-right">
-          <button class="btn btn-outline-success bg-dark" type="submit">Answer</button>
+          <button class="btn btn-outline-success bg-dark" type="submit">
+            Answer
+          </button>
           <button
             class="btn btn-outline-success bg-dark"
             type="button"
             @click="closeDialog()"
-          >Cancel</button>
+          >
+            Cancel
+          </button>
         </div>
       </form>
     </dialog>
   </div>
 </template>
-  
+
 <script>
 import Swal from "../../node_modules/sweetalert2/dist/sweetalert2.js";
 import "../../node_modules/sweetalert2/src/sweetalert2.scss";
@@ -337,6 +366,7 @@ export default {
     this.$http.get(`http://${ip}/data-api/threads/${id}`).then(res => {
       console.log();
       this.threadF = res.data;
+      this.$store.dispatch("users/set_last_thread", res.data.tags);
     });
 
     this.$http.get(`http://${ip}/data-api/threads/${id}/answers`).then(res => {
@@ -389,18 +419,19 @@ export default {
       return true;
     },
     numberFollowers() {
-      if(this.threadF == null) return 0;
+      if (this.threadF == null) return 0;
       return this.threadF.follow;
     },
     numberUpvotes() {
-      if(this.threadF == null) return 0;
+      if (this.threadF == null) return 0;
       return this.threadF.upvotes;
     }
   },
   methods: {
     /** É preciso estar logado */
     /** Follow/Unfollow */
-    seguir() { // Feito
+    seguir() {
+      // Feito
       //Como só dá para seguir a thread, usar o threadF.id
       /**
        * Chamada à API para incrementar follow na thread e
@@ -465,8 +496,11 @@ export default {
             )
             .then(res =>
               console.log(save, "Já seguiste, VAi ficar com menos 1 follow")
-            ).catch(err => {
-              this.errorSwal("Ocorreu um erro na nossa API, por favor tenta seguir a thread mais tarde")
+            )
+            .catch(err => {
+              this.errorSwal(
+                "Ocorreu um erro na nossa API, por favor tenta seguir a thread mais tarde"
+              );
             });
         }
       } else {
@@ -476,13 +510,10 @@ export default {
     /** Respostas/Comentários */
     addAnswer() {
       /** Confirmar 1º se a resposta é vazia ou não */
-      if(this.answerText == false){
+      if (this.answerText == false) {
         // answer vazia
-        this.errorSwal("Tens que escrever alguma coisa")
-      }
-      else {
-
-
+        this.errorSwal("Tens que escrever alguma coisa");
+      } else {
         //No fim fazer um Swal a dizer que a resposta foi gravada com sucesso
       }
     },
@@ -510,7 +541,7 @@ export default {
     },
     confirmAuth() {
       //Working
-      console.log(this.$store.state.users.loggedUser, "lelels")
+      console.log(this.$store.state.users.loggedUser, "lelels");
       if (this.$store.state.users.loggedUser != null) {
         return true;
       }
@@ -556,9 +587,9 @@ img {
 }
 @media (max-width: 576px) {
   .news-author {
-    float:left !important;
+    float: left !important;
     text-align: left;
-    margin-top: 15px
+    margin-top: 15px;
   }
 
   .auth-title {
@@ -566,17 +597,15 @@ img {
     margin-top: 5px;
     padding-right: 0;
   }
-
-
 }
 .user-section {
   text-align: right;
-  display:inline-block;
+  display: inline-block;
 }
 div.buttons-section {
   text-align: left;
   padding: 0px;
-  display:inline-block;
+  display: inline-block;
 }
 
 .news-likes {

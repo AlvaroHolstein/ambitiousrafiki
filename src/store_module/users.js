@@ -167,7 +167,8 @@ const users = {
      * Não vai haver uma variável tipo (isLoggedIn),
      * vai se ver se o loggedUser é diferente de null
      */
-    loggedUser: null
+    loggedUser: null,
+    lastViewedThread: null
     // notifications: [] //As notificações só vão ser preenchidas na mutation getLoggedUser
   },
   mutations: {
@@ -215,12 +216,18 @@ const users = {
         let index = state.loggedUser.follow.findIndex(fol => fol == payload.id);
         state.loggedUser.follow.splice(index, 1);
       }
+    },
+    SET_LAST_THREAD(state, payload) {
+      state.lastViewedThread = payload;
     }
   },
   actions: {
     // Pedido à API para o user e notificações que vai ser para o login
     a() {
       console.log("alalalalalalalalalalalalala");
+    },
+    set_last_thread(context, payload) {
+      context.commit("SET_LAST_THREAD", payload);
     }
   },
   getters: {}
