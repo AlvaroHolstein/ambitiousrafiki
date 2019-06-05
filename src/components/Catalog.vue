@@ -11,7 +11,7 @@
       </select>
       <div
         id="findByTag"
-        v-if="searchBy=='Tag'"
+        v-if="searchBy == 'Tag'"
         class="text-center d-flex flex-column justify-content-center"
       >
         <p class="p-2">Search By Tag</p>
@@ -21,27 +21,26 @@
           v-model="tag"
           :tags="tags"
           :autocomplete-items="filteredItems"
-          :max-tags="1"
-          @tags-changed="newTags => tags = newTags"
+          @tags-changed="newTags => (tags = newTags)"
         />
       </div>
       <div
         id="findByKeyword"
-        v-if="searchBy=='Keyword'"
+        v-if="searchBy == 'Keyword'"
         class="text-center d-flex flex-column justify-content-center"
       >
         <p class="p-2">Search By Keyword</p>
-        <br>
+        <br />
         <input
           class="p-2 mx-auto"
           type="text"
           style="width:49%;"
           v-model="keyword"
           placeholder="Search By Keyword"
-        >
+        />
       </div>
     </div>
-    <br>
+    <br />
     <div class="table-responsive">
       <table class="table table-striped table-hover table-bordered">
         <thead class="thead-dark">
@@ -54,24 +53,28 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(thread) in filteredThreads" v-bind:key="thread.id">
+          <tr v-for="thread in filteredThreads" v-bind:key="thread.id">
             <td>
               <!-- v-on:click="" -->
-              <a v-on:click="goToThread(thread.id)" class="title">{{thread.title}}</a>
+              <a v-on:click="goToThread(thread.id)" class="title">{{
+                thread.title
+              }}</a>
             </td>
             <td>
               <!-- v-bind:src="" -->
-              <img v-bind:src="thread.userInfo.photo" class="img-fluid pic">
+              <img v-bind:src="thread.userInfo.photo" class="img-fluid pic" />
             </td>
-            <td>{{thread.views}}</td>
+            <td>{{ thread.views }}</td>
 
-            <td>{{thread.upvotes}}</td>
-            <td>{{thread.date | filterDate}}</td>
+            <td>{{ thread.upvotes }}</td>
+            <td>{{ thread.date | filterDate }}</td>
           </tr>
         </tbody>
       </table>
       <div class="text-center">
-        <button v-on:click="moreThreads()" class="btn btn-outline-dark">View More</button>
+        <button v-on:click="moreThreads()" class="btn btn-outline-dark">
+          View More
+        </button>
       </div>
     </div>
 
@@ -138,6 +141,13 @@ export default {
         console.log(res.data, "TAGS no CATALOG");
         this.autoComleteTags = res.data;
       });
+    if (this.$store.state.searchTag != "") {
+      this.searchBy = "Tag";
+      this.tag = this.$store.state.searchTag;
+      console.log("Esta é a nova tag", this.tag);
+      this.tags.push(this.tag);
+      console.log("Estas sao as tags", this.tags);
+    }
   },
   updated() {
     if (this.searchBy == "All") {
@@ -150,15 +160,12 @@ export default {
       this.tags.length = 0;
       this.tag = "";
     }
-    if (this.tags.length == 1) {
-      this.tag = this.tags[0].text;
-    }
     console.log(this.tag);
     console.log(this.keyword);
     console.log(this.tags.length);
   },
   beforeDestroy() {
-    // this.$store.dispatch("search_tag", "");
+    this.$store.dispatch("search_tag", "");
   },
   computed: {
     autocompleteItems() {
@@ -175,21 +182,32 @@ export default {
         "filteredThreads catalog.vue"
       );
       return this.$store.state.threads.threads_.filter((thread, cont) => {
+        let thread1 = false;
         if (cont + 1 <= this.totalThreads) {
-          if (this.tags.length == 1) {
+          if (this.tags.length > 0) {
             console.log("Entra");
-
-            if (thread.tags.find(tag => tag.text == this.tag)) {
-              return true;
-              console.log("Entra");
+            for (let i = 0; i < this.tags.length; i++) {
+              if (thread.tags.find(tag => tag.text == this.tags[i].text)) {
+                thread1 = true;
+                console.log("Entra");
+              } else {
+                thread1 = false;
+              }
             }
           } else if (this.keyword != "") {
-            if (thread.title.toLowerCase().includes(this.keyword.toLowerCase()))
-              return true;
+            if (
+              thread.title.toLowerCase().includes(this.keyword.toLowerCase())
+            ) {
+              thread1 = true;
+            } else {
+              thread1 = false;
+            }
           } else if (this.keyword == "" && this.tags.length == 0) {
-            return true;
+            thread1 = true;
           }
         }
+
+        return thread1;
       });
     }
   },
@@ -243,7 +261,7 @@ export default {
         params: {
           threadid: id
         }
-      })
+      });
     }
   },
   filters: {
@@ -256,7 +274,6 @@ export default {
   }
 };
 </script>
-
 
 <style scoped>
 /* #letabela {
