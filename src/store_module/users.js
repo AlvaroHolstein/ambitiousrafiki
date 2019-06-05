@@ -79,12 +79,12 @@ class User {
         console.log(all);
         // let batota = 20;
 
-        function badgeComparisson(goal, acutal) {
-            if(actual >= goal) gravar = true
-        }
+
         for (let badge of badgesArr) {
             let gravar = false;
-
+            function badgeComparisson(goal, actual) {
+                if (actual >= goal) gravar = true
+            }
             console.log(badge, "badge");
             console.log(this.experience, "experience");
             console.log(badge.goal)
@@ -106,22 +106,22 @@ class User {
              *  - (acrescentar mais)
              */
             if (badge.category == "help") {
-                switch(badge.specific) {
+                switch (badge.specific) {
                     case "answers":
                         badgeComparisson(badge.goal, numAnswers)
                         break;
-                    
-                    case "threads": 
-                        badgeComparisson(badge.goal, numThreads)
-                    break;
 
-                    case "comments": 
+                    case "threads":
+                        badgeComparisson(badge.goal, numThreads)
+                        break;
+
+                    case "comments":
                         badgeComparisson(badge.goal, numComments)
-                    break;
+                        break;
 
                     case "all":
-                    badgeComparisson(badge.goal, all)
-                    break;
+                        badgeComparisson(badge.goal, all)
+                        break;
 
                 }
                 // if (badge.goal <= all) {, por agora não vai ser usado
