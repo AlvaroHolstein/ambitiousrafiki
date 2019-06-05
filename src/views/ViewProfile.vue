@@ -60,6 +60,7 @@
       <about v-bind:user="user" v-if="ulIndex == 1" />
       <userBadges v-bind:user="user" v-if="ulIndex == 2" />
       <myThreads v-bind:threads="userThreads" v-if="ulIndex == 3" />
+      <myrankings v-if="ulIndex == 4" />
       <edit v-bind:user="user" v-if="ulIndex == 5" />
       <!-- <div v-if="ulIndex == 1">
         <h1>1</h1>
@@ -77,13 +78,15 @@ import about from "@/components/About.vue";
 import myThreads from "@/components/MyThreads.vue";
 import userBadges from "@/components/MyBadges.vue";
 import edit from "@/components/editProfile.vue";
+import myrankings from "@/components/MyRankings.vue";
 export default {
   components: {
     apexchart: VueApexCharts,
     about,
     myThreads,
     userBadges,
-    edit
+    edit,
+    myrankings
   },
   data() {
     return {

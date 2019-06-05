@@ -1,6 +1,6 @@
 <template>
   <div class="container" style="padding: 0px">
-    <table class="table table-striped" v-if="ranks.length>0">
+    <table class="table table-striped" v-if="users.length > 0">
       <thead class="thead-dark">
         <tr>
           <th scope="col">#</th>
@@ -9,10 +9,14 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(rank, cont) in ranks" v-bind:key="cont">
-          <th scope="row">{{rank.rank[0] + 1}}</th>
-          <td>{{rank.name}}</td>
-          <td>{{rank.level}}</td>
+        <tr
+          v-for="user in users"
+          v-bind:key="user.id"
+          v-bind:class="{ 'table-active': user.id == userid }"
+        >
+          <th scope="row">{{ user.rank }}</th>
+          <td>{{ user.name }}</td>
+          <td>{{ user.level }}</td>
         </tr>
       </tbody>
     </table>
@@ -23,47 +27,73 @@
 export default {
   data() {
     return {
-      ranks: [],
-      users: this.$store.getters.getUsers
+      users: []
     };
   },
   created() {
-    this.users.sort((a, b) => {
-      if (a.level > b.level) return -1;
-      if (a.level < b.level) return 1;
-      else return 0;
-    });
-    console.log(this.users)
+    this.$http
+      .get(`http://${this.$store.getters.getIp}/data-api/users`)
+      .then(res => {
+        this.users = this.sortUsers(res.data);
+        console.log(this.users);
+        let pos = this.users.findIndex(
+          user => user.id == this.$route.params.userid
+        );
 
-    //Ordenar users ranking global
-    for (let i = 0; i < this.users.length; i++) {
-      this.users[i].rank[0] = i;
-    }
+        if (pos < 5) {
+          console.log("Top 5");
+          this.users = this.users.map((user, index) => {
+            let newObj = {
+              id: user.id,
+              rank: index + 1,
+              name: user.name,
+              level: Math.floor(user.experience / 100) + 1
+            };
+            return newObj;
+          });
+          this.users.length = 5;
+        } else {
+          console.log("Abaixo do top 5");
+          let ranks = [];
+          for (let i = pos; i >= 0; i--) {
+            ranks.push(this.users[i]);
+          }
+          ranks.reverse();
+          this.users = [];
 
-    let pos = this.getIndexByID();
-    console.log(pos);
-    let cont = 5;
-    if (pos <= 1) {
-      console.log("TOP 5");
-      for (let i = 0; i < cont; i++) {
-        this.ranks.push(this.users[i]);
-        console.log('ata');
-      }
-    } else if (pos >= 0) {
-      console.log("Está a meio ou no fim da ladder");
-      for (let i = pos + 1 - cont; i < pos + 1; i++) {
-        this.ranks.push(this.users[i]);
-        console.log('ata2');
-      }
-    }
-    console.log(this.ranks)
+          ranks = ranks.map((user, index) => {
+            let newObj = {
+              id: user.id,
+              rank: index + 1,
+              name: user.name,
+              level: Math.floor(user.experience / 100) + 1
+            };
+            return newObj;
+          });
+          for (let i = pos + 1 - 5; i < pos + 1; i++) {
+            this.users.push(ranks[i]);
+          }
+          console.log("Ranks", ranks);
+        }
+      });
   },
   methods: {
-    getIndexByID() {
-      return this.users.findIndex(
-        user => user.id == this.$store.getters.getloginID
-      );
+    sortUsers(usersR) {
+      let users = usersR.sort((a, b) => {
+        if (a.experience > b.experience) return -1;
+        if (a.experience < b.experience) return 1;
+        else return 0;
+      });
+
+      return users;
     }
   }
 };
 </script>
+<style>
+.table-active,
+.table-active > td,
+.table-active > th {
+  background-color: rgb(255, 223, 135);
+}
+</style>
