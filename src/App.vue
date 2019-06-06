@@ -7,7 +7,7 @@
     </div>-->
     <router-view/>
     <Footer/>
-    <searchThing />
+    <searchThing/>
   </div>
 </template>
 
@@ -46,14 +46,21 @@ export default {
         }
       })
         .then(res => {
-          console.log(res.data)
+          console.log(res.data);
           if (res.data.auth == true) {
-            this.$http.get(`http://${this.$store.getters.getIp}/data-api/users/${res.data.userId}`)
-            .then(resp => {
-              this.$store.commit("users/setLoggedUser", resp.data)
-            }).catch(err => {
-              if(err) throw err
-            });
+            this.$http
+              .get(
+                `http://${this.$store.getters.getIp}/data-api/users/${
+                  res.data.userId
+                }`
+              )
+              .then(resp => {
+                this.$store.commit("users/setLoggedUser", resp.data);
+                this.$store.dispatch("users/user_badges").then(() => console.log("memememememememememememememeem"));
+              })
+              .catch(err => {
+                if (err) throw err;
+              });
           }
         })
         .catch(err => {

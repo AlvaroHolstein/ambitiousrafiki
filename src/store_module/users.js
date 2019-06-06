@@ -1,3 +1,6 @@
+import axios from "axios";
+import { async } from "q";
+
 class User {
   constructor(
     /**
@@ -48,7 +51,7 @@ class User {
     let trueRank = null;
     // console.log(this.level);
     switch (
-      rank //O calculo do rank deve estar mal....
+    rank //O calculo do rank deve estar mal....
     ) {
       case 0:
         trueRank = "A começar";
@@ -72,7 +75,7 @@ class User {
     let badges = [];
     this.badges = [];
     // console.log(threadsArr);
-    let all = this.getThreads(threadsArr, commentsArr, answersArr); //Isto depois vai substituir a batota
+    let all = this.getTotContribution(threadsArr, commentsArr, answersArr); //Isto depois vai substituir a batota
     let numThreads = this.getTotThreads(threadsArr);
     let numAnswers = this.getTotAnswers(answersArr);
     let numComments = this.getTotComments(commentsArr);
@@ -132,11 +135,11 @@ class User {
         badges.push(badge.id);
       }
     }
-    console.log(badges);
+    console.log(badges, "lalalalalalalala badges");
     return badges;
   }
 
-  getThreads(threadsArr, commentsArr, answersArr) {
+  getTotContribution(threadsArr, commentsArr, answersArr) {
     /* Vai ter que returnar um numero */
     let total = 0;
 
@@ -159,10 +162,13 @@ class User {
     if (this.notifications.length == 6) this.notifications.shift();
   }
 }
+
+/** VUEX */
 const users = {
   namespaced: true,
   state: {
     userClass: User,
+<<<<<<< HEAD
     /**
      * Não vai haver uma variável tipo (isLoggedIn),
      * vai se ver se o loggedUser é diferente de null
@@ -170,9 +176,12 @@ const users = {
     loggedUser: null,
     lastViewedThread: null
     // notifications: [] //As notificações só vão ser preenchidas na mutation getLoggedUser
+=======
+    loggedUser: null
+>>>>>>> still many changes to go
   },
   mutations: {
-    // Preencher o loggedUser e as notifications
+    /** Preencher o loggedUser */
     setLoggedUser(state, payload) {
       console.log(payload, "PAYLOAD NO SETLOGGEDUSER!!!!!!!!!!!!!");
       let {
@@ -202,12 +211,13 @@ const users = {
         notifications
       );
       console.log(state.loggedUser, "LOGGED USEER !!!!!?!?!?!?!?!?!!?!?!? ");
-      // state.notifications = payload.notifications
     },
+    /**REmover loggedUSer */
     unLoggedUser(state) {
       console.log(state, "unLoggedUser");
       state.loggedUser = null;
     },
+    /** Fazer Follow/Unfollow ("add"/"remove") */
     changeFollow(state, payload) {
       console.log(payload, "payload no users.js changeFollow()");
       if (payload.type == "add") {
@@ -217,6 +227,7 @@ const users = {
         state.loggedUser.follow.splice(index, 1);
       }
     },
+<<<<<<< HEAD
     SET_LAST_THREAD(state, payload) {
       state.lastViewedThread = payload;
     }
@@ -228,6 +239,67 @@ const users = {
     },
     set_last_thread(context, payload) {
       context.commit("SET_LAST_THREAD", payload);
+=======
+    /** Preencher os badges de um user */
+    user_badges(state, payload) {
+      console.log(payload, "User badges na mutation user_badges")
+      state.loggedUser.badges = payload
+    },
+    add_upvote(state, payload) {
+      if (state.loggedUser.burnedUpvotes != undefined) {
+        state.loggedUser.burnedUpvotes.push(payload)
+      }
+    }
+  },
+  actions: {
+    /** Buscar os badges e filtrar-los para depois fazer commit deles */
+    user_badges({ rootGetters, rootState, commit, state }) {
+      async function aux() {
+        try {
+          let threads = await axios.get(`http://${rootGetters.getIp}/data-api/threads/userThreads/${state.loggedUser.id}`).then(res => res.data)
+          let answers = await axios.get(`http://${rootGetters.getIp}/data-api/userAnswers/${state.loggedUser.id}`).then(res => res.data)
+          let comments = await axios.get(`http://${rootGetters.getIp}/data-api/userComments/${state.loggedUser.id}`).then(res => res.data)
+          return {
+            th: threads,
+            ans: answers,
+            com: comments
+          }
+        }
+        catch (err) {
+          console.log(err, "ERRO no users/user_badges!!!!!!!!!")
+        }
+      }
+      aux().then((res) => {
+        commit("user_badges", state.loggedUser.getBadges(rootState.badges, res.th, res.com, res.ans))
+        return;
+      })
+    },
+
+    /** Adicionar Upvote */
+    add_upvote({ state, commit, rootGetters }, { upv, burnUpv, login }) {
+
+      let exp = 30
+
+      /** A confirmação se o upvote é ou não
+       * burned, é feita no back-end só
+       */
+
+      axios({
+        url: `http://${rootGetters.getIp}/data-api/users/${burnUpv.userId}/isBurned`,
+        method: "post",
+        data: upv,
+        headers: {
+          "x-access-token": login
+        }
+      }).then(res => {
+        if(!res.data.isBurned) {
+          /** Agora vou dar commit da experiencia e a seguir 
+           * faz se o pedido à API para alterar o user
+           */
+          commit("add_upvote")
+        }
+      })
+>>>>>>> still many changes to go
     }
   },
   getters: {}

@@ -16,18 +16,6 @@ const threads = {
             console.log(payload, "payload na MUTATION")
             state.threads_ = payload
         },
-        /**
-         * Answers
-         */
-        getAnswers(state, payload) {
-
-        },
-        /**
-         * Comments
-         */
-        getComments(state, payload) {
-
-        }
     },
     actions: {
         /**
@@ -44,22 +32,33 @@ const threads = {
             }
             else console.log('Os users já estão preenchidos');
         },
-        /**
-         * Get Answers
-         */
-        getAnswers({ commit, rootGetters }, id_thread) {
-            axios.get(`http://${rootGetters.getIp}/data-api/threads/${id_thread}`)
-                .then(res => {
-                    // TODO: 
-                    console.log(res.data)
-                })
-            // console.log(rootGetters, 'LELELELELEL')
+
+        /** REmover Upvotes */
+        remove_upvote_thread({ rootGetters }, payload) {
+            axios({
+                url: `http://${rootGetters.getIp}/data-api/threads/${
+                    payload.th.id
+                    }/downvote`,
+                method: "put",
+                headers: {
+                    "x-access-token": payload.login
+                }
+            }).catch(err => {
+                throw err;
+            });
         },
-        /**
-         * getComments
-         */
-        getComments({ commit }, id_ans) {
-            console.log('comments')
+
+        /** Adicionar Upvotes */
+        add_upvote_thread({ rootGetters }, payload) {
+            axios({
+                url: `http://${rootGetters.getIp}/data-api/threads/${
+                    payload.th.id
+                    }/upvote`,
+                method: "put",
+                headers: {
+                    "x-access-token": payload.login
+                }
+            }).catch(err => { throw err })
         }
     }
 }

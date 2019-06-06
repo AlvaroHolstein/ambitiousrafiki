@@ -159,6 +159,7 @@ export default {
             console.log(setCookie, "SET COOKIE");
             document.cookie = setCookie.toString();
             this.$store.commit("users/setLoggedUser", user);
+            this.$store.dispatch("users/user_badges")
             this.$router.push({
               name: "viewProfile",
               params: {

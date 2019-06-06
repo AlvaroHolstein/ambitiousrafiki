@@ -79,9 +79,9 @@ export default {
     let ip = this.$store.getters.getIp;
     let allBadges = this.$store.state.badges;
     // console.log(theUser, "USER");
-    function fillBadges(badges) {
-      this.myBadges = badges;
-    }
+    // function fillBadges(badges) {
+    //   this.myBadges = badges;
+    // }
     async function getItems() {
       let userThreads = await axios
         .get(`http://${ip}/data-api/threads/userThreads/${theUser.id}`)
