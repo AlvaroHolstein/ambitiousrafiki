@@ -5,14 +5,22 @@
       class="list-group"
       v-if="relatedThreads.length > 0"
     >
-      <a
-        style="width:100%"
-        class="list-group-item"
-        v-for="thread in relatedThreads"
-        v-bind:key="thread.id"
-        @click="goToThread(thread.id)"
-        >{{ thread.title }}</a
-      >
+      <div v-for="thread in relatedThreads" v-bind:key="thread.id">
+        <a
+          style="width:100%"
+          class="list-group-item"
+          @click="goToThread(thread.id)"
+          v-if="thread.title.length < 20"
+          >{{ thread.title }}</a
+        >
+        <a
+          style="width:100%"
+          class="list-group-item"
+          @click="goToThread(thread.id)"
+          v-else
+          >{{ thread.title.substring(0, 19) + "..." }}</a
+        >
+      </div>
     </div>
     <div v-else>
       <a style="width:100%" class="list-group-item">No Topics at the moment</a>

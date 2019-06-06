@@ -4,15 +4,22 @@
       style="padding: 0 0 0 5; padding-inline-start: 20px"
       class="list-group"
     >
-      <!-- Assim só aparece 5 threads -->
-      <a
-        style="width:100%"
-        class="list-group-item"
-        v-for="thread in hotTopics"
-        v-bind:key="thread.id"
-        @click="goToThread(thread.id)"
-        >{{ thread.title }}</a
-      >
+      <div v-for="thread in hotTopics" v-bind:key="thread.id">
+        <a
+          style="width:100%"
+          class="list-group-item"
+          @click="goToThread(thread.id)"
+          v-if="thread.title.length < 20"
+          >{{ thread.title }}</a
+        >
+        <a
+          style="width:100%"
+          class="list-group-item"
+          @click="goToThread(thread.id)"
+          v-else
+          >{{ thread.title.substring(0, 19) + "..." }}</a
+        >
+      </div>
     </div>
   </div>
 </template>

@@ -315,6 +315,9 @@ const users = {
           commit("add_upvote");
         }
       });
+    },
+    set_last_thread(context, payload) {
+      context.commit("SET_LAST_THREAD", payload);
     }
   },
   getters: {}
