@@ -15,7 +15,10 @@
         <h3 style="padding: 0 0 0 5; padding-inline-start: 20px">
           Topics For You
         </h3>
-        <related v-f="show"></related>
+        <related v-if="show"></related>
+        <div v-else>
+                <a style="width:100%" class="list-group-item">Please Log in</a>
+        </div>
       </div>
     </div>
   </div>
@@ -24,6 +27,7 @@
 <script>
 import Catalog from "@/components/Catalog.vue";
 import hotTopics from "@/components/hotTopics.vue";
+
 import mostViewed from "@/components/mostViewed.vue";
 import Related from "@/components/recommended.vue";
 
@@ -44,10 +48,9 @@ export default {
   },
   created() {
     if (this.$store.state.users.loggedUser !== null) {
-      //WHAT
-      if (this.$store.state.users.lastViewedThread.length != null) {
+  
         this.show = true;
-      }
+     
     }
   },
   /* created() {
