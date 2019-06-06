@@ -46,41 +46,18 @@ export default {
         user_name: "",
         user_email: "",
         text: "",
-        date: new Date().toISOString().split('T')[0],
-        time: new Date().toISOString().split('T')[1]
       }
     };
   },
   methods: {
     submit() {
-      const conf = Swal.mixin({
-        position: "center",
-        showConfirmButton: false,
-        timer: 3000
-      });
-
-      if (this.form.subject != "") {
-        emailjs.send("gmail", "contact_form", this.form).then(
-          response => {
-            console.log("SUCCESS!", response.status, response.text);
-            conf({
-              type: "success",
-              text:
-                "E-mail enviado com sucesso, \nResponderemos o mais breve possivel."
-            });
-          }
-          ,
-          error => {
-            console.log("Falhou.....!", error);
-            conf({
-              type: "error",
-              text: "Alguma coisa correu mal, \nTenta mais tarde."
-            });
-          }
-        );
-      } else {
-        console.log("Escolhe uma categoria");
-      }
+      
+      this.$http.post(`http://${this.$store.getters.getIp}/data-api/contact`,{
+        email:this.form.user_email,
+        name:this.form.user_name,
+        message:this.form.text,
+        subject:this.form.subject,
+      }).then(res=>console.log(res))
     }
   }
 };
