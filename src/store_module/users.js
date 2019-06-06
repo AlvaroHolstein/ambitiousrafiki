@@ -51,7 +51,7 @@ class User {
     let trueRank = null;
     // console.log(this.level);
     switch (
-    rank //O calculo do rank deve estar mal....
+      rank //O calculo do rank deve estar mal....
     ) {
       case 0:
         trueRank = "A começar";
@@ -168,7 +168,6 @@ const users = {
   namespaced: true,
   state: {
     userClass: User,
-<<<<<<< HEAD
     /**
      * Não vai haver uma variável tipo (isLoggedIn),
      * vai se ver se o loggedUser é diferente de null
@@ -176,9 +175,6 @@ const users = {
     loggedUser: null,
     lastViewedThread: null
     // notifications: [] //As notificações só vão ser preenchidas na mutation getLoggedUser
-=======
-    loggedUser: null
->>>>>>> still many changes to go
   },
   mutations: {
     /** Preencher o loggedUser */
@@ -227,7 +223,6 @@ const users = {
         state.loggedUser.follow.splice(index, 1);
       }
     },
-<<<<<<< HEAD
     SET_LAST_THREAD(state, payload) {
       state.lastViewedThread = payload;
     }
@@ -239,15 +234,15 @@ const users = {
     },
     set_last_thread(context, payload) {
       context.commit("SET_LAST_THREAD", payload);
-=======
+    },
     /** Preencher os badges de um user */
     user_badges(state, payload) {
-      console.log(payload, "User badges na mutation user_badges")
-      state.loggedUser.badges = payload
+      console.log(payload, "User badges na mutation user_badges");
+      state.loggedUser.badges = payload;
     },
     add_upvote(state, payload) {
       if (state.loggedUser.burnedUpvotes != undefined) {
-        state.loggedUser.burnedUpvotes.push(payload)
+        state.loggedUser.burnedUpvotes.push(payload);
       }
     }
   },
@@ -256,50 +251,70 @@ const users = {
     user_badges({ rootGetters, rootState, commit, state }) {
       async function aux() {
         try {
-          let threads = await axios.get(`http://${rootGetters.getIp}/data-api/threads/userThreads/${state.loggedUser.id}`).then(res => res.data)
-          let answers = await axios.get(`http://${rootGetters.getIp}/data-api/userAnswers/${state.loggedUser.id}`).then(res => res.data)
-          let comments = await axios.get(`http://${rootGetters.getIp}/data-api/userComments/${state.loggedUser.id}`).then(res => res.data)
+          let threads = await axios
+            .get(
+              `http://${rootGetters.getIp}/data-api/threads/userThreads/${
+                state.loggedUser.id
+              }`
+            )
+            .then(res => res.data);
+          let answers = await axios
+            .get(
+              `http://${rootGetters.getIp}/data-api/userAnswers/${
+                state.loggedUser.id
+              }`
+            )
+            .then(res => res.data);
+          let comments = await axios
+            .get(
+              `http://${rootGetters.getIp}/data-api/userComments/${
+                state.loggedUser.id
+              }`
+            )
+            .then(res => res.data);
           return {
             th: threads,
             ans: answers,
             com: comments
-          }
-        }
-        catch (err) {
-          console.log(err, "ERRO no users/user_badges!!!!!!!!!")
+          };
+        } catch (err) {
+          console.log(err, "ERRO no users/user_badges!!!!!!!!!");
         }
       }
-      aux().then((res) => {
-        commit("user_badges", state.loggedUser.getBadges(rootState.badges, res.th, res.com, res.ans))
+      aux().then(res => {
+        commit(
+          "user_badges",
+          state.loggedUser.getBadges(rootState.badges, res.th, res.com, res.ans)
+        );
         return;
-      })
+      });
     },
 
     /** Adicionar Upvote */
     add_upvote({ state, commit, rootGetters }, { upv, burnUpv, login }) {
-
-      let exp = 30
+      let exp = 30;
 
       /** A confirmação se o upvote é ou não
        * burned, é feita no back-end só
        */
 
       axios({
-        url: `http://${rootGetters.getIp}/data-api/users/${burnUpv.userId}/isBurned`,
+        url: `http://${rootGetters.getIp}/data-api/users/${
+          burnUpv.userId
+        }/isBurned`,
         method: "post",
         data: upv,
         headers: {
           "x-access-token": login
         }
       }).then(res => {
-        if(!res.data.isBurned) {
-          /** Agora vou dar commit da experiencia e a seguir 
+        if (!res.data.isBurned) {
+          /** Agora vou dar commit da experiencia e a seguir
            * faz se o pedido à API para alterar o user
            */
-          commit("add_upvote")
+          commit("add_upvote");
         }
-      })
->>>>>>> still many changes to go
+      });
     }
   },
   getters: {}

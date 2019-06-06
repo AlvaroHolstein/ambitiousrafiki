@@ -12,7 +12,7 @@
                 class="form-control"
                 placeholder="Your Email *"
                 v-model="loginEmail"
-              >
+              />
             </div>
             <div class="form-group">
               <input
@@ -21,26 +21,41 @@
                 placeholder="Your Password *"
                 v-model="loginPassword"
                 value
-              >
+              />
             </div>
             <div class="form-group">
-              <input type="submit" class="btnSubmit" value="Login" :disabled="loginEmail==''">
+              <input
+                type="submit"
+                class="btnSubmit"
+                value="Login"
+                :disabled="loginEmail == ''"
+              />
             </div>
           </form>
 
           <!-- FORGOT PASSWORD -->
-          <form v-on:submit.prevent="forgotPassword()">
+          <form v-on:submit.prevent="sendmail()">
             <div class="form-group">
-              <p class="btnForgetPwd" v-on:click="showfp = !showfp; emailfp = null">Forgot Password?</p>
+              <p
+                class="btnForgetPwd"
+                v-on:click="
+                  showfp = !showfp;
+                  emailfp = null;
+                "
+              >
+                Forgot Password?
+              </p>
               <div class="col-md-12" v-show="showfp">
-                <p class="form-text">Insert your e-mail and we send you Rafiki</p>
+                <p class="form-text">
+                  Insert your e-mail and we send you Rafiki
+                </p>
                 <input
                   type="email"
                   v-model="emailfp"
                   class="form-control"
                   placeholder="E-mail..."
                   required
-                >
+                />
                 <div class="col-md-12 text-right" style="margin-top: 1rem;">
                   <button type="submit" class="btn btn-success">Enviar</button>
                 </div>
@@ -61,7 +76,7 @@
                 placeholder="Your Username"
                 v-model="regUsername"
                 required
-              >
+              />
             </div>
             <div class="form-group">
               <input
@@ -70,7 +85,7 @@
                 placeholder="Your Email"
                 v-model="regEmail"
                 required
-              >
+              />
             </div>
             <div class="form-group">
               <input
@@ -79,7 +94,7 @@
                 placeholder="Your Password *"
                 v-model="regPassword"
                 required
-              >
+              />
             </div>
             <div class="form-group">
               <input
@@ -88,10 +103,15 @@
                 placeholder="Confirm Password *"
                 v-model="regConfPassword"
                 required
-              >
+              />
             </div>
             <div class="form-group">
-              <input type="button" class="btnSubmit" value="Register" @click="register">
+              <input
+                type="button"
+                class="btnSubmit"
+                value="Register"
+                @click="register"
+              />
             </div>
           </form>
         </div>
@@ -159,29 +179,41 @@ export default {
             console.log(setCookie, "SET COOKIE");
             document.cookie = setCookie.toString();
             this.$store.commit("users/setLoggedUser", user);
-            this.$store.dispatch("users/user_badges")
+            this.$store.dispatch("users/user_badges");
             this.$router.push({
               name: "viewProfile",
               params: {
                 userid: this.$store.state.users.loggedUser.id
               }
-            })
+            });
           }
         })
         .catch(err => {
-          Swal.fire("Credencias Erradas", "Username ou password erradas", "error")
+          Swal.fire(
+            "Credencias Erradas",
+            "Username ou password erradas",
+            "error"
+          );
           console.log(err, "Erro ao fazer Login");
         });
     },
-    forgotPassword() {
-      /**
-       * Forgot Password
-       */
+    sendmail() {
+      let data = {
+        email: this.emailfp
+      };
+      this.$http
+        .post(
+          `http://${this.$store.state.address +
+            this.$store.state.port}/auth-api/passwordreset`,
+          data
+        )
+        .then(res => {
+          Swal.fire("Mail Sent");
+        });
     }
   }
 };
 </script>
-
 
 <!-- 
 let focusReg = false;
