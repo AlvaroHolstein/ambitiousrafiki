@@ -30,29 +30,24 @@
     <ul class="nav nav-tabs" id="nav" style="margin-bottom:1em">
       <!-- Quais e como é que vão ser mostradas as tabs só para o loggedUser -->
       <li class="nav-item">
-        <button class="btn btn-primary" v-on:click="ulIndex = 1">About</button>
+        <a class="nav-link" v-on:click="ulIndex = 1">About</a>
       </li>
 
       <li class="nav-item">
-        <button class="btn btn-primary" v-on:click="ulIndex = 2">
-          User Badges
-        </button>
+        <a class="nav-link" v-on:click="ulIndex = 2">User Badges</a>
       </li>
 
-      <li class="nav-item">
-        <button class="btn btn-primary" v-on:click="ulIndex = 3">
-          My Threads
-        </button>
+      <li class="nav-item" v-if="ownProfile">
+        <a class="nav-link" v-on:click="ulIndex = 3">My Threads</a>
+      </li>
+      <li class="nav-item" v-else>
+        <a class="nav-link" v-on:click="ulIndex = 3">User Threads</a>
       </li>
       <li v-if="ownProfile" class="nav-item">
-        <button class="btn btn-primary" v-on:click="ulIndex = 4">
-          Ranking
-        </button>
+        <a class="nav-link" v-on:click="ulIndex = 4">Ranking</a>
       </li>
       <li v-if="ownProfile" class="nav-item">
-        <button class="btn btn-primary" v-on:click="ulIndex = 5">
-          Edit Profile
-        </button>
+        <a class="nav-link" v-on:click="ulIndex = 5">Edit Profile</a>
       </li>
     </ul>
     <transition name="fade" mode="out-in">
@@ -562,8 +557,5 @@ export default {
 }
 .fitWindow {
   height: calc(100vh - 200px);
-}
-ul#nav li {
-  margin-right: 2px;
 }
 </style>
