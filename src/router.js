@@ -27,6 +27,10 @@ import home from "@/views/Home.vue";
  * Login Page
  */
 import login from "@/views/Login.vue";
+/**
+ * Back Office
+ */
+import backoffice from "@/views/BackOffice.vue";
 
 /**
  * Páginas "Simples"
@@ -107,7 +111,15 @@ export default new Router({
       path: "/createThread",
       name: "createThread",
       component: createThread
-    }
+    },
+    {
+      path: "/backoffice",
+      name: "backoffice",
+      component: backoffice,
+      meta: {
+        admin: true
+      }
+    },
     // {
     //   path: "/about",
     //   name: "about",

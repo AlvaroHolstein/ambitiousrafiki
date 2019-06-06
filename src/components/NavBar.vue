@@ -35,7 +35,7 @@
           <a v-on:click="goToUserProfile()" class="nav-link pointer">Profile</a>
         </li>
         <li v-if="toBeOrNotToBeAdmin" class="nav-item">
-          <a class="nav-link pointer">Back-Office</a>
+          <router-link :to="{name:'backoffice'}" :class="{'nav-link': true}"> Back-Office</router-link>
         </li>
         <li>
           <hr>
