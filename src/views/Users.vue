@@ -27,7 +27,7 @@
           <div class="user-front">
             <img v-bind:src="user.picture" class="img-fluid">
             <a class="userName">{{user.name}}</a>
-            <p>LEVEL - {{user.experience}}</p>
+            <p>LEVEL - {{level(user.experience)}}</p>
             <!-- <p>RANK - {{user.rank[1]}}</p> -->
           </div>
         </div>
@@ -81,6 +81,9 @@ export default {
             .includes(this.userSearch.toUpperCase());
         }
       });
+    },
+    level(exp) {
+      return Math.floor(exp/100)+1
     }
   },
   computed: {

@@ -30,17 +30,17 @@
         class="text-center d-flex flex-column justify-content-center"
       >
         <p class="p-2">Search By Keyword</p>
-        <br />
+        <br>
         <input
           class="p-2 mx-auto"
           type="text"
           style="width:49%;"
           v-model="keyword"
           placeholder="Search By Keyword"
-        />
+        >
       </div>
     </div>
-    <br />
+    <br>
     <div class="table-responsive">
       <table class="table table-striped table-hover table-bordered">
         <thead class="thead-dark">
@@ -56,13 +56,11 @@
           <tr v-for="thread in filteredThreads" v-bind:key="thread.id">
             <td>
               <!-- v-on:click="" -->
-              <a v-on:click="goToThread(thread.id)" class="title">
-                {{ thread.title }}
-              </a>
+              <a v-on:click="goToThread(thread.id)" class="title">{{ thread.title }}</a>
             </td>
             <td>
               <!-- v-bind:src="" -->
-              <img v-bind:src="thread.userInfo.photo" class="img-fluid pic" />
+              <img v-bind:src="thread.userInfo.photo" class="img-fluid pic">
             </td>
             <td>{{ thread.views }}</td>
 
@@ -72,44 +70,9 @@
         </tbody>
       </table>
       <div class="text-center">
-        <button v-on:click="moreThreads()" class="btn btn-outline-dark">
-          View More
-        </button>
+        <button v-on:click="moreThreads()" class="btn btn-outline-dark">View More</button>
       </div>
     </div>
-
-    <!-- <div
-      class="border-pill border col-sm-12"
-      v-for="thread in filteredThreads"
-      v-bind:key="thread.id"
-      style="width: 100%;margin-bottom: 20px;"
-    >
-       <div class="col-sm-3">
-          <img src="../assets/logo.png" class="card-img-left img-fluid" alt="...">
-      </div>
-      <div class="card-body">
-        <a
-          tag="h5"
-          class="card-title titulo"
-        >{{thread.title}}</a>
-        <h6 class="card-subtitle mb-2 text-muted">{{thread.date}}</h6>
-        <p class="card-text">
-          <span v-for="tag in thread.tags" v-bind:key="tag.id">{{tag.text}}</span>
-        </p>
-        <a href="#" class="card-link">{{thread.id}}</a>
-        <a href="#" class="card-link">{{thread.views}}</a>
-        >{{thread.title}}</router-link>
-
-        <div class="item-content-block tags">
-          <a v-for="tag in thread.tags" v-bind:key="tag.id">{{tag.text}}</a>
-        </div>
-        <a href="#" class="card-link">Upvotes {{thread.upvotes}}</a>
-        <a href="#" class="card-link">Views {{thread.views}}</a>
-        <a href="#" class="card-link"> Upvotes {{thread.upvotes}}</a>
-        <a href="#" class="card-link"> Views {{thread.views}}</a>
-        <h6 class="card-subtitle mb-2 text-muted">Posted {{thread.date}}</h6>
-      </div>
-    </div>-->
   </div>
 
   <!-- </div> -->
@@ -133,7 +96,8 @@ export default {
     };
   },
   created() {
-    this.$store.dispatch("threads/getInitialThreads", 2);
+    /** Ir buscar as Threads inicias dependendo de quantas se quer mostrar na tabela */
+    this.$store.dispatch("threads/getInitialThreads", this.totalThreads);
 
     this.$http
       .get(`http://${this.$store.getters.getIp}/data-api/tags`)
@@ -180,6 +144,7 @@ export default {
       );
       return this.$store.state.threads.threads_.filter((thread, cont) => {
         let thread1 = false;
+        /** Mais um delimitador de threads a apresentar */
         if (cont + 1 <= this.totalThreads) {
           if (this.tags.length > 0) {
             console.log("Entra");
@@ -223,12 +188,22 @@ export default {
         }
       );
       console.log(alreadyHere);
+      if (alreadyHere.length > this.totalThreads) {
+        /** Sim smi sim, era mais fácil fazer sempre pedidos e "esvaziar" o array */
+        console.log(alreadyHere, this.totalThreads, "Ainda não vai ser preciso fazer pedidos")
+        this.totalThreads*=2
+      } else {
+        this.getThreads_();
+      }
+    },
+    getThreads_() {
       this.$http
         .post(
           `http://${this.$store.getters.getIp}/data-api/threads/findAndExclude`,
           {
             exclude: alreadyHere,
-            qty: 1
+            /** Vai buscar o numero de threads a apresentar na tabela */
+            qty: this.totalThreads
           }
         )
         .then(res => {

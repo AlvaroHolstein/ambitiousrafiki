@@ -431,7 +431,6 @@ export default {
     /** É preciso estar logado */
     /** Follow/Unfollow */
     seguir() {
-      // Feito
       //Como só dá para seguir a thread, usar o threadF.id
       /**
        * Chamada à API para incrementar follow na thread e
@@ -465,7 +464,7 @@ export default {
               console.log(res.data, "Followed");
               this.threadF.follow++;
             });
-          /** User
+          /** User que segue
            *  Altera-se o loggedUser e manda-se lho para a BD,
            * mas neste caso, só o array de follow
            */
@@ -488,6 +487,13 @@ export default {
               "x-access-token": loginCookie
             }
           }).then(res => console.log("updated USer"));
+
+          /** User autor da Thread 
+           * Verificar se o follow está burned ou não 
+           * enviar (idUser (loggedUser) & idThread)
+          */
+         
+
         } else {
           this.$store.commit("users/changeFollow", {
             type: "remove",

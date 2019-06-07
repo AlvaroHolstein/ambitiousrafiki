@@ -29,24 +29,24 @@
 
     <ul class="nav nav-tabs" id="nav" style="margin-bottom:1em">
       <!-- Quais e como é que vão ser mostradas as tabs só para o loggedUser -->
-      <li class="nav-item">
+      <li class="nav-item pointer">
         <a class="nav-link" v-on:click="ulIndex = 1">About</a>
       </li>
 
-      <li class="nav-item">
+      <li class="nav-item pointer">
         <a class="nav-link" v-on:click="ulIndex = 2">User Badges</a>
       </li>
 
-      <li class="nav-item" v-if="ownProfile">
+      <li class="nav-item pointer" v-if="ownProfile">
         <a class="nav-link" v-on:click="ulIndex = 3">My Threads</a>
       </li>
-      <li class="nav-item" v-else>
+      <li class="nav-item pointer" v-else>
         <a class="nav-link" v-on:click="ulIndex = 3">User Threads</a>
       </li>
-      <li v-if="ownProfile" class="nav-item">
+      <li v-if="ownProfile" class="nav-item pointer">
         <a class="nav-link" v-on:click="ulIndex = 4">Ranking</a>
       </li>
-      <li v-if="ownProfile" class="nav-item">
+      <li v-if="ownProfile" class="nav-item pointer">
         <a class="nav-link" v-on:click="ulIndex = 5">Edit Profile</a>
       </li>
     </ul>
@@ -557,5 +557,8 @@ export default {
 }
 .fitWindow {
   height: calc(100vh - 200px);
+}
+.pointer {
+  cursor: pointer;
 }
 </style>
