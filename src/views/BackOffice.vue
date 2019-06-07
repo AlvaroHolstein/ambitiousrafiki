@@ -13,19 +13,17 @@
           <tr>
             <th></th>
             <th>Name</th>
-            <th>Rank</th>
             <th>Level</th>
             <th>Course</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(user) in getUsers" v-bind:key="user.id">
+          <tr v-for="(user) in users" v-bind:key="user.id">
             <td>
               <img v-bind:src="user.picture" class="img-fluid pic">
             </td>
             <td>{{user.name}}</td>
-            <td>ola</td>
             <td>
               <!--{{user.level}}
               {{getLevel(user.id)}}-->
@@ -229,7 +227,6 @@
 <script>
 import cookie from "cookie";
 export default {
-  
   data() {
     return {
       badges: this.$store.getters.getBadges,
@@ -242,7 +239,8 @@ export default {
       tagName: "",
       tags_: [],
       threads_: [],
-      level_: ""
+      level_: "",
+      users: []
     };
   },
   created() {
@@ -270,6 +268,7 @@ export default {
       )
       .then(res => (this.level_ = res.data))
       .catch(err => console.log(err, "level"));*/
+    this.getUsers();
   },
   methods: {
     deleteUser(id) {
@@ -278,10 +277,15 @@ export default {
       let headers = {
         "x-access-token": parsedCookie.login
       };
-      this.$http.delete(`http://${this.$store.getters.getIp}/data-api/users/${id}`,
-      {
-              headers:   headers
-            })
+      this.$http
+        .delete(`http://${this.$store.getters.getIp}/data-api/users/${id}`, {
+          headers: headers
+        })
+        .then(res => {
+          let index = this.users.findIndex(user => user.id == id);
+          console.log(index);
+          this.users.splice(index, 1);
+        }).catch(err => console.log(err, "erro no delete"));
     },
 
     deleteBadge(id) {
@@ -358,26 +362,18 @@ export default {
         .catch(err => console.log(err, "level"));
     },*/
     getUsers() {
-      let users = this.$store.state.users_root;
-
-      if (users.length == 0) {
-        this.$http
-          .get(
-            `http://${this.$store.state.address +
-              this.$store.state.port}/data-api/users`
-          )
-          .then(res => {
-            this.$store.state.users_root = res.data;
-            console.log(res.data, "res");
-            return this.$store.state.users_root;
-          })
-          .catch(err => {
-            console.log(err, "ERRO Users.vue");
-          });
-      } else {
-
-        return this.$store.state.users_root;
-      }
+      this.$http
+        .get(
+          `http://${this.$store.state.address +
+            this.$store.state.port}/data-api/users`
+        )
+        .then(res => {
+          this.users = res.data;
+          console.log(res.data, "res");
+        })
+        .catch(err => {
+          console.log(err, "ERRO Users.vue");
+        });
     },
     tags() {
       return this.tags_;
