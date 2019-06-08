@@ -3,6 +3,7 @@ import Vuex from "vuex";
 import users from "./store_module/users";
 import threads from "./store_module/threads";
 import axios from "axios";
+import cookie from "cookie";
 Vue.use(Vuex);
 
 export default new Vuex.Store({
@@ -30,13 +31,24 @@ export default new Vuex.Store({
     /**
      * VAriáveis de comunicação com a API
      */
-    address: "172.23.118.110", // "192.168.1.83", '172.23.116.246'
+    address: "192.168.1.75", // "192.168.1.83", '172.23.116.246'
     port: ":420"
   },
   mutations: {
     LOAD_BADGES(state, payload) {
       state.badges = payload;
       console.log(state.badges, "BADGES");
+    },
+    DELETE_BADGE(state, id) {
+      let index = state.badges.findIndex(badge => badge.id == id);
+      state.badges.splice(index, 1);
+    },
+    CREATE_BADGE(state, payload) {
+      state.badges.push(payload)
+      console.log(payload, "PAYLOAD NA MUTAÇÃO")
+      /*let aux = state.badges;
+      aux.push(payload);
+      state.badges = aux;*/
     },
     SEARCH_TAG(state, tag) {
       state.searchTag = tag;
@@ -49,6 +61,42 @@ export default new Vuex.Store({
         .then(res => commit("LOAD_BADGES", res.data))
         .catch(err => console.log(err, "ERRO na ACTION load_badges"));
     },
+    delete_badge(context, id) {
+      let parsedCookie = cookie.parse(document.cookie);
+      let headers = {
+        "x-access-token": parsedCookie.login
+      };
+      axios
+        .delete(`http://${context.state.address + context.state.port}/data-api/badges/${id}`, {
+          headers: headers
+        })
+        .then(function () { context.commit("DELETE_BADGE", id) })
+        .catch(err => console.log(err, "ERRO na ACTION delete_badge"))
+
+    },
+    create_badge(context, payload) {
+      let parsedCookie = cookie.parse(document.cookie);
+      let headers = {
+        "x-access-token": parsedCookie.login
+      };
+      console.log(payload, "PAYLOAADDDDDDD")
+      axios({
+        method: 'post',
+        url: `http://${context.state.address + context.state.port}/data-api/badges`,
+        data: {
+          id: payload.id,
+          name: payload.name,
+          goal: payload.goal,
+          desc: payload.desc,
+          category: payload.category
+        },
+        headers: headers
+      }).then(function () {console.log("BLAWWEWK"), context.commit("CREATE_BADGE", payload) })
+        .catch(err => console.log(err, "erro no create badges"));
+  
+    },
+
+
     search_tag(context, tag) {
       context.commit("SEARCH_TAG", tag);
     }

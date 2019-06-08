@@ -3,11 +3,19 @@
     <div class="row">
       <div class="col-md-12">
         <br>
-        <h2>Users</h2>
+        <h2>
+          Users
+          <button @click="showUsers=!showUsers" type="button" class="btn btn-sm">
+            <span class="badge">
+              <i class="fas fa-chevron-down"></i>
+            </span>
+          </button>
+        </h2>
         <hr>
       </div>
     </div>
-    <div class="table-responsive">
+    <transition name="slide-fade">
+    <div v-if="showUsers" class="table-responsive">
       <table class="table table-striped table-hover table-bordered">
         <thead class="thead-dark">
           <tr>
@@ -36,23 +44,30 @@
         </tbody>
       </table>
     </div>
+    </transition>
     <!-- BADGES -->
 
     <div class="row">
       <div class="col-md-12">
         <br>
-        <h2>Badges</h2>
+        <h2>Badges  <button @click="showBadges=!showBadges" type="button" class="btn btn-sm">
+            <span class="badge">
+              <i class="fas fa-chevron-down"></i>
+            </span>
+          </button></h2>
         <hr>
-        <button
+        <transition name="slide-fade">
+        <button v-if="showBadges"
           type="button"
           class="btn btn-success btn-lg"
+          style="margin-bottom:15px"
           @click="openDialog('badges')"
         >Create Badge</button>
-        <br>
-        <br>
+        </transition>
       </div>
     </div>
-    <div class="table-responsive">
+    <transition name="slide-fade">
+    <div v-if="showBadges" class="table-responsive">
       <table class="table table-striped table-hover table-bordered">
         <thead class="thead-dark">
           <tr>
@@ -76,6 +91,7 @@
         </tbody>
       </table>
     </div>
+    </transition>
     <dialog id="idDialog" ref="myDialog">
       <form method="dialog">
         <p>
@@ -138,11 +154,16 @@
     <div class="row">
       <div class="col-md-12">
         <br>
-        <h2>Threads</h2>
+        <h2>Threads  <button @click="showThreads=!showThreads" type="button" class="btn btn-sm">
+            <span class="badge">
+              <i class="fas fa-chevron-down"></i>
+            </span>
+          </button></h2>
         <hr>
       </div>
     </div>
-    <div class="table-responsive">
+    <transition name="slide-fade">
+    <div v-if="showThreads" class="table-responsive">
       <table class="table table-striped table-hover table-bordered">
         <thead class="thead-dark">
           <tr>
@@ -155,36 +176,40 @@
         <tbody>
           <tr v-for="(thread) in getThreads" v-bind:key="thread.id">
             <td>{{thread.title}}</td>
-            <td>{{thread.date}}</td>
-            <td>
-              <!--{{getUserById(thread.userInfo.userid).name}}-->
-              {{thread.userInfo.name}}
-            </td>
+            <td>{{ thread.date | filterDate }}</td>
+            <td>{{thread.userInfo.name}}</td>
             <td>
               <button type="button" class="btn btn-danger btn-sm" @click="deleteThread(thread.id)">X</button>
               <button
                 type="button"
-                class="btn btn-caution btn-sm"
+                class="btn btn-primary btn-sm"
+                style="margin-left: 5px; color:white"
                 @click="closeThread(thread.id)"
-                v-if="thread.closeDate==''"
               >Close</button>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
+    </transition>
 
     <!-- TAGS -->
     <div class="row">
       <div class="col-md-12">
         <br>
-        <h2>Tags</h2>
+        <h2>Tags  <button @click="showTags=!showTags" type="button" class="btn btn-sm">
+            <span class="badge">
+              <i class="fas fa-chevron-down"></i>
+            </span>
+          </button></h2>
         <hr>
-        <button
+        <transition name="slide-fade">
+        <button v-if="showTags"
           v-on:click="openDialog('tags')"
           type="button"
           class="btn btn-success btn-lg"
         >Create Tag</button>
+        </transition>
         <br>
         <br>
       </div>
@@ -201,7 +226,8 @@
         </form>
       </dialog>
     </div>
-    <div class="table-responsive">
+    <transition name="slide-fade">
+    <div v-if="showTags" class="table-responsive">
       <table class="table table-striped table-hover table-bordered">
         <thead class="thead-dark">
           <tr>
@@ -221,6 +247,7 @@
         </tbody>
       </table>
     </div>
+    </transition>
   </div>
 </template>
 
@@ -229,7 +256,11 @@ import cookie from "cookie";
 export default {
   data() {
     return {
-      badges: this.$store.getters.getBadges,
+      showUsers:false,
+      showBadges:false,
+      showThreads:false,
+      showTags:false,
+      badges: this.$store.state.badges,
       badgeId: "",
       badgeName: "",
       badgeGoal: "",
@@ -238,6 +269,7 @@ export default {
       dialog: "",
       tagName: "",
       tags_: [],
+      tagId: "",
       threads_: [],
       level_: "",
       users: []
@@ -270,6 +302,9 @@ export default {
       .catch(err => console.log(err, "level"));*/
     this.getUsers();
   },
+  /**
+   ***** METHODS *****
+   */
   methods: {
     deleteUser(id) {
       console.log(id);
@@ -285,32 +320,88 @@ export default {
           let index = this.users.findIndex(user => user.id == id);
           console.log(index);
           this.users.splice(index, 1);
-        }).catch(err => console.log(err, "erro no delete"));
+        })
+        .catch(err => console.log(err, "erro no delete"));
+    },
+    deleteThread(id) {
+      let parsedCookie = cookie.parse(document.cookie);
+      let headers = {
+        "x-access-token": parsedCookie.login
+      };
+      this.$http
+        .delete(`http://${this.$store.getters.getIp}/data-api/threads/${id}`, {
+          headers: headers
+        })
+        .then(res => {
+          let index = this.threads_.findIndex(thread => thread.id == id);
+          console.log(index);
+          this.threads_.splice(index, 1);
+        })
+        .catch(err => console.log(err, "erro no delete threads"));
+    },
+
+    deleteTag(id) {
+      let parsedCookie = cookie.parse(document.cookie);
+      let headers = {
+        "x-access-token": parsedCookie.login
+      };
+      this.$http
+        .delete(`http://${this.$store.getters.getIp}/data-api/tags/${id}`, {
+          headers: headers
+        })
+        .then(res => {
+          let index = this.tags_.findIndex(tag => tag.id == id);
+          console.log(index);
+          this.tags_.splice(index, 1);
+        })
+        .catch(err => console.log(err, "erro no delete tags"));
     },
 
     deleteBadge(id) {
       this.$store.dispatch("delete_badge", id);
     },
 
-    deleteThread(id) {
-      this.$store.dispatch("delete_thread", id);
+    //TAGS
+    // GET LAST TAG ID
+    getLastTagID() {
+      let maior;
+      if (this.tags_.length != 0) {
+        this.tags_.sort(function(a, b) {
+          if (a.id > b.id) return 1;
+          if (a.id < b.id) return -1;
+        });
+        maior = this.tags_[this.tags_.length - 1].id;
+        console.log(maior);
+        return maior;
+      } else {
+        return 0;
+      }
+    },
+    // CREATE TAG
+    createTag() {
+      let parsedCookie = cookie.parse(document.cookie);
+      let headers = {
+        "x-access-token": parsedCookie.login
+      };
+      this.tagId = this.getLastTagID() + 1;
+      this.$http
+        .post(`http://${this.$store.getters.getIp}/data-api/tags`, {
+          id: this.tagId,
+          text: this.tagName,
+          headers: headers
+        })
+        .then(res => {
+          console.log("THEN DO CREATE TAG");
+          let tag = {
+            id: this.tagId,
+            text: this.tagName
+          };
+          this.tags_.push(tag);
+          this.tagName = "";
+        })
+        .catch(err => console.log(err, "erro no create tags"));
     },
 
-    deleteTag(id) {
-      this.$store.dispatch("delete_tag", id);
-    },
-    createTag() {
-      let id =
-        this.$store.getters.getTags.length == 0
-          ? 1
-          : this.$store.getters.getTags[this.$store.getters.getTags.length - 1]
-              .id + 1;
-      console.log(
-        this.$store.getters.getTags[this.$store.getters.getTags.length - 1]
-      );
-      this.$store.dispatch("add_tag", { id: id, text: this.tagName });
-      this.tagName = "";
-    },
     openDialog(dialog) {
       if (dialog == "badges") this.$refs.myDialog.showModal();
       else if (dialog == "tags") this.$refs.addTag.showModal();
@@ -321,7 +412,7 @@ export default {
       else if (dialog == "tags") this.$refs.addTag.close();
     },
 
-    getLastID() {
+    getLastBadgeID() {
       let maior;
       if (this.badges.length != 0) {
         this.badges.sort(function(a, b) {
@@ -337,8 +428,8 @@ export default {
     },
 
     createBadge() {
-      this.badgeId = this.getLastID() + 1;
-      this.$store.dispatch("add_badge", {
+      this.badgeId = this.getLastBadgeID() + 1;
+      this.$store.dispatch("create_badge", {
         id: this.badgeId,
         name: this.badgeName,
         goal: this.badgeGoal,
@@ -353,7 +444,9 @@ export default {
       this.$store.dispatch("close_thread", id);
     }
   },
-
+  /**
+   ***** COMPUTED *****
+   */
   computed: {
     /*getLevel(id) {
       this.$http
@@ -384,10 +477,48 @@ export default {
     level() {
       return this.level_;
     }
+  },
+  filters: {
+    filterDate: function(value) {
+      if (!value) return "Sem data";
+
+      let date = value.split("T")[0].split("-");
+      return `${date[2]}/${date[1]}/${date[0]}`;
+    }
   }
 };
 </script>
 <style>
+bounce-enter-active {
+  animation: bounce-in .5s;
+}
+.bounce-leave-active {
+  animation: bounce-in .5s reverse;
+}
+@keyframes bounce-in {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.5);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+
+.slide-fade-enter-active {
+  transition: all .3s ease;
+}
+.slide-fade-leave-active {
+  transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+}
+.slide-fade-enter, .slide-fade-leave-to
+/* .slide-fade-leave-active below version 2.1.8 */ {
+  transform: translateX(10px);
+  opacity: 0;
+}
 .pic {
   width: 50px;
   height: 50px;
