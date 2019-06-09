@@ -33,8 +33,7 @@
             </td>
             <td>{{user.name}}</td>
             <td>
-              <!--{{user.level}}
-              {{getLevel(user.id)}}-->
+              {{getLevel(user.id)}}
             </td>
             <td>{{user.course}}</td>
             <td>
@@ -291,21 +290,21 @@ export default {
       .then(res => (this.threads_ = res.data))
       .catch(err => console.log(err, "thread"));
 
-    //level
-    /*this.$http
-      .get(
-        `http://${this.$store.getters.getIp}/data-api/userLevel/${
-          this.$route.params.userid
-        }`
-      )
-      .then(res => (this.level_ = res.data))
-      .catch(err => console.log(err, "level"));*/
+
     this.getUsers();
+    
   },
   /**
    ***** METHODS *****
    */
   methods: {
+      getLevel(id) {
+      let user_ = this.users.filter(user => user.id == id)[0]
+      
+      let level2 = Math.round(user_.experience / 100) + 1 
+      return level2 
+
+    },
     deleteUser(id) {
       console.log(id);
       let parsedCookie = cookie.parse(document.cookie);
@@ -448,12 +447,7 @@ export default {
    ***** COMPUTED *****
    */
   computed: {
-    /*getLevel(id) {
-      this.$http
-        .get(`http://${this.$store.getters.getIp}/data-api/userLevel/${id}`)
-        .then(res => (this.level_ = res.data))
-        .catch(err => console.log(err, "level"));
-    },*/
+
     getUsers() {
       this.$http
         .get(
@@ -489,24 +483,6 @@ export default {
 };
 </script>
 <style>
-bounce-enter-active {
-  animation: bounce-in .5s;
-}
-.bounce-leave-active {
-  animation: bounce-in .5s reverse;
-}
-@keyframes bounce-in {
-  0% {
-    transform: scale(0);
-  }
-  50% {
-    transform: scale(1.5);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
 
 .slide-fade-enter-active {
   transition: all .3s ease;
