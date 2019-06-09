@@ -265,7 +265,7 @@
           </div>
         </div>
         <div v-else>
-          <h1 class="text-center">Não há REspostas ainda</h1>
+          <h1 class="text-center">There's no answers yet </h1>
         </div>
         <div class="row" v-show="isLoggedIn == true && !threadFechada == true">
           <div class="col-md-12 text-left">
