@@ -429,6 +429,10 @@ export default {
   },
   methods: {
     /** É preciso estar logado */
+    /** Vai ser para tirar e por experiencia sempre
+     * o user que vai "gerar" a notificação vai ser sempre o utilizador logado,
+     * e quem vai receber a notificação vai ser o autor da thread, answer, ou comment.
+     */
     /** Follow/Unfollow */
     seguir() {
       //Como só dá para seguir a thread, usar o threadF.id
@@ -439,99 +443,16 @@ export default {
        */
 
       if (this.confirmAuth() === true) {
-        /** Follow/Unfollow */
-        let addFollow = true;
-        let { follow } = this.$store.state.users.loggedUser;
-        console.log(follow, "DEstructured follow from USER!!!!");
+        /** inserir follow no BD then, inserir no user local */
+        this.$http({
+          url: `http://${this.$store.getters.getIp}/data-api/`
+        })
+        /** Atribuir experiencia no BD */
+        
+        /** Criar notificação */
 
-        for (let i = 0; i < follow.length; i++) {
-          if (follow[i] == this.threadF.id) {
-            addFollow = false;
-          }
-        }
-        let loginCookie = cookie.parse(document.cookie).login;
+        /** Criar document para o expLog */
 
-        if (addFollow) {
-          /** Thread */
-          console.log(loginCookie, "Login COOKIE !!!!!!!!");
-          this.$http
-            .put(
-              `http://${this.$store.getters.getIp}/data-api/threads/${
-                this.threadF.id
-              }/follow`
-            )
-            .then(res => {
-              console.log(res.data, "Followed");
-              this.threadF.follow++;
-            });
-          /** User que segue
-           *  Altera-se o loggedUser e manda-se lho para a BD,
-           * mas neste caso, só o array de follow
-           */
-          this.$store.commit("users/changeFollow", {
-            type: "add",
-            id: this.threadF.id
-          });
-          this.$http({
-            url: `http://${
-              this.$store.getters.getIp
-            }/data-api/users/changeFollow/${
-              this.$store.state.users.loggedUser.id
-            }`,
-            method: "put",
-            data: {
-              /** Neste caso vai se enviar o array de followers */
-              follow: this.$store.state.users.loggedUser.follow
-            },
-            headers: {
-              "x-access-token": loginCookie
-            }
-          }).then(res => console.log("updated USer"));
-
-          /** User autor da Thread 
-           * Verificar se o follow está burned ou não 
-           * enviar (idUser (loggedUser) & idThread)
-          */
-         
-
-        } else {
-          this.$store.commit("users/changeFollow", {
-            type: "remove",
-            id: this.threadF.id
-          });
-          this.$http
-            .put(
-              `http://${this.$store.getters.getIp}/data-api/threads/${
-                this.threadF.id
-              }/unfollow`
-            )
-            .then(res => {
-              console.log(
-                res.data,
-                "Já seguiste, VAi ficar com menos 1 follow"
-              );
-              this.threadF.follow--;
-            })
-            .catch(err => {
-              this.errorSwal(
-                "Ocorreu um erro na nossa API, por favor tenta seguir a thread mais tarde"
-              );
-            });
-          this.$http({
-            url: `http://${
-              this.$store.getters.getIp
-            }/data-api/users/changeFollow/${
-              this.$store.state.users.loggedUser.id
-            }`,
-            method: "put",
-            data: {
-              follow: this.$store.state.users.loggedUser.follow
-            },
-            headers: {
-              "x-access-token": loginCookie
-            }
-          });
-        }
       } else {
         this.errorSwal("Tens que estar autenticado para poderes dar follow");
       }
@@ -544,6 +465,7 @@ export default {
         this.errorSwal("Tens que escrever alguma coisa");
       } else {
         //No fim fazer um Swal a dizer que a resposta foi gravada com sucesso
+        /** mas se foir para fazer o swal fazer daqueles que aparece à direita em cima */
       }
     },
     commentAnswer() {},
@@ -552,73 +474,7 @@ export default {
     /** Upvotes */
     upvoteThread() {
       if (this.confirmAuth() == true) {
-        let upv = true;
-        if (this.$store.state.users.loggedUser.upvotes.length > 0) {
-          for (
-            let i = 0;
-            i < this.$store.state.users.loggedUser.upvotes.length;
-            i++
-          ) {
-            if (
-              this.$store.state.users.loggedUser.upvotes[i].threadId ==
-              this.threadF.id
-            )
-              upv = false;
-          }
-        }
-        if (upv) {
-          /** Adicionar Upvote */
-          let burnUpv = {
-            userId: this.$store.state.users.loggedUser.id, //Id do user que fez o upvote, vai ser usado só para os burnedUpvotes
-            threadId: this.threadF.id,
-            answerId: null,
-            commentId: null
-          };
-          let upvote = {
-            threadId: this.threadF.id,
-            answerId: null,
-            commentId: null
-          };
-          let login = cookie.parse(document.cookie).login;
-
-          /** Thread */
-          this.$store
-            .dispatch("threads/add_upvote_thread", {
-              threadid: upvote.threadId,
-              login: login
-            })
-            .then(res => {
-              this.threadF.upvotes++;
-            });
-          /** User */
-          this.$store
-            .dispatch("users/add_upvote", {
-              upv: upvote,
-              burnUpv: burnUpv,
-              login: login
-            })
-            .then(() => {
-              this.$store.commit("users/upvote");
-            });
-        } else {
-          /** REmover Upvote */
-          let upvote = {
-            th: this.threadF,
-            ans: null,
-            com: null
-          };
-          let login = cookie.parse(document.cookie).login;
-          this.$store
-            .dispatch("threads/remove_upvote_thread", {
-              upv: upvote,
-              login: login
-            })
-            .then(res => {
-              //Este res deu undefined
-              this.threadF.upvotes--;
-            });
-          /**Tirar upvote do user */
-        }
+        
       }
     },
     upvoteAns() {},
@@ -657,7 +513,8 @@ export default {
       Swal({
         title: "Ocorreu um erro",
         type: "error",
-        text: msg
+        text: msg,
+        footer: `<a href="/#/login"><strong>Ir para Login/Register</strong></a>` //Decidir se isto é um erro ou não...(kinda que é)
       });
     },
     /** Funções de chamada À API */

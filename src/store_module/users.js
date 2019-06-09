@@ -228,25 +228,6 @@ const users = {
     }
   },
   actions: {
-    // Pedido à API para o user e notificações que vai ser para o login
-    a() {
-      console.log("alalalalalalalalalalalalala");
-    },
-    set_last_thread(context, payload) {
-      context.commit("SET_LAST_THREAD", payload);
-    },
-    /** Preencher os badges de um user */
-    user_badges(state, payload) {
-      console.log(payload, "User badges na mutation user_badges");
-      state.loggedUser.badges = payload;
-    },
-    add_upvote(state, payload) {
-      if (state.loggedUser.burnedUpvotes != undefined) {
-        state.loggedUser.burnedUpvotes.push(payload);
-      }
-    }
-  },
-  actions: {
     /** Buscar os badges e filtrar-los para depois fazer commit deles */
     user_badges({ rootGetters, rootState, commit, state }) {
       async function aux() {

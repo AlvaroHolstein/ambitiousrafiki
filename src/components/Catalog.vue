@@ -193,10 +193,10 @@ export default {
         console.log(alreadyHere, this.totalThreads, "Ainda não vai ser preciso fazer pedidos")
         this.totalThreads*=2
       } else {
-        this.getThreads_();
+        this.getThreads_(alreadyHere);
       }
     },
-    getThreads_() {
+    getThreads_(alreadyHere) {
       this.$http
         .post(
           `http://${this.$store.getters.getIp}/data-api/threads/findAndExclude`,
