@@ -31,7 +31,7 @@ export default new Vuex.Store({
     /**
      * VAriáveis de comunicação com a API
      */
-    address: "192.168.1.77", // "192.168.1.83", '172.23.116.246'
+    address: "192.168.1.75", // "192.168.1.83", '172.23.116.246'
     port: ":420"
   },
   mutations: {

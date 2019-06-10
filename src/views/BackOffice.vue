@@ -184,6 +184,7 @@
                 class="btn btn-primary btn-sm"
                 style="margin-left: 5px; color:white"
                 @click="closeThread(thread.id)"
+                v-if="thread.closeDate==null"
               >Close</button>
             </td>
           </tr>
@@ -440,7 +441,30 @@ export default {
       return this.$store.getters.getUsers.filter(user => user.id == id)[0];
     },
     closeThread(id) {
-      this.$store.dispatch("close_thread", id);
+      let parsedCookie = cookie.parse(document.cookie);
+      let headers = {
+        "x-access-token": parsedCookie.login
+      };
+      this.$http
+      ({
+        method: 'put',
+        url: `http://${this.$store.getters.getIp}/data-api/threads/${id}/close`,
+        headers: headers})
+        .then( res => {console.log("thread fechado")})
+        .catch(err => console.log(err, "erro no cclose thread"))
+      
+    
+  
+   /* }
+        .put(`http://${this.$store.getters.getIp}/data-api/threads/${id}/close`, {
+          headers: headers
+        })
+        .then(res => {
+          console.log("thread fechado")
+        })
+        .catch(err => console.log(err, "erro no close thread "));*/
+    
+    
     }
   },
   /**
