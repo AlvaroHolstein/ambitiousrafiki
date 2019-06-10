@@ -67,6 +67,9 @@ export default {
           document.cookie = `login=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;`;
           this.$store.state.users.loggedUser = null;
           console.log("A cookie foi limpa porque o token já não é válido");
+          this.$router.push({
+            name: 'home'
+          })
         });
     }
   }

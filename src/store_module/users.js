@@ -236,6 +236,23 @@ const users = {
       return new Promise((resolve, reject) => {
         setTimeout(() => resolve(true), 1000)
       })
+    },
+    addUpvote(state, upvote) {
+      let insert = true
+      for(let upv of state.loggedUser.upvotes) {
+        if(upv.type == upvote.type && upv.targetId == upvote.targetId) {
+          insert = false
+          return;
+        }
+      }
+      if(insert) state.loggedUser.upvotes.push(upvote)
+    },
+    removeUpvote(state, upvote) {
+      let index = state.loggedUser.upvotes.findIndex(upv => {
+        if(upv.type == upvote.type && upv.targetId == upvote.targetId) return true
+        return false
+      })
+      if(index != -1) state.loggedUser.upvotes.splice(index, 1)
     }
   },
   actions: {
