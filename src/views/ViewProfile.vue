@@ -2,17 +2,14 @@
   <div class="container">
     <div class="header row" style="margin-bottom: 40px;">
       <div class="col-md-4 text-center">
-        <img :src="user.picture" class="picture img-fluid" />
+        <img :src="user.picture" class="picture img-fluid">
       </div>
       <div class="col-md-5">
         <h1>{{ user.name }}</h1>
         <span>Level:{{ user.level }}</span>
 
-        <div class="progress">
-          <div
-            :style="{ width: getUserProgress }"
-            class="progress-bar progress-bar-info"
-          ></div>
+        <div id="progressBar" class="progress">
+          <div :style="{ width: getUserProgress }" class="progress-bar progress-bar-info"></div>
         </div>
       </div>
       <div class="col-md-3">
@@ -52,17 +49,12 @@
     </ul>
     <transition name="fade" mode="out-in">
       <!-- Ver se é melhor usar o v-if ou v-show -->
-      <about v-bind:user="user" v-if="ulIndex == 1" />
-      <userBadges v-bind:user="user" v-if="ulIndex == 2" />
-      <myThreads v-bind:threads="userThreads" v-if="ulIndex == 3" />
-      <myrankings v-if="ulIndex == 4" />
-      <edit v-bind:user="user" v-if="ulIndex == 5" />
-      <!-- <div v-if="ulIndex == 1">
-        <h1>1</h1>
-      </div>
-      <div v-if="ulIndex == 2">
-        <h1>2</h1>
-      </div>-->
+      <about v-bind:user="user" v-if="ulIndex == 1"/>
+      <userBadges v-bind:user="user" v-if="ulIndex == 2"/>
+      <myThreads v-bind:threads="userThreads" v-if="ulIndex == 3"/>
+      <myrankings v-if="ulIndex == 4"/>
+      <edit v-bind:user="user" v-if="ulIndex == 5"/>
+   
     </transition>
   </div>
 </template>
@@ -74,6 +66,7 @@ import myThreads from "@/components/MyThreads.vue";
 import userBadges from "@/components/MyBadges.vue";
 import edit from "@/components/editProfile.vue";
 import myrankings from "@/components/MyRankings.vue";
+import tippy from "tippy.js";
 export default {
   components: {
     apexchart: VueApexCharts,
@@ -230,6 +223,10 @@ export default {
            * ir buscar as answers e os comments
            */
           this.getThreads(this.user.id);
+          tippy("#progressBar", {
+            content: `Level: ${this.user.experience}`,
+            placement: "bottom"
+          });
         })
         .catch(err => console.log(err, "ERRO no find user no computed user"));
     },

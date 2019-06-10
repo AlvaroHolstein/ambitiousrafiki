@@ -20,6 +20,7 @@
     "quill-image-drop-module": "^1.0.3",
     "quill-image-resize-module": "^1.0.0",
     "sweetalert2": "^7.31.1",
+    "tippy.js": "^4.3.4",
     "vue": "^2.6.10",
     "vue-apexcharts": "^1.2.8",
     "vue-router": "^3.0.3",

@@ -51,7 +51,7 @@ class User {
     let trueRank = null;
     // console.log(this.level);
     switch (
-      rank //O calculo do rank deve estar mal....
+    rank //O calculo do rank deve estar mal....
     ) {
       case 0:
         trueRank = "A começar";
@@ -225,6 +225,17 @@ const users = {
     },
     SET_LAST_THREAD(state, payload) {
       state.lastViewedThread = payload;
+    },
+    addFollow(state, follow) {
+      state.loggedUser.follow.push(follow)
+    },
+    removeFollow(state, follow) {
+      let index = state.loggedUser.follow.findIndex(fol => fol == follow)
+      if (index != -1) state.loggedUser.follow.splice(index, 1)
+      console.log(index, "mutation")
+      return new Promise((resolve, reject) => {
+        setTimeout(() => resolve(true), 1000)
+      })
     }
   },
   actions: {
@@ -235,21 +246,21 @@ const users = {
           let threads = await axios
             .get(
               `http://${rootGetters.getIp}/data-api/threads/userThreads/${
-                state.loggedUser.id
+              state.loggedUser.id
               }`
             )
             .then(res => res.data);
           let answers = await axios
             .get(
               `http://${rootGetters.getIp}/data-api/userAnswers/${
-                state.loggedUser.id
+              state.loggedUser.id
               }`
             )
             .then(res => res.data);
           let comments = await axios
             .get(
               `http://${rootGetters.getIp}/data-api/userComments/${
-                state.loggedUser.id
+              state.loggedUser.id
               }`
             )
             .then(res => res.data);
@@ -282,7 +293,7 @@ const users = {
       axios({
         url: `http://${rootGetters.getIp}/data-api/users/${
           burnUpv.userId
-        }/isBurned`,
+          }/isBurned`,
         method: "post",
         data: upv,
         headers: {
