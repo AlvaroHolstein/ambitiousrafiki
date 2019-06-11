@@ -35,7 +35,7 @@
           <a v-on:click="goToUserProfile()" class="nav-link pointer">Profile</a>
         </li>
         <li v-if="toBeOrNotToBeAdmin" class="nav-item">
-          <router-link :to="{name:'backoffice'}" :class="{'nav-link': true}"> Back-Office</router-link>
+          <router-link :to="{name:'backoffice'}" :class="{'nav-link': true}">Back-Office</router-link>
         </li>
         <li>
           <hr>
@@ -120,7 +120,9 @@
 
 <script>
 import cookie from "cookie";
-
+import Swal from "../../node_modules/sweetalert2/dist/sweetalert2.js";
+import "../../node_modules/sweetalert2/src/sweetalert2.scss";
+1;
 export default {
   data() {
     return {};
@@ -143,24 +145,46 @@ export default {
       let parsedCookie = cookie.parse(document.cookie);
       let cookieSerialized = cookie.serialize("login", parsedCookie.login);
 
-      this.$http({
-        url: `http://${this.$store.getters.getIp}/auth-api/logout`,
-        headers: {
-          "x-access-token": parsedCookie.login
-        }
-      }).then(res => {
-        if (res.data.auth == false) {
-          /**
-           * Já apaga a cookie e faz logout,
-           * maaaaaaas, não envia a cookie automaticamente.........
-           */
-          document.cookie = `login=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;`;
-          this.$store.commit("users/unLoggedUser");
-          this.$router.push({
-            name: "home"
-          });
+      Swal.fire({
+        title: "De certeza que queres abandonar?",
+        type: "question",
+        showCancelButton: true,
+        confirmButtonText: "Abandonar",
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33"
+      }).then(result => {
+        if (result.value) {
+          this.$http({
+            url: `http://${this.$store.getters.getIp}/auth-api/logout`,
+            headers: {
+              "x-access-token": parsedCookie.login
+            }
+          })
+            .then(res => {
+              if (res.data.auth == false) {
+                /**
+                 * Já apaga a cookie e faz logout,
+                 * maaaaaaas, não envia a cookie automaticamente.........
+                 */
+
+                document.cookie = `login=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;`;
+                this.$store.commit("users/unLoggedUser");
+                this.$router.push({
+                  name: "home"
+                });
+              }
+            })
+            .catch(err => {
+              document.cookie = `login=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;`;
+              this.$store.commit("users/unLoggedUser");
+              this.$router.push({
+                name: "home"
+              });
+              console.log(err, "Tá male");
+            });
         }
       });
+
       console.log(parsedCookie, "parsedCookie");
       console.log(cookieSerialized, "logout");
     },
@@ -179,7 +203,10 @@ export default {
     },
     notificationsLength() {
       if (this.$store.state.users.loggedUser != null) {
-        if (this.$store.state.users.loggedUser.notifications.length > 0 && this.$store.state.users.loggedUser.notifications[0] != null) {
+        if (
+          this.$store.state.users.loggedUser.notifications.length > 0 &&
+          this.$store.state.users.loggedUser.notifications[0] != null
+        ) {
           return this.$store.state.users.loggedUser.notifications.filter(
             not => {
               not.visto == false;
@@ -200,10 +227,13 @@ export default {
       return false;
     },
     loginUserNotifications() {
-      if (this.$store.state.users.loggedUser.notifications.length > 0 && this.$store.state.users.loggedUser.notifications[0] != null)
+      if (
+        this.$store.state.users.loggedUser.notifications.length > 0 &&
+        this.$store.state.users.loggedUser.notifications[0] != null
+      )
         return this.$store.state.users.loggedUser.notifications;
 
-      return [{}]
+      return [{}];
     }
   }
 };

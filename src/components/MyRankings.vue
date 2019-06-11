@@ -12,7 +12,7 @@
         <tr
           v-for="user in users"
           v-bind:key="user.id"
-          v-bind:class="{ 'table-active': user.id == userid }"
+          v-bind:class="{ 'table-active': user.id == $route.params.userid }"
         >
           <th scope="row">{{ user.rank }}</th>
           <td>{{ user.name }}</td>

@@ -56,7 +56,9 @@ export default {
               )
               .then(resp => {
                 this.$store.commit("users/setLoggedUser", resp.data);
-                this.$store.dispatch("users/user_badges").then(() => console.log("memememememememememememememeem"));
+                this.$store
+                  .dispatch("users/user_badges")
+                  .then(() => console.log("memememememememememememememeem"));
               })
               .catch(err => {
                 if (err) throw err;
@@ -65,7 +67,10 @@ export default {
         })
         .catch(err => {
           document.cookie = `login=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;`;
-          this.$store.state.users.loggedUser = null;
+          this.$store.commit("users/unLoggedUser");
+          this.$router.push({
+            name: "home"
+          });
           console.log("A cookie foi limpa porque o token já não é válido");
         });
     }

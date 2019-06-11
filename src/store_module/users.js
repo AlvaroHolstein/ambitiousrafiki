@@ -51,7 +51,7 @@ class User {
     let trueRank = null;
     // console.log(this.level);
     switch (
-      rank //O calculo do rank deve estar mal....
+    rank //O calculo do rank deve estar mal....
     ) {
       case 0:
         trueRank = "A começar";
@@ -225,25 +225,35 @@ const users = {
     },
     SET_LAST_THREAD(state, payload) {
       state.lastViewedThread = payload;
-    }
-  },
-  actions: {
-    // Pedido à API para o user e notificações que vai ser para o login
-    a() {
-      console.log("alalalalalalalalalalalalala");
     },
-    set_last_thread(context, payload) {
-      context.commit("SET_LAST_THREAD", payload);
+    addFollow(state, follow) {
+      state.loggedUser.follow.push(follow)
     },
-    /** Preencher os badges de um user */
-    user_badges(state, payload) {
-      console.log(payload, "User badges na mutation user_badges");
-      state.loggedUser.badges = payload;
+    removeFollow(state, follow) {
+      let index = state.loggedUser.follow.findIndex(fol => fol == follow)
+      if (index != -1) state.loggedUser.follow.splice(index, 1)
+      console.log(index, "mutation")
+      return new Promise((resolve, reject) => {
+        setTimeout(() => resolve(true), 1000)
+      })
     },
-    add_upvote(state, payload) {
-      if (state.loggedUser.burnedUpvotes != undefined) {
-        state.loggedUser.burnedUpvotes.push(payload);
+    addUpvote(state, upvote) {
+      let insert = true
+      console.log(upvote)
+      for(let upv of state.loggedUser.upvotes) {
+        if(upv.type == upvote.type && upv.targetId == upvote.targetId) {
+          insert = false
+          return;
+        }
       }
+      if(insert) state.loggedUser.upvotes.push(upvote)
+    },
+    removeUpvote(state, upvote) {
+      let index = state.loggedUser.upvotes.findIndex(upv => {
+        if(upv.type == upvote.type && upv.targetId == upvote.targetId) return true
+        return false
+      })
+      if(index != -1) state.loggedUser.upvotes.splice(index, 1)
     }
   },
   actions: {
@@ -254,21 +264,21 @@ const users = {
           let threads = await axios
             .get(
               `http://${rootGetters.getIp}/data-api/threads/userThreads/${
-                state.loggedUser.id
+              state.loggedUser.id
               }`
             )
             .then(res => res.data);
           let answers = await axios
             .get(
               `http://${rootGetters.getIp}/data-api/userAnswers/${
-                state.loggedUser.id
+              state.loggedUser.id
               }`
             )
             .then(res => res.data);
           let comments = await axios
             .get(
               `http://${rootGetters.getIp}/data-api/userComments/${
-                state.loggedUser.id
+              state.loggedUser.id
               }`
             )
             .then(res => res.data);
@@ -301,7 +311,7 @@ const users = {
       axios({
         url: `http://${rootGetters.getIp}/data-api/users/${
           burnUpv.userId
-        }/isBurned`,
+          }/isBurned`,
         method: "post",
         data: upv,
         headers: {
