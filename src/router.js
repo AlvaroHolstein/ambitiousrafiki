@@ -33,6 +33,11 @@ import login from "@/views/Login.vue";
 import backoffice from "@/views/BackOffice.vue";
 
 /**
+ * Notifications (view more)
+ */
+import notifications from "@/views/Notifications.vue";
+
+/**
  * Páginas "Simples"
  * Faq, Rankings, Tags, Badges, Contact us,Stats
  */
@@ -111,6 +116,12 @@ export default new Router({
       path: "/createThread",
       name: "createThread",
       component: createThread
+    },
+    {
+      path: "/notifications",
+      name: "notifications",
+      component: notifications
+
     },
     {
       path: "/backoffice",

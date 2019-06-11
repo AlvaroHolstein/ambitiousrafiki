@@ -15,81 +15,83 @@
       </div>
     </div>
     <transition name="slide-fade">
-    <div v-if="showUsers" class="table-responsive">
-      <table class="table table-striped table-hover table-bordered">
-        <thead class="thead-dark">
-          <tr>
-            <th></th>
-            <th>Name</th>
-            <th>Level</th>
-            <th>Course</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(user) in users" v-bind:key="user.id">
-            <td>
-              <img v-bind:src="user.picture" class="img-fluid pic">
-            </td>
-            <td>{{user.name}}</td>
-            <td>
-              {{getLevel(user.id)}}
-            </td>
-            <td>{{user.course}}</td>
-            <td>
-              <button type="button" class="btn btn-danger btn-sm" @click="deleteUser(user.id)">X</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+      <div v-if="showUsers" class="table-responsive">
+        <table class="table table-striped table-hover table-bordered">
+          <thead class="thead-dark">
+            <tr>
+              <th></th>
+              <th>Name</th>
+              <th>Level</th>
+              <th>Course</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr @click="goToUserProfile(user.id)" v-for="(user) in users" v-bind:key="user.id">
+              <td>
+                <img v-bind:src="user.picture" class="img-fluid pic">
+              </td>
+              <td>{{user.name}}</td>
+              <td>{{getLevel(user.id)}}</td>
+              <td>{{user.course}}</td>
+              <td>
+                <button type="button" class="btn btn-danger btn-sm" @click="deleteUser(user.id)">X</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </transition>
     <!-- BADGES -->
 
     <div class="row">
       <div class="col-md-12">
         <br>
-        <h4>Badges  <button @click="showBadges=!showBadges" type="button" class="btn btn-sm">
+        <h4>
+          Badges
+          <button @click="showBadges=!showBadges" type="button" class="btn btn-sm">
             <span class="badge">
               <i class="fas fa-chevron-down"></i>
             </span>
-          </button></h4>
+          </button>
+        </h4>
         <hr>
         <transition name="slide-fade">
-        <button v-if="showBadges"
-          type="button"
-          class="btn btn-success btn-lg"
-          style="margin-bottom:15px"
-          @click="openDialog('badges')"
-        >Create Badge</button>
+          <button
+            v-if="showBadges"
+            type="button"
+            class="btn btn-success btn-lg"
+            style="margin-bottom:15px"
+            @click="openDialog('badges')"
+          >Create Badge</button>
         </transition>
       </div>
     </div>
     <transition name="slide-fade">
-    <div v-if="showBadges" class="table-responsive">
-      <table class="table table-striped table-hover table-bordered">
-        <thead class="thead-dark">
-          <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Goal</th>
-            <th>Category</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(badge) in $store.state.badges" v-bind:key="badge.id">
-            <td>{{badge.id}}</td>
-            <td>{{badge.name}}</td>
-            <td>{{badge.desc}}</td>
-            <td>{{badge.category}}</td>
-            <td>
-              <button type="button" class="btn btn-danger btn-sm" @click="deleteBadge(badge.id)">X</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+      <div v-if="showBadges" class="table-responsive">
+        <table class="table table-striped table-hover table-bordered">
+          <thead class="thead-dark">
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Goal</th>
+              <th>Category</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(badge) in $store.state.badges" v-bind:key="badge.id">
+              <td>{{badge.id}}</td>
+              <td>{{badge.name}}</td>
+              <td>{{badge.desc}}</td>
+              <td>{{badge.category}}</td>
+              <td>
+                <button type="button" class="btn btn-danger btn-sm" @click="deleteBadge(badge.id)">X</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </transition>
     <dialog id="idDialog" ref="myDialog">
       <form method="dialog">
@@ -153,62 +155,75 @@
     <div class="row">
       <div class="col-md-12">
         <br>
-        <h4>Threads  <button @click="showThreads=!showThreads" type="button" class="btn btn-sm">
+        <h4>
+          Threads
+          <button @click="showThreads=!showThreads" type="button" class="btn btn-sm">
             <span class="badge">
               <i class="fas fa-chevron-down"></i>
             </span>
-          </button></h4>
+          </button>
+        </h4>
         <hr>
       </div>
     </div>
     <transition name="slide-fade">
-    <div v-if="showThreads" class="table-responsive">
-      <table class="table table-striped table-hover table-bordered">
-        <thead class="thead-dark">
-          <tr>
-            <th>Title</th>
-            <th>Date</th>
-            <th>Owner</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(thread) in getThreads" v-bind:key="thread.id">
-            <td>{{thread.title}}</td>
-            <td>{{ thread.date | filterDate }}</td>
-            <td>{{thread.userInfo.name}}</td>
-            <td>
-              <button type="button" class="btn btn-danger btn-sm" @click="deleteThread(thread.id)">X</button>
-              <button
-                type="button"
-                class="btn btn-primary btn-sm"
-                style="margin-left: 5px; color:white"
-                @click="closeThread(thread.id)"
-                v-if="thread.closeDate==null"
-              >Close</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+      <div v-if="showThreads" class="table-responsive">
+        <table class="table table-striped table-hover table-bordered">
+          <thead class="thead-dark">
+            <tr>
+              <th>Title</th>
+              <th>Date</th>
+              <th>Owner</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(thread) in getThreads" v-bind:key="thread.id">
+              <td>
+                <a v-on:click="goToThread(thread.id)" class="title pointer">{{ thread.title }}</a>
+              </td>
+              <td>{{ thread.date | filterDate }}</td>
+              <td>{{thread.userInfo.name}}</td>
+              <td>
+                <button
+                  type="button"
+                  class="btn btn-danger btn-sm"
+                  @click="deleteThread(thread.id)"
+                >X</button>
+                <button
+                  type="button"
+                  class="btn btn-primary btn-sm"
+                  style="margin-left: 5px; color:white"
+                  @click="closeThread(thread.id)"
+                  v-if="thread.closeDate==null"
+                >Close</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </transition>
 
     <!-- TAGS -->
     <div class="row">
       <div class="col-md-12">
         <br>
-        <h4>Tags  <button @click="showTags=!showTags" type="button" class="btn btn-sm">
+        <h4>
+          Tags
+          <button @click="showTags=!showTags" type="button" class="btn btn-sm">
             <span class="badge">
               <i class="fas fa-chevron-down"></i>
             </span>
-          </button></h4>
+          </button>
+        </h4>
         <hr>
         <transition name="slide-fade">
-        <button v-if="showTags"
-          v-on:click="openDialog('tags')"
-          type="button"
-          class="btn btn-success btn-lg"
-        >Create Tag</button>
+          <button
+            v-if="showTags"
+            v-on:click="openDialog('tags')"
+            type="button"
+            class="btn btn-success btn-lg"
+          >Create Tag</button>
         </transition>
         <br>
         <br>
@@ -227,26 +242,26 @@
       </dialog>
     </div>
     <transition name="slide-fade">
-    <div v-if="showTags" class="table-responsive">
-      <table class="table table-striped table-hover table-bordered">
-        <thead class="thead-dark">
-          <tr>
-            <th>#</th>
-            <th>Name</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(tag) in tags" v-bind:key="tag.id">
-            <td>{{tag.id}}</td>
-            <td>{{tag.text}}</td>
-            <td>
-              <button type="button" class="btn btn-danger btn-sm" @click="deleteTag(tag.id)">X</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+      <div v-if="showTags" class="table-responsive">
+        <table class="table table-striped table-hover table-bordered">
+          <thead class="thead-dark">
+            <tr>
+              <th>#</th>
+              <th>Name</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(tag) in tags" v-bind:key="tag.id">
+              <td>{{tag.id}}</td>
+              <td>{{tag.text}}</td>
+              <td>
+                <button type="button" class="btn btn-danger btn-sm" @click="deleteTag(tag.id)">X</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </transition>
   </div>
 </template>
@@ -256,10 +271,10 @@ import cookie from "cookie";
 export default {
   data() {
     return {
-      showUsers:false,
-      showBadges:false,
-      showThreads:false,
-      showTags:false,
+      showUsers: false,
+      showBadges: false,
+      showThreads: false,
+      showTags: false,
       badges: this.$store.state.badges,
       badgeId: "",
       badgeName: "",
@@ -291,20 +306,48 @@ export default {
       .then(res => (this.threads_ = res.data))
       .catch(err => console.log(err, "thread"));
 
-
     this.getUsers();
-    
   },
   /**
    ***** METHODS *****
    */
   methods: {
-      getLevel(id) {
-      let user_ = this.users.filter(user => user.id == id)[0]
-      
-      let level2 = Math.round(user_.experience / 100) + 1 
-      return level2 
+    getUsers() {
+      this.$http
+        .get(
+          `http://${this.$store.state.address +
+            this.$store.state.port}/data-api/users`
+        )
+        .then(res => {
+          this.users = res.data;
+          console.log(res.data, "res");
+        })
+        .catch(err => {
+          console.log(err, "ERRO Users.vue");
+        });
+    },
+    goToUserProfile(userid) {
+      console.log(userid, "USERID no USERS");
+      this.$router.push({
+        name: "viewProfile",
+        params: {
+          userid: userid
+        }
+      });
+    },
+    goToThread(id) {
+      this.$router.push({
+        name: "thread",
+        params: {
+          threadid: id
+        }
+      });
+    },
+    getLevel(id) {
+      let user_ = this.users.filter(user => user.id == id)[0];
 
+      let level2 = Math.round(user_.experience / 100) + 1;
+      return level2;
     },
     deleteUser(id) {
       console.log(id);
@@ -445,22 +488,22 @@ export default {
       let headers = {
         "x-access-token": parsedCookie.login
       };
-      this.$http
-      ({
-        method: 'put',
+      this.$http({
+        method: "put",
         url: `http://${this.$store.getters.getIp}/data-api/threads/${id}/close`,
-        headers: headers})
-        .then( res => { this.$http({
-          method: 'get',
-          url: `http://${this.$store.getters.getIp}/data-api/threads`,})
-          .then(res => (this.threads_ = res.data))
-          .catch(err => console.log(err, "thread"));
+        headers: headers
+      })
+        .then(res => {
+          this.$http({
+            method: "get",
+            url: `http://${this.$store.getters.getIp}/data-api/threads`
+          })
+            .then(res => (this.threads_ = res.data))
+            .catch(err => console.log(err, "thread"));
         })
-        .catch(err => console.log(err, "erro no cclose thread"))
-      
+        .catch(err => console.log(err, "erro no cclose thread"));
 
-  
-   /* }
+      /* }
         .put(`http://${this.$store.getters.getIp}/data-api/threads/${id}/close`, {
           headers: headers
         })
@@ -468,29 +511,12 @@ export default {
           console.log("thread fechado")
         })
         .catch(err => console.log(err, "erro no close thread "));*/
-    
-    
     }
   },
   /**
    ***** COMPUTED *****
    */
   computed: {
-
-    getUsers() {
-      this.$http
-        .get(
-          `http://${this.$store.state.address +
-            this.$store.state.port}/data-api/users`
-        )
-        .then(res => {
-          this.users = res.data;
-          console.log(res.data, "res");
-        })
-        .catch(err => {
-          console.log(err, "ERRO Users.vue");
-        });
-    },
     tags() {
       return this.tags_;
     },
@@ -512,12 +538,11 @@ export default {
 };
 </script>
 <style>
-
 .slide-fade-enter-active {
-  transition: all .3s ease;
+  transition: all 0.3s ease;
 }
 .slide-fade-leave-active {
-  transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+  transition: all 0.8s cubic-bezier(1, 0.5, 0.8, 1);
 }
 .slide-fade-enter, .slide-fade-leave-to
 /* .slide-fade-leave-active below version 2.1.8 */ {

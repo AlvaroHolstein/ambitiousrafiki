@@ -91,18 +91,14 @@
               <span class="vermais text-right" v-on:click="verMais()">Ver Mais</span>-->
               <div class="dropdwon-divider"></div>
               <div id="dropdown-footer" class="dropdown-item">
-                <ul class="list-inline">
-                  <li class="list-inline-item helpers point">
-                    <!-- <router-link
-                        :to="{ name: 'ViewMore' }"
-                        :class="{ 'nav-link': true }"
-                      >View More</router-link>
-                    </li>-->
+                <ul class="list-inline viewPage">
+                  <li class="list-inline-item helpers point viewPage">
+                   <router-link :to="{ name: 'notifications' }" :class="{ 'nav-link': true }">View More</router-link>
                   </li>
                   <li
                     v-on:click="markAsRead()"
                     class="list-inline-item helpers point"
-                  >Marcar como Lido</li>
+                  >Mark as read</li>
                   <!-- Isto podia ficar com um icone de mesnsagem aberta e com um helper -->
                 </ul>
               </div>
@@ -208,9 +204,7 @@ export default {
           this.$store.state.users.loggedUser.notifications[0] != null
         ) {
           return this.$store.state.users.loggedUser.notifications.filter(
-            not => {
-              not.visto == false;
-            }
+            not => not.visto == false
           ).length;
         }
       }
@@ -243,6 +237,9 @@ export default {
 /* .navi {
   padding: 10px;
 } */
+.viewPage{
+  color:black !important;
+}
 nav {
   margin-bottom: 2rem;
 }
