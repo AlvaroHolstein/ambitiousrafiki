@@ -116,8 +116,8 @@ export default {
   data() {
     return {
       showSearchBar: true,
-      users: this.$store.state.users,
-      threads: this.$store.state.threads,
+      users: [],
+      threads: [],
       loginID: this.$store.getters.getloginID,
       searchText: null,
       cont: 0,
@@ -126,6 +126,17 @@ export default {
       maxEle: 5,
       index: 0 //Index para controlar os divs no modal de search
     };
+  },
+  created() {
+    this.$http({
+      url: `http://${this.$store.getters.getIp}/data-api/users`,
+      method: "get",
+    }).then(res => this.users = res.data)
+
+    this.$http({
+      url: `http://${this.$store.getters.getIp}/data-api/threads`,
+      method: "get"
+    }).then(res=> this.threads = res.data)
   },
   mounted() {
     // $("li.navigation")[0].className = "page-item navigation active"
@@ -204,9 +215,9 @@ export default {
     },
     goToUser(usid) {
       this.$router.push({
-        name: "viewprofile",
+        name: "viewProfile",
         params: {
-          visiteduserid: usid
+          userid: usid
         }
       });
       location.reload();
@@ -423,8 +434,9 @@ export default {
   color: white;
 }
 
-#searchBox .modal-backdrop {
+.modal-backdrop {
   display: none;
+  z-index: -1;
 }
 #searchBox div.searchbar {
   margin-bottom: auto;
