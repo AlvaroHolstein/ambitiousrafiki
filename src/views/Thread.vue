@@ -197,7 +197,7 @@
                               <strong>{{ com.userInfo.name }}</strong>
                             </a>
                           </p>
-                          <p>{{ com.text }}</p>
+                          <p>{{ com.comment }}</p>
                           <p>
                             <!-- <a class="float-right btn btn-outline-primary ml-2">
                             <i class="fa fa-reply"></i>
@@ -291,7 +291,9 @@ export default {
       answersF: null,
       commentsF: [],
       answerText: "", //TExto para a resposta
-      commentToAnswer: ""
+      commentToAnswer: "",
+      targetAns: 0, // Facilitar o comment Answer
+      replyUser: ""
     };
   },
   created() {
@@ -1526,7 +1528,7 @@ export default {
             });
             //Notificação para os seguidores
             await main.http({
-              url: `http://${main.ip}/data-api/users/addanswer/multiplenotis`,
+              url: `http://${main.ip}/data-api/users/multiplenotis`,
               method: "put",
               headers: main.headers,
               data: {
@@ -1539,7 +1541,8 @@ export default {
                   text: "respondeu a uma thread que segue"
                 }
               }
-            }); //Não vai estar à espera de uma resposta, por agora
+            }); //Não vai estar à espera de uma resposta, por agora, tem que ficar xD
+
             /** Adicionar expLog */
             await main
               .http({
@@ -1590,9 +1593,165 @@ export default {
        * autor da answer,
        * todos os seguidores
        */
+      let main = {
+        ip: this.$store.getters.getIp,
+        lg: this.$store.state.users.loggedUser,
+        th: this.threadF,
+        // author: this.userInfo,
+        cookie: this.getLogCookie(),
+        http: this.$http,
+        expValue: 5, //Não esquecer de fazer math.abs()
+        ans: this.targetAns,
+        upvote: {
+          type: "comment to answer",
+          targetId: this.targetAns.id
+        },
+        headers: {
+          "x-access-token": this.getLogCookie()
+        }
+      };
+
+      let newComment = {
+        userInfo: {
+          name: this.$store.state.users.loggedUser.name,
+          photo: this.$store.state.users.loggedUser.picture,
+          userid: this.$store.state.users.loggedUser.id,
+          rank: this.$store.state.users.loggedUser.rank.trueRank
+        },
+        comment: this.commentToAnswer
+      };
+      if (this.confirmAuth()) {
+        async function addComment() {
+          /** Adicionar resposta */
+          let com = await main
+            .http({
+              url: `http://${main.ip}/data-api/threads/${main.th.id}/answers/${
+                main.ans.id
+              }/comments`,
+              method: "post",
+              headers: main.headers,
+              data: {
+                comment: newComment
+              }
+            })
+            .then(res => res.data.comment);
+
+          /** Adicionar experiencia */
+          await main
+            .http({
+              url: `http://${main.ip}/data-api/users/addexp/${
+                main.ans.userInfo.userid
+              }`,
+              method: "put",
+              headers: main.headers,
+              data: {
+                exp: main.expValue
+              }
+            })
+            .then(res => console.log(res, "experiencia adicionada"));
+
+          /** Adicionar notificação
+           * autor da answer,
+           * criador thread,
+           * followers
+           */
+          await main.http({
+            url: `http://${main.ip}/data-api/users/addnotification/${
+              main.ans.userInfo.userid
+            }`,
+            method: "put",
+            headers: main.headers,
+            data: {
+              notification: {
+                userInfo: {
+                  id: main.lg.id,
+                  name: main.lg.name
+                },
+                text: "comentou a sua answer"
+              }
+            }
+          });
+
+          await main.http({
+            url: `http://${main.ip}/data-api/users/addnotification/${
+              main.th.userInfo.userid
+            }`,
+            method: "put",
+            headers: main.headers,
+            data: {
+              notification: {
+                userInfo: {
+                  id: main.lg.id,
+                  name: main.lg.name
+                },
+                text: "comentou uma resposta a uma thread sua"
+              }
+            }
+          });
+
+          await main.http({
+            url: `http://${main.ip}/data-api/users/multiplenotis`,
+            method: "put",
+            headers: main.headers,
+            data: {
+              threadId: main.th.id,
+              notification: {
+                userInfo: {
+                  id: main.lg.id,
+                  name: main.lg.name
+                },
+                text: "comentou uma resposta de uma thread que segue"
+              }
+            }
+          });
+
+          /** Adicionar expLog */
+          await main.http({
+            url: `http://${main.ip}/data-api/explog/add`,
+            method: "post",
+            headers: main.headers,
+            data: {
+              expLog: {
+                targetId: main.th.id,
+                targetType: "comment",
+                logType: "comment to answer",
+                expValue: main.expValue,
+                receiverUserInfo: {
+                  // Isto não deve estar a fazer sentido
+                  userId: main.ans.userInfo.userid,
+                  name: main.ans.userInfo.name,
+                  rank: main.ans.userInfo.rank
+                },
+                expUserInfo: {
+                  userId: main.lg.id,
+                  name: main.lg.name,
+                  rank: main.lg.rank.trueRank
+                }
+              }
+            }
+          });
+
+          return {
+            addedComment: com
+          };
+        }
+        addComment().then(res => {
+          /** Adicionar comentario localmente */
+          if (res.addedComment) {
+            console.log(res.addComment);
+            this.commentsF.push(res.addedComment);
+            this.commentToAnswer = "";
+          }
+        });
+      } else {
+        this.errorSwal("Tens que estar autenticado para poder dar comentar");
+      }
     },
     openModal(ans) {
       if (this.confirmAuth() == true) {
+        this.targetAns = ans;
+        this.replyUser = ans.userInfo.name;
+        this.$refs.myDialogcomment.showModal();
       } else {
         this.errorSwal("Tens que estar autenticado para poder dar comentar");
       }
@@ -1621,7 +1780,6 @@ export default {
       }
       return false;
     },
-    replyUser() {},
     /** Funções para dar trigger aos Swals */
     successSwal(msg) {
       Swal({
@@ -1644,6 +1802,9 @@ export default {
           footer: `<a href="/#/login"><strong>Ir para Login/Register</strong></a>` //Decidir se isto é um erro ou não...(kinda que é)
         });
       }
+    },
+    closeDialog() {
+      this.$refs.myDialogcomment.close();
     },
     /** Funções de chamada À API,
      * não está a ser usada, porque está a função perdida da vida?????
