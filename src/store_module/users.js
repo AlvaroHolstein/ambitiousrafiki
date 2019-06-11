@@ -239,6 +239,7 @@ const users = {
     },
     addUpvote(state, upvote) {
       let insert = true
+      console.log(upvote)
       for(let upv of state.loggedUser.upvotes) {
         if(upv.type == upvote.type && upv.targetId == upvote.targetId) {
           insert = false
