@@ -3,14 +3,14 @@
     <div class="row">
       <div class="col-md-12">
         <br>
-        <h2>
+        <h4>
           Users
           <button @click="showUsers=!showUsers" type="button" class="btn btn-sm">
             <span class="badge">
               <i class="fas fa-chevron-down"></i>
             </span>
           </button>
-        </h2>
+        </h4>
         <hr>
       </div>
     </div>
@@ -49,11 +49,11 @@
     <div class="row">
       <div class="col-md-12">
         <br>
-        <h2>Badges  <button @click="showBadges=!showBadges" type="button" class="btn btn-sm">
+        <h4>Badges  <button @click="showBadges=!showBadges" type="button" class="btn btn-sm">
             <span class="badge">
               <i class="fas fa-chevron-down"></i>
             </span>
-          </button></h2>
+          </button></h4>
         <hr>
         <transition name="slide-fade">
         <button v-if="showBadges"
@@ -153,11 +153,11 @@
     <div class="row">
       <div class="col-md-12">
         <br>
-        <h2>Threads  <button @click="showThreads=!showThreads" type="button" class="btn btn-sm">
+        <h4>Threads  <button @click="showThreads=!showThreads" type="button" class="btn btn-sm">
             <span class="badge">
               <i class="fas fa-chevron-down"></i>
             </span>
-          </button></h2>
+          </button></h4>
         <hr>
       </div>
     </div>
@@ -197,11 +197,11 @@
     <div class="row">
       <div class="col-md-12">
         <br>
-        <h2>Tags  <button @click="showTags=!showTags" type="button" class="btn btn-sm">
+        <h4>Tags  <button @click="showTags=!showTags" type="button" class="btn btn-sm">
             <span class="badge">
               <i class="fas fa-chevron-down"></i>
             </span>
-          </button></h2>
+          </button></h4>
         <hr>
         <transition name="slide-fade">
         <button v-if="showTags"
@@ -450,10 +450,15 @@ export default {
         method: 'put',
         url: `http://${this.$store.getters.getIp}/data-api/threads/${id}/close`,
         headers: headers})
-        .then( res => {console.log("thread fechado")})
+        .then( res => { this.$http({
+          method: 'get',
+          url: `http://${this.$store.getters.getIp}/data-api/threads`,})
+          .then(res => (this.threads_ = res.data))
+          .catch(err => console.log(err, "thread"));
+        })
         .catch(err => console.log(err, "erro no cclose thread"))
       
-    
+
   
    /* }
         .put(`http://${this.$store.getters.getIp}/data-api/threads/${id}/close`, {
