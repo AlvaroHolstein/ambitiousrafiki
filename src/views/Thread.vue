@@ -153,7 +153,7 @@
                       v-show="!threadFechada"
                       v-bind:id="ans.id + '_anchor'"
                       class="float-right btn btn-outline-primary ml-2"
-                      v-on:click="commentAnswer(ans.id, ans.userInfo.id)"
+                      v-on:click="openModal(ans)"
                     >
                       <i class="fa fa-reply" v-bind:id="ans.id + '_icon'"></i>
                     </a>
@@ -203,11 +203,11 @@
                             <i class="fa fa-reply"></i>
                             </a>-->
                             <a
-                              v-bind:class="{'float-right': true, 'btn': true, 'text-white':true, 'btn-success': !com.upv, 'ml-2': true, 'btn-danger': com.upv}"
+                              v-bind:class="{'float-right': true, 'btn': true, 'text-white':true, 'btn-success':verifyUpv(com), 'ml-2': true, 'btn-danger': !verifyUpv(com)}"
                               v-on:click="upvoteComment(com, ans)"
                             >
                               <i
-                                v-bind:class="{'fas fa-thumbs-up': !com.upv, 'fas fa-thumbs-down': com.upv}"
+                                v-bind:class="{'fas fa-thumbs-up': verifyUpv(com), 'fas fa-thumbs-down': !verifyUpv(com)}"
                               >
                                 |
                                 {{
@@ -290,7 +290,8 @@ export default {
       threadF: null,
       answersF: null,
       commentsF: [],
-      answerText: "" //TExto para a resposta
+      answerText: "", //TExto para a resposta
+      commentToAnswer: ""
     };
   },
   created() {
@@ -403,6 +404,17 @@ export default {
     }
   },
   methods: {
+    verifyUpv(comment) {
+      if (this.$store.state.users.loggedUsers != null) {
+        let upv = true;
+        for (let upv of this.$store.state.users.loggedUser.upvotes) {
+          if (upv.type == "comment" && upv.targetId == comment.id) {
+            upv = false;
+          }
+        }
+        return upv;
+      }
+    },
     fol_unfol() {
       //Não está a ser usado
       if (this.$store.state.users.loggedUser == null) return true;
@@ -1215,13 +1227,212 @@ export default {
     },
     upvoteComment(comment, answer) {
       if (this.confirmAuth() == true) {
-        let Upv = true
-        for(let com of this.$store.state.users.upvotes) {
-          if(com.type == "comment" && com.targetId == comment.id) Upv = false
+        let Upv = true;
+
+        console.log(answer);
+        console.log(comment, "Comentário e em cima answer");
+        for (let com of this.$store.state.users.loggedUser.upvotes) {
+          if (com.type == "comment" && com.targetId == comment.id) Upv = false;
         }
 
-        if(Upv) {
-          
+        let main = {
+          ip: this.$store.getters.getIp,
+          lg: this.$store.state.users.loggedUser,
+          th: this.threadF,
+          author: comment.userInfo,
+          cookie: this.getLogCookie(),
+          http: this.$http,
+          expValue: 5, //Não esquecer de fazer math.abs()
+          upvote: {
+            type: "comment",
+            targetId: comment.id
+          },
+          headers: {
+            "x-access-token": this.getLogCookie()
+          }
+        };
+
+        if (Upv) {
+          console.log("Vais adicionar upv");
+          async function addUpvCom() {
+            /** Adicionar Upvote */
+            let successUpv = await main
+              .http({
+                url: `http://${main.ip}/data-api/users/addupvote/${main.lg.id}`,
+                method: "put",
+                headers: main.headers,
+                data: {
+                  upvote: main.upvote
+                }
+              })
+              .then(res => res.data.success);
+
+            /** Icrementar Upvote comment */
+            let successUpvCom = await main
+              .http({
+                url: `http://${main.ip}/data-api/threads/${
+                  main.th.id
+                }/answers/${answer.id}/comments/${comment.id}/upvote`,
+                method: "put",
+                headers: main.headers
+              })
+              .then(res => res.data.success);
+            /** Adicionar experiencia ao autor do comentário */
+            await main
+              .http({
+                url: `http://${main.ip}/data-api/users/addexp/${
+                  main.author.userid
+                }`,
+                method: "put",
+                headers: main.headers,
+                data: {
+                  exp: main.expValue
+                }
+              })
+              .then(res => console.log("experiencia adicionada com suucesso"));
+            /** Adicionar Notificação ao autor do comentário */
+            await main.http({
+              url: `http://${main.ip}/data-api/users/addNotification/${
+                main.author.userid
+              }`,
+              method: "put",
+              headers: main.headers,
+              data: {
+                notification: {
+                  userInfo: {
+                    id: main.lg.id,
+                    name: main.lg.name
+                  },
+                  text: "deu upv no seu comentario"
+                }
+              }
+            });
+
+            /** Adicionar ExpLog */
+            await main.http({
+              url: `http://${main.ip}/data-api/explog/add`,
+              method: "post",
+              headers: main.headers,
+              data: {
+                expLog: {
+                  targetId: comment.id,
+                  targetType: "comment",
+                  logType: "upvote",
+                  expValue: main.expValue,
+                  expUserInfo: {
+                    userId: main.author.userid,
+                    name: main.author.name,
+                    rank: main.author.rank
+                  },
+                  receiverUserInfo: {
+                    userId: main.lg.id,
+                    name: main.lg.name,
+                    rank: main.lg.rank.trueRank
+                  }
+                }
+              }
+            });
+            /** Devolver objeto */
+            return {
+              upvUser: successUpv,
+              addUpvCom: successUpvCom
+            };
+          }
+
+          addUpvCom().then(res => {
+            console.log(res, "res do addUpvCom()");
+            if (res.upvUser) {
+              this.$store.commit("users/addUpvote", main.upvote);
+            }
+            if (res.addUpvCom) {
+              for (let com of this.commentsF) {
+                if (com.id == comment.id) com.upvotes++;
+              }
+            }
+          });
+        } else {
+          console.log("Vais remover upv");
+          async function rmUpvCom() {
+            /** Remover Upvote */
+            let successUpv = await main
+              .http({
+                url: `http://${main.ip}/data-api/users/removeupvote/${
+                  main.lg.id
+                }`,
+                method: "put",
+                headers: main.headers,
+                data: {
+                  upvote: main.upvote
+                }
+              })
+              .then(res => res.data.success);
+            /** tirar upvote commnet */
+
+            let successUpvCom = await main
+              .http({
+                url: `http://${main.ip}/data-api/threads/${
+                  main.th.id
+                }/answers/${answer.id}/comments/${comment.id}/downvote`,
+                method: "put",
+                headers: main.headers
+              })
+              .then(res => res.data.success);
+            /** Remover exp autor do comment */
+            await main
+              .http({
+                url: `http://${main.ip}/data-api/users/rmexp/${
+                  main.author.userid
+                }`,
+                method: "put",
+                headers: main.headers,
+                data: {
+                  exp: main.expValue
+                }
+              })
+              .then(res => console.log("experiencia removida com suucesso"));
+
+            /** Adicionar explog */
+            await main.http({
+              url: `http://${main.ip}/data-api/explog/add`,
+              method: "post",
+              headers: main.headers,
+              data: {
+                expLog: {
+                  targetId: comment.id,
+                  targetType: "comment",
+                  logType: "downvote",
+                  expValue: -main.expValue,
+                  expUserInfo: {
+                    userId: main.author.userid,
+                    name: main.author.name,
+                    rank: main.author.rank
+                  },
+                  receiverUserInfo: {
+                    userId: main.lg.id,
+                    name: main.lg.name,
+                    rank: main.lg.rank.trueRank
+                  }
+                }
+              }
+            });
+            /** Devolver objeto */
+            return {
+              rmUpvUser: successUpv,
+              rmUpvCom: successUpvCom
+            };
+          }
+
+          rmUpvCom().then(res => {
+            console.log(res, "res do rmUpvcom()");
+            if (res.rmUpvUser) {
+              this.$store.commit("users/removeUpvote", main.upvote);
+            }
+            if (res.rmUpvCom) {
+              for (let com of this.commentsF) {
+                if (com.id == comment.id) com.upvotes--;
+              }
+            }
+          });
         }
       } else {
         this.errorSwal("Tens que estar autenticado para poder dar upvote");
@@ -1231,33 +1442,161 @@ export default {
      * Aqui é que se vai fazer a confirmação por badges
      */
     addAnswer() {
+      // Fuckiing
       /** Confirmar 1º se a resposta é vazia ou não */
       if (this.confirmAuth() == true) {
-      } else {
-        this.errorSwal("Tens que estar autenticado para poder dar upvote");
-      }
-      if (this.answerText == false) {
-        // answer vazia
-        this.errorSwal("Tens que escrever alguma coisa", true, "warning");
-      } else {
-        //No fim fazer um Swal a dizer que a resposta foi gravada com sucesso
-        /** mas se foir para fazer o swal fazer daqueles que aparece à direita em cima */
-      }
-    },
-    /** Um destes dois deve estar a mais */
-    commentAnswer() {
-      if (this.confirmAuth() == true) {
-      } else {
-        this.errorSwal("Tens que estar autenticado para poder dar upvote");
-      }
-    },
-    commentToAnswer() {
-      if (this.confirmAuth() == true) {
-      } else {
-        this.errorSwal("Tens que estar autenticado para poder dar upvote");
-      }
-    },
+        if (this.answerText == "") {
+          // answer vazia
+          this.errorSwal("Tens que escrever alguma coisa", true, "warning");
+        } else {
+          console.log(this.answerText, "Aqui vai uma resposta");
+          let main = {
+            ip: this.$store.getters.getIp,
+            lg: this.$store.state.users.loggedUser,
+            th: this.threadF,
+            // author: this.userInfo,
+            cookie: this.getLogCookie(),
+            http: this.$http,
+            expValue: 5, //Não esquecer de fazer math.abs()
+            upvote: {
+              type: "answer to thread",
+              targetId: this.threadF.id
+            },
+            headers: {
+              "x-access-token": this.getLogCookie()
+            }
+          };
+          console.log(this.answerText);
+          let newAnswer = {
+            // idThread: this.threadF.id,
+            userInfo: {
+              name: this.$store.state.users.loggedUser.name,
+              photo: this.$store.state.users.loggedUser.picture,
+              userid: this.$store.state.users.loggedUser.id,
+              rank: this.$store.state.users.loggedUser.rank.trueRank
+            },
+            answer: this.answerText
+          };
 
+          async function addAnswer() {
+            /** Adicionar Answer */
+            let addAns = await main
+              .http({
+                url: `http://${main.ip}/data-api/threads/${main.th.id}/answers`,
+                method: "post",
+                headers: main.headers,
+                data: {
+                  answer: newAnswer
+                }
+              })
+              .then(res => res.data.answer)
+              .catch(err => {
+                throw err;
+              });
+
+            /** Adicionar Experiencia */
+            await main
+              .http({
+                url: `http://${main.ip}/data-api/users/addexp/${main.lg.id}`,
+                method: "put",
+                headers: main.headers,
+                data: {
+                  exp: main.expValue
+                }
+              })
+              .then(res => console.log("Experiencia adicionada"));
+
+            /** Adicionar notificações */
+            //Notificação para o criador da thread
+            await main.http({
+              url: `http://${main.ip}/data-api/users/addnotification/${
+                main.lg.id
+              }`,
+              method: "put",
+              headers: main.headers,
+              data: {
+                notification: {
+                  userInfo: {
+                    id: main.lg.id,
+                    name: main.lg.name
+                  },
+                  text: "respondeu à sua thread"
+                }
+              }
+            });
+            //Notificação para os seguidores
+            await main.http({
+              url: `http://${main.ip}/data-api/users/addanswer/multiplenotis`,
+              method: "put",
+              headers: main.headers,
+              data: {
+                threadId: main.th.id,
+                notification: {
+                  userInfo: {
+                    id: main.lg.id,
+                    name: main.lg.name
+                  },
+                  text: "respondeu a uma thread que segue"
+                }
+              }
+            }); //Não vai estar à espera de uma resposta, por agora
+            /** Adicionar expLog */
+            await main
+              .http({
+                url: `http://${main.ip}/data-api/explog/add`,
+                method: "post",
+                headers: main.headers,
+                data: {
+                  expLog: {
+                    targetId: main.th.id,
+                    targetType: "answer",
+                    logType: "answer to thread",
+                    expValue: main.expValue,
+                    receiverUserInfo: {
+                      userId: main.th.userInfo.userid,
+                      name: main.th.userInfo.name,
+                      rank: main.th.userInfo.rank
+                    },
+                    expUserInfo: {
+                      userId: main.lg.id,
+                      name: main.lg.name,
+                      rank: main.lg.rank.trueRank
+                    }
+                  }
+                }
+              })
+              .then(res => console.log("explog adicionado"));
+            return {
+              add: addAns
+            };
+          }
+          addAnswer().then(res => {
+            if (res.add) {
+              console.log(res.add, "'resposta' vinda da api");
+              this.answersF.push(res.add);
+              this.answerText = "";
+            }
+          });
+        }
+      } else {
+        this.errorSwal("Tens que estar autenticado para poder dar upvote");
+      }
+    },
+    comentar() {
+      /** Adicionar Comentário */
+      /** Atribuir experiencia a quem fez o comment
+       * Mandar notificações para:
+       * Autor da thread,
+       * autor da answer,
+       * todos os seguidores
+       */
+    },
+    openModal(ans) {
+      if (this.confirmAuth() == true) {
+      } else {
+        this.errorSwal("Tens que estar autenticado para poder dar comentar");
+      }
+    },
     /** Dar toogle aos comentários (dá para usar jQuery)  */
     hideComments(event, ansid) {
       let coms = $(`#${ansid}_wrapper.theWrapper`);
