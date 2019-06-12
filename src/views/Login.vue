@@ -12,7 +12,7 @@
                 class="form-control"
                 placeholder="Your Email *"
                 v-model="loginEmail"
-              />
+              >
             </div>
             <div class="form-group">
               <input
@@ -21,15 +21,10 @@
                 placeholder="Your Password *"
                 v-model="loginPassword"
                 value
-              />
+              >
             </div>
             <div class="form-group">
-              <input
-                type="submit"
-                class="btnSubmit"
-                value="Login"
-                :disabled="loginEmail == ''"
-              />
+              <input type="submit" class="btnSubmit" value="Login" :disabled="loginEmail == ''">
             </div>
           </form>
 
@@ -42,20 +37,16 @@
                   showfp = !showfp;
                   emailfp = null;
                 "
-              >
-                Forgot Password?
-              </p>
+              >Forgot Password?</p>
               <div class="col-md-12" v-show="showfp">
-                <p class="form-text">
-                  Insert your e-mail and we send you Rafiki
-                </p>
+                <p class="form-text">Insert your e-mail and we send you Rafiki</p>
                 <input
                   type="email"
                   v-model="emailfp"
                   class="form-control"
                   placeholder="E-mail..."
                   required
-                />
+                >
                 <div class="col-md-12 text-right" style="margin-top: 1rem;">
                   <button type="submit" class="btn btn-success">Enviar</button>
                 </div>
@@ -76,7 +67,7 @@
                 placeholder="Your Username"
                 v-model="regUsername"
                 required
-              />
+              >
             </div>
             <div class="form-group">
               <input
@@ -85,7 +76,7 @@
                 placeholder="Your Email"
                 v-model="regEmail"
                 required
-              />
+              >
             </div>
             <div class="form-group">
               <input
@@ -94,7 +85,7 @@
                 placeholder="Your Password *"
                 v-model="regPassword"
                 required
-              />
+              >
             </div>
             <div class="form-group">
               <input
@@ -103,15 +94,10 @@
                 placeholder="Confirm Password *"
                 v-model="regConfPassword"
                 required
-              />
+              >
             </div>
             <div class="form-group">
-              <input
-                type="button"
-                class="btnSubmit"
-                value="Register"
-                @click="register"
-              />
+              <input type="button" class="btnSubmit" value="Register" @click="register">
             </div>
           </form>
         </div>
@@ -147,10 +133,67 @@ export default {
        * Falta chamada à API
        * Depois de fazer REgister vai direto para o viewProfile
        */
+      console.log("alalalalal")
       if (this.regPassword == this.regConfPassword) {
-        /**
-         * Depois disto é que se faz a chamada à API
-         */
+        this.$http({
+          url: `http://${this.$store.getters.getIp}/auth-api/register`,
+          method: "post",
+          data: {
+            name: this.regUsername,
+            email: this.regEmail,
+            password: this.regPassword
+          }
+        }).then(res => {
+          if (res.data.auth) {
+            let { auth, token, id, user } = res.data;
+            let options = {
+              // httpOnly: true,
+              maxAge: 9999,
+              path: "/"
+            };
+            let setCookie = cookie.serialize(res.data.cookie, token, options);
+            console.log(setCookie, "SET COOKIE");
+            document.cookie = setCookie.toString();
+            this.$store.commit("users/setLoggedUser", res.data.user);
+            this.$store.dispatch("users/user_badges");
+            this.$router.push({
+              name: "viewProfile",
+              params: {
+                userid: res.data.id
+              }
+            });
+            // this.$http({
+            //   url: `http://${this.$store.getters.getIp}/data-api/users/${
+            //     res.data.id
+            //   }`,
+            //   method: "get",
+            //   headers: {
+            //     "x-access-token": cookie.parse(document.cookie).login
+            //   }
+            // })
+            // .then(res => {
+            //   if (res.data) {
+            //     this.$store.commit("users/setLoggedUser", res.data);
+            //     this.$store.dispatch("users/user_badges");
+            //   }
+            // })
+            // .catch(err => {
+            //   throw err;
+            // });
+            this.$router.push({
+              name: "viewProfile",
+              params: {
+                userid: res.data.id
+              }
+            });
+          } else {
+            Swal.fire({
+              type: "error",
+              title: "algo correu mal",
+              text: res.data.msg
+            })
+          }
+        });
       } else {
         Swal("Password Diferente de Confirmar Password");
       }

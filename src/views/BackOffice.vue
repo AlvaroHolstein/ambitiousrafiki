@@ -473,9 +473,9 @@ export default {
     createBadge() {
       this.badgeId = this.getLastBadgeID() + 1;
       this.$store.dispatch("create_badge", {
-        id: this.badgeId,
+        id: Number(this.badgeId),
         name: this.badgeName,
-        goal: this.badgeGoal,
+        goal: Number(this.badgeGoal),
         desc: this.badgeDesc,
         category: this.badgeCat
       });
