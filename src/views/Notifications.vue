@@ -49,31 +49,40 @@ export default {
   },
   methods: {
     seenNotification(id) {
-      let parsedCookie = cookie.parse(document.cookie);
+      //Check if notification is true
+      let notifi = this.$store.state.users.loggedUser.notifications.filter(
+        noti => noti.id == id
+      );
+      console.log(notifi);
+      if (notifi[0].visto != true) {
+        let parsedCookie = cookie.parse(document.cookie);
 
-      console.log(parsedCookie.login, "PARSED COOOOOOOOOOOOOOOOOOOOOOOOOKIE");
-      this.$http({
-        url: `http://${this.$store.getters.getIp}/data-api/users/${
-          this.user_.id
-        }/updatenotification/${id}`,
-        method: "put",
-        headers: { "x-access-token": parsedCookie.login }
-      })
-        .then(res => {
-          let notiChange = this.$store.state.users.loggedUser.notifications.filter(
-            noti => noti.id == id
-          );
-          notiChange[0].visto = true;
-          let index = this.$store.state.users.loggedUser.notifications.findIndex(
-            notification => notification.id == notiChange[0].id
-          );
-          this.$store.state.users.loggedUser.notifications.splice(index, 1);
-          this.$store.state.users.loggedUser.notifications.push(notiChange);
-          console.log(res);
+        console.log(parsedCookie.login, "PARSED COOOOOOOOOOOOOOOOOOOOOOOOOKIE");
+        this.$http({
+          url: `http://${this.$store.getters.getIp}/data-api/users/${
+            this.user_.id
+          }/updatenotification/${id}`,
+          method: "put",
+          headers: { "x-access-token": parsedCookie.login }
         })
-        .catch(err => console.log(err, "erro no updateNoti"));
+          .then(res => {
+            let notiChange = this.$store.state.users.loggedUser.notifications.filter(
+              noti => noti.id == id
+            );
+            notiChange[0].visto = true;
+            let index = this.$store.state.users.loggedUser.notifications.findIndex(
+              notification => notification.id == notiChange[0].id
+            );
+            this.$store.state.users.loggedUser.notifications.splice(index, 1);
+            this.$store.state.users.loggedUser.notifications.push(notiChange);
+            console.log(res);
+          })
+          .catch(err => console.log(err, "erro no updateNoti"));
 
-      console.log(id, "seenNotification");
+        console.log(id, "seenNotification");
+      } else {
+        console.log("Já Foi Vista");
+      }
     },
     deleteNotification(id) {
       /*let parsedCookie = cookie.parse(document.cookie);
