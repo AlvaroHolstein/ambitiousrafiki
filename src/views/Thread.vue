@@ -139,12 +139,12 @@
                 </div>
                 <div class="col-md-10">
                   <p>
-                    <a
+                    <router-link
                       class="float-left"
-                      href="https://maniruzzaman-akash.blogspot.com/p/contact.html"
+                      :to="{name: 'viewProfile', params: { userid: ans.userInfo.userid}}"
                     >
                       <strong>{{ ans.userInfo.name }}</strong>
-                    </a>
+                    </router-link>
                   </p>
                   <div class="clearfix"></div>
                   <p>{{ ans.answer }}</p>
@@ -194,7 +194,10 @@
                         <div class="col-md-10">
                           <p>
                             <a href>
-                              <strong>{{ com.userInfo.name }}</strong>
+                              <router-link
+                                class="float-left"
+                                :to="{name: 'viewProfile', params: { userid: com.userInfo.userid}}"
+                              >{{ com.userInfo.name }}</router-link>
                             </a>
                           </p>
                           <p>{{ com.comment }}</p>

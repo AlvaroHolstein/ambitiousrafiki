@@ -167,13 +167,13 @@ class Notification {
   constructor(threadId, text, name, userId, id = 1) {
     this.id = id
     this.idThread = threadId,
-    this.text = text,
-    this.userInfo = {
-      name: name,
-      id: userId
-    },
-    this.visto = false,
-    this.date = new Date().toISOString()
+      this.text = text,
+      this.userInfo = {
+        name: name,
+        id: userId
+      },
+      this.visto = false,
+      this.date = new Date().toISOString()
   }
 }
 
@@ -255,20 +255,30 @@ const users = {
     addUpvote(state, upvote) {
       let insert = true
       console.log(upvote)
-      for(let upv of state.loggedUser.upvotes) {
-        if(upv.type == upvote.type && upv.targetId == upvote.targetId) {
+      for (let upv of state.loggedUser.upvotes) {
+        if (upv.type == upvote.type && upv.targetId == upvote.targetId) {
           insert = false
           return;
         }
       }
-      if(insert) state.loggedUser.upvotes.push(upvote)
+      if (insert) state.loggedUser.upvotes.push(upvote)
     },
     removeUpvote(state, upvote) {
       let index = state.loggedUser.upvotes.findIndex(upv => {
-        if(upv.type == upvote.type && upv.targetId == upvote.targetId) return true
+        if (upv.type == upvote.type && upv.targetId == upvote.targetId) return true
         return false
       })
-      if(index != -1) state.loggedUser.upvotes.splice(index, 1)
+      if (index != -1) state.loggedUser.upvotes.splice(index, 1)
+    },
+    removeNotis(state, payload) {
+      for (let noti of payload) {
+        let index = state.loggedUser.notifications.findIndex(nt => nt.id == noti)
+        if (index != -1) state.loggedUser.notifications.splice(index, 1)
+      }
+    },
+    viewOrNotNotification(state, id) {
+      let index = state.loggedUser.notifications.findIndex(nt => nt.id == id)
+      if (index != -1) state.loggedUser.notifications[index].visto = !state.loggedUser.notifications[index].visto
     }
   },
   actions: {

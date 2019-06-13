@@ -12,58 +12,39 @@
       <span class="navbar-toggler-icon"></span>
     </button>
     <router-link :to="{ name: 'home' }">
-      <img alt="Vue logo" src="@/assets/logoR.png" style="width: 100px" />
+      <img alt="Vue logo" src="@/assets/logoR.png" style="width: 100px">
     </router-link>
     <div class="collapse navbar-collapse" id="navModal">
       <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
         <li class="nav-item">
-          <router-link :to="{ name: 'badges' }" :class="{ 'nav-link': true }"
-            >Badges</router-link
-          >
+          <router-link :to="{ name: 'badges' }" :class="{ 'nav-link': true }">Badges</router-link>
         </li>
         <li class="nav-item">
-          <router-link :to="{ name: 'stats' }" :class="{ 'nav-link': true }"
-            >Statistics</router-link
-          >
+          <router-link :to="{ name: 'stats' }" :class="{ 'nav-link': true }">Statistics</router-link>
         </li>
         <li class="nav-item">
-          <router-link :to="{ name: 'rankings' }" :class="{ 'nav-link': true }"
-            >Ranking</router-link
-          >
+          <router-link :to="{ name: 'rankings' }" :class="{ 'nav-link': true }">Ranking</router-link>
         </li>
         <li class="nav-item">
-          <router-link :to="{ name: 'users' }" :class="{ 'nav-link': true }"
-            >Users</router-link
-          >
+          <router-link :to="{ name: 'users' }" :class="{ 'nav-link': true }">Users</router-link>
         </li>
         <li class="nav-item">
-          <router-link :to="{ name: 'tags' }" :class="{ 'nav-link': true }"
-            >Tags</router-link
-          >
+          <router-link :to="{ name: 'tags' }" :class="{ 'nav-link': true }">Tags</router-link>
         </li>
         <li v-if="$store.state.users.loggedUser != null" class="nav-item">
           <a v-on:click="goToUserProfile()" class="nav-link pointer">Profile</a>
         </li>
         <li v-if="toBeOrNotToBeAdmin" class="nav-item">
-          <router-link
-            :to="{ name: 'backoffice' }"
-            :class="{ 'nav-link': true }"
-            >Back-Office</router-link
-          >
+          <router-link :to="{ name: 'backoffice' }" :class="{ 'nav-link': true }">Back-Office</router-link>
         </li>
         <li>
-          <hr />
+          <hr>
           <!-- Estilizar este hr, e confirmar se funciona mesmo -->
         </li>
       </ul>
-      <ul
-        v-if="$store.state.users.loggedUser === null"
-        class="navbar-nav ml-auto"
-      >
+      <ul v-if="$store.state.users.loggedUser === null" class="navbar-nav ml-auto">
         <li class="nav-item">
-          <router-link :to="{ name: 'login' }" :class="{ 'nav-link': true }"
-            >Login</router-link
-          >
+          <router-link :to="{ name: 'login' }" :class="{ 'nav-link': true }">Login</router-link>
         </li>
       </ul>
       <!-- <div  class="navbar-collapse collapse w-100 order-3 dual-collapse2"> -->
@@ -74,7 +55,7 @@
             alt="Ups"
             class="rounded-circle"
             style="height: 35px; width: auto;"
-          />
+          >
         </li>
         <li class="nav-item">
           <div class="dropdown dropleft">
@@ -85,10 +66,12 @@
               style="height:20px;border-radius: 50%;"
             >
               <!-- O span vai se mostrar se houver notificações e o innerHTML do "sino" Vai ser o numero de notificações -->
-              <span class="point">
-                <i class="fas fa-bell" style="color: #60CAE2;">{{
+              <span class="pointer">
+                <i class="fas fa-bell" style="color: #60CAE2;">
+                  {{
                   notificationsLength
-                }}</i>
+                  }}
+                </i>
               </span>
             </a>
             <div id="drops" class="dropdown-menu">
@@ -117,26 +100,22 @@
               <div class="dropdwon-divider"></div>
               <div id="dropdown-footer" class="dropdown-item">
                 <ul class="list-inline viewPage">
-                  <li class="list-inline-item helpers point viewPage">
+                  <li class="list-inline-item helpers pointer viewPage">
+
                     <router-link
+                      id="viewMore"
                       :to="{ name: 'notifications' }"
                       :class="{ 'nav-link': true }"
-                      >View More</router-link
-                    >
+                    >View More</router-link>
                   </li>
-                  <li
-                    v-on:click="markAsRead()"
-                    class="list-inline-item helpers point"
-                  >
-                    Mark as read
-                  </li>
+                  <li v-on:click="markAsRead()" class="list-inline-item helpers pointer">Mark as read</li>
                   <!-- Isto podia ficar com um icone de mesnsagem aberta e com um helper -->
                 </ul>
               </div>
             </div>
           </div>
         </li>
-        <li class="nav-item point" @click="logout">
+        <li class="nav-item pointer" @click="logout">
           <a class="nav-link pointer">Logout</a>
         </li>
       </ul>
@@ -256,7 +235,10 @@ export default {
         this.$store.state.users.loggedUser.notifications.length > 0 &&
         this.$store.state.users.loggedUser.notifications[0] != null
       )
-        return this.$store.state.users.loggedUser.notifications;
+        return this.$store.state.users.loggedUser.notifications.filter((not, cont) => {
+          if(cont < 10) return true
+          return false
+        });
 
       return [{}];
     }
@@ -276,6 +258,9 @@ nav {
 }
 .pointer:hover {
   cursor: pointer;
+}
+#viewMore {
+  color: black;
 }
 /* .navLogo {
   width: 100px;

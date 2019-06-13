@@ -1,28 +1,46 @@
-<template>
+-<template>
   <div class="container">
     <h3>Notifications</h3>
     <div
       v-for="(noti, cont) of userNotifications"
       v-bind:key="cont"
-      v-on:click="seenNotification(noti.id)"
-      v-bind:class="{ seen: noti.visto, NotSeen: !noti.visto }"
+      v-bind:class="{ 'seen': noti.visto, 'NotSeen': !noti.visto }"
     >
-      <div class="container">
-        <div>
-          <router-link
-            v-bind:to="{ name: 'thread', params: { threadid: noti.idThread } }"
-            class="dropdown-item"
-            v-bind:class="{ bgNoti: noti.visto, textNoti: noti.visto }"
-          >
-            <i class="far fa-flag ii"></i>
-            {{
-              noti.userInfo != undefined
+      <div class="row">
+        <div class="col-md-12">
+          <ul class="list-inline">
+            <li class="list-inline-item">
+              <input
+                type="checkbox"
+                class="mx-left checks"
+                v-bind:id="noti.id"
+                v-on:click="pick($event)"
+              >
+            </li>
+            <li class="list-inline-item" v-on:click="seenNotification(noti.id)">
+              <router-link
+                v-bind:to="{ name: 'thread', params: { threadid: noti.idThread } }"
+                class="dropdown-item"
+                v-bind:class="{ 'bgNoti': noti.visto, 'textNoti': noti.visto }"
+              >
+                <i class="far fa-flag ii"></i>
+                {{
+                noti.userInfo != undefined
                 ? noti.userInfo.name + " - " + noti.text
                 : ""
-            }}
-          </router-link>
+                }}
+              </router-link>
+            </li>
+          </ul>
         </div>
       </div>
+    </div>
+    <div class="text-center" id="bottomDiv">
+      <button
+        v-show="rmNotifications.length > 0"
+        class="btn btn-outline-dark"
+        v-on:click="remove_notifications()"
+      >Apagar</button>
     </div>
   </div>
 </template>
@@ -37,8 +55,9 @@ export default {
       users: this.$store.getters.getUsers
     };*/
     return {
-      notis_: this.$store.state.users.loggedUser.notifications,
-      user_: this.$store.state.users.loggedUser
+      // notis_: this.$store.state.users.loggedUser.notifications != null ? this.$store.state.users.,
+      user_: this.$store.state.users.loggedUser,
+      rmNotifications: []
     };
   },
   created() {
@@ -48,16 +67,30 @@ export default {
     )[0];*/
   },
   methods: {
+    pick(event) {
+      console.log(event.target.id);
+      let checkNoti = $(".checks");
+      console.log(checkNoti);
+      if (event.target.checked) {
+        this.rmNotifications.push(Number(event.target.id));
+      } else {
+        let index = this.rmNotifications.findIndex(
+          btn => btn == event.target.id
+        );
+        if (index != -1) this.rmNotifications.splice(index, 1);
+      }
+      console.log(this.rmNotifications);
+    },
     seenNotification(id) {
       //Check if notification is true
-      let notifi = this.$store.state.users.loggedUser.notifications.filter(
+      let notifi = this.$store.state.users.loggedUser.notifications.find(
         noti => noti.id == id
       );
       console.log(notifi);
-      if (notifi[0].visto != true) {
+      if (notifi.visto != true) {
         let parsedCookie = cookie.parse(document.cookie);
 
-        console.log(parsedCookie.login, "PARSED COOOOOOOOOOOOOOOOOOOOOOOOOKIE");
+        // console.log(parsedCookie.login, "PARSED COOOOOOOOOOOOOOOOOOOOOOOOOKIE");
         this.$http({
           url: `http://${this.$store.getters.getIp}/data-api/users/${
             this.user_.id
@@ -66,16 +99,17 @@ export default {
           headers: { "x-access-token": parsedCookie.login }
         })
           .then(res => {
-            let notiChange = this.$store.state.users.loggedUser.notifications.filter(
-              noti => noti.id == id
-            );
-            notiChange[0].visto = true;
-            let index = this.$store.state.users.loggedUser.notifications.findIndex(
-              notification => notification.id == notiChange[0].id
-            );
-            this.$store.state.users.loggedUser.notifications.splice(index, 1);
-            this.$store.state.users.loggedUser.notifications.push(notiChange);
-            console.log(res);
+            this.$store.commit("users/viewOrNotNotification", id)
+            // let notiChange = this.$store.state.users.loggedUser.notifications.filter(
+            //   noti => noti.id == id
+            // );
+            // notiChange[0].visto = true;
+            // let index = this.$store.state.users.loggedUser.notifications.findIndex(
+            //   notification => notification.id == notiChange[0].id
+            // );
+            // this.$store.state.users.loggedUser.notifications.splice(index, 1);
+            // this.$store.state.users.loggedUser.notifications.push(notiChange);
+            // console.log(res);
           })
           .catch(err => console.log(err, "erro no updateNoti"));
 
@@ -84,7 +118,7 @@ export default {
         console.log("Já Foi Vista");
       }
     },
-    deleteNotification(id) {
+    deleteNotification(id) { // Passou a chamar se remove_notifications()
       /*let parsedCookie = cookie.parse(document.cookie);
       let headers = {
         "x-access-token": parsedCookie.login
@@ -98,6 +132,35 @@ export default {
           notiChange[0].visto = true
         })
         .catch(err => console.log(err, "erro no updateNoti"));*/
+    },
+    checkeds() {
+      let checkNotis = $(".checks");
+      for (let i of checkNotis) {
+        console.log(i, "leleleleleell");
+      }
+      return checkNotis.filter(btn => console.log(btn, "alalalal"));
+    },
+    remove_notifications() {
+      if (this.rmNotifications.length > 0) {
+        this.$http({
+          url: `http://${
+            this.$store.getters.getIp
+          }/data-api/users/removeNotification/${
+            this.$store.state.users.loggedUser.id
+          }`,
+          method: "PUT",
+          headers: {
+            "x-access-token": cookie.parse(document.cookie).login
+          },
+          data: {
+            notifications: this.rmNotifications
+          }
+        }).then(res => {
+          if (res.data.success) {
+            this.$store.commit("users/rmNotis", this.rmNotifications);
+          }
+        });
+      }
     }
     /* notificacaoVista(id) {
       let indexUser = this.users.findIndex(us => us.id == this.loginUser.id);
@@ -113,7 +176,9 @@ export default {
   },
   computed: {
     userNotifications() {
-      return this.notis_;
+      return this.$store.state.users.loggedUser != null
+        ? this.$store.state.users.loggedUser.notifications
+        : [];
     }
     /*loginUserNotifications() {
       if (
@@ -146,14 +211,20 @@ export default {
   color: #fff !important;
 }
 .NotSeen {
-  background-color: yellow !important;
+  border: 1px solid red;
 }
 .seen {
-  background-color: red !important;
+  border: 1px solid black;
 }
 span.Info {
   font-weight: bold;
   font-size: 2.2vh;
   font-family: verdana;
+}
+.checks {
+  background-color: black;
+}
+#bottomDiv {
+  margin-top: 10px;
 }
 </style>
