@@ -31,7 +31,7 @@ export default new Vuex.Store({
     /**
      * VAriáveis de comunicação com a API
      */
-    address:  '172.23.116.246', //"192.168.1.83" , 
+    address: "192.168.1.74", //"192.168.1.83" ,
     port: ":420"
   },
   mutations: {
@@ -44,8 +44,8 @@ export default new Vuex.Store({
       state.badges.splice(index, 1);
     },
     CREATE_BADGE(state, payload) {
-      state.badges.push(payload)
-      console.log(payload, "PAYLOAD NA MUTAÇÃO")
+      state.badges.push(payload);
+      console.log(payload, "PAYLOAD NA MUTAÇÃO");
       /*let aux = state.badges;
       aux.push(payload);
       state.badges = aux;*/
@@ -59,8 +59,8 @@ export default new Vuex.Store({
       axios
         .get(`http://${state.address + state.port}/data-api/badges`)
         .then(res => {
-          console.log(res.data, "BADGES DISPATCHHHHHHHHHHHHH!")
-          commit("LOAD_BADGES", res.data)
+          console.log(res.data, "BADGES DISPATCHHHHHHHHHHHHH!");
+          commit("LOAD_BADGES", res.data);
         })
         .catch(err => console.log(err, "ERRO na ACTION load_badges"));
     },
@@ -70,22 +70,28 @@ export default new Vuex.Store({
         "x-access-token": parsedCookie.login
       };
       axios
-        .delete(`http://${context.state.address + context.state.port}/data-api/badges/${id}`, {
-          headers: headers
+        .delete(
+          `http://${context.state.address +
+            context.state.port}/data-api/badges/${id}`,
+          {
+            headers: headers
+          }
+        )
+        .then(function() {
+          context.commit("DELETE_BADGE", id);
         })
-        .then(function () { context.commit("DELETE_BADGE", id) })
-        .catch(err => console.log(err, "ERRO na ACTION delete_badge"))
-
+        .catch(err => console.log(err, "ERRO na ACTION delete_badge"));
     },
     create_badge(context, payload) {
       let parsedCookie = cookie.parse(document.cookie);
       let headers = {
         "x-access-token": parsedCookie.login
       };
-      console.log(payload, "PAYLOAADDDDDDD")
+      console.log(payload, "PAYLOAADDDDDDD");
       axios({
-        method: 'post',
-        url: `http://${context.state.address + context.state.port}/data-api/badges`,
+        method: "post",
+        url: `http://${context.state.address +
+          context.state.port}/data-api/badges`,
         data: {
           id: payload.id,
           name: payload.name,
@@ -94,11 +100,12 @@ export default new Vuex.Store({
           category: payload.category
         },
         headers: headers
-      }).then(function () {console.log("BLAWWEWK"), context.commit("CREATE_BADGE", payload) })
+      })
+        .then(function() {
+          console.log("BLAWWEWK"), context.commit("CREATE_BADGE", payload);
+        })
         .catch(err => console.log(err, "erro no create badges"));
-  
     },
-
 
     search_tag(context, tag) {
       context.commit("SEARCH_TAG", tag);
