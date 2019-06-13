@@ -4,7 +4,7 @@
     <div
       v-for="(noti, cont) of userNotifications"
       v-bind:key="cont"
-      v-on:click="seenNotification(noti._id)"
+      v-on:click="seenNotification(noti.id)"
       v-bind:class="{seen: noti.visto, NotSeen: !noti.visto}"
     >
       <div class="container">
@@ -24,6 +24,7 @@
 </template>
 
 <script>
+import cookie from "cookie";
 export default {
   data() {
     /* return {
@@ -32,7 +33,8 @@ export default {
       users: this.$store.getters.getUsers
     };*/
     return {
-      notis_: this.$store.state.users.loggedUser.notifications
+      notis_: this.$store.state.users.loggedUser.notifications,
+      user_: this.$store.state.users.loggedUser
     };
   },
   created() {
@@ -43,8 +45,38 @@ export default {
   },
   methods: {
     seenNotification(id) {
-      
+      let parsedCookie = cookie.parse(document.cookie);
+      let headers = {
+        "x-access-token": parsedCookie.login
+      };
+      console.log(parsedCookie.login, "PARSED COOOOOOOOOOOOOOOOOOOOOOOOOKIE")
+      this.$http
+        .put(`http://${this.$store.getters.getIp}/data-api/users/${this.user_.id}/updatenotification/${id}`, {
+          headers: headers
+        })
+        .then(res => { 
+          let notiChange = this.loggedUser.notifications.filter(noti => noti.id == id)
+          notiChange[0].visto = true
+        })
+        .catch(err => console.log(err, "erro no updateNoti"));
+
       console.log(id, "seenNotification");
+    },
+    deleteNotification(id) {
+            /*let parsedCookie = cookie.parse(document.cookie);
+      let headers = {
+        "x-access-token": parsedCookie.login
+      };
+      this.$http
+        .(`http://${this.$store.getters.getIp}/data-api/users/${this.user_.id}/updatenotification/${id}`, {
+          headers: headers
+        })
+        .then(res => { 
+          let notiChange = this.loggedUser.notifications.filter(noti => noti.id == id)
+          notiChange[0].visto = true
+        })
+        .catch(err => console.log(err, "erro no updateNoti"));*/
+
     }
     /* notificacaoVista(id) {
       let indexUser = this.users.findIndex(us => us.id == this.loginUser.id);
@@ -93,7 +125,7 @@ export default {
   color: #fff !important;
 }
 .NotSeen {
-    background-color: yellow !important;
+  background-color: yellow !important;
 }
 .seen {
   background-color: red !important;
