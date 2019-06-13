@@ -446,7 +446,8 @@ export default {
             author: this.threadF.userInfo,
             cookie: this.getLogCookie(),
             http: this.$http,
-            expValue: 5
+            expValue: 5,
+            notiClass: this.$store.state.users.notificationClass
           };
           console.log(main);
 
@@ -501,13 +502,12 @@ export default {
                   }`,
                   method: "put",
                   data: {
-                    notification: {
-                      userInfo: {
-                        id: main.lg.id,
-                        name: main.lg.name
-                      },
-                      text: "Seguiu a sua thread"
-                    }
+                    notification: new main.notiClass(
+                      main.th.id,
+                      "Seguiu a sua Thread",
+                      main.lg.name,
+                      main.lg.id
+                    )
                   },
                   headers: {
                     "x-access-token": main.cookie
@@ -587,7 +587,8 @@ export default {
             author: this.threadF.userInfo,
             cookie: this.getLogCookie(),
             http: this.$http,
-            expValue: -5
+            expValue: -5,
+            notiClass: this.$store.state.users.notificationClass
           };
           async function follow() {
             try {
@@ -714,7 +715,8 @@ export default {
             upvote: {
               type: "thread",
               targetId: this.threadF.id
-            }
+            },
+            notiClass: this.$store.state.users.notificationClass
           };
           console.log(main, "main");
           async function upvoteTh() {
@@ -763,6 +765,13 @@ export default {
                 .then(res => res.data.success);
               console.log("3");
               /** notificações */
+              let noti = new main.notiClass(
+                main.th.id,
+                "deu upvote à sua thread",
+                main.lg.name,
+                main.lg.id
+              );
+              console.log(noti, "NOTIFICAÇAAAAAAAAAAAO");
               await main
                 .http({
                   url: `http://${main.ip}/data-api/users/addnotification/${
@@ -773,13 +782,12 @@ export default {
                     "x-access-token": main.cookie
                   },
                   data: {
-                    notification: {
-                      userInfo: {
-                        id: main.lg.id,
-                        name: main.lg.name
-                      },
-                      text: "deu upvote à sua thread"
-                    }
+                    notification: new main.notiClass(
+                      main.th.id,
+                      "deu upvote à sua thread",
+                      main.lg.name,
+                      main.lg.id
+                    )
                   }
                 })
                 .then(res =>
@@ -853,7 +861,8 @@ export default {
             upvote: {
               type: "thread",
               targetId: this.threadF.id
-            }
+            },
+            notiClass: this.$store.state.users.notificationClass
           };
           console.log(main, "main");
 
@@ -972,7 +981,8 @@ export default {
           upvote: {
             type: "answer",
             targetId: answer.id
-          }
+          },
+          notiClass: this.$store.state.users.notificationClass
         };
         let upvote = true;
         for (let ans of this.answersF) {
@@ -1053,13 +1063,12 @@ export default {
                     "acess-token": main.cookie
                   },
                   data: {
-                    notification: {
-                      userInfo: {
-                        id: main.lg.id,
-                        name: main.lg.name
-                      },
-                      text: "deu upvote à sua resposta"
-                    }
+                    notification: new main.notiClass(
+                      main.th.id,
+                      "deu upvote à sua resposta",
+                      main.lg.name,
+                      main.lg.id
+                    )
                   }
                 })
                 .then(res =>
@@ -1251,7 +1260,8 @@ export default {
           },
           headers: {
             "x-access-token": this.getLogCookie()
-          }
+          },
+          notiClass: this.$store.state.users.notificationClass
         };
 
         if (Upv) {
@@ -1300,13 +1310,12 @@ export default {
               method: "put",
               headers: main.headers,
               data: {
-                notification: {
-                  userInfo: {
-                    id: main.lg.id,
-                    name: main.lg.name
-                  },
-                  text: "deu upv no seu comentario"
-                }
+                notification: new main.notiClass(
+                  main.th.id,
+                  "deu upvote no seu comentário",
+                  main.lg.name,
+                  main.lg.id
+                )
               }
             });
 
@@ -1466,7 +1475,8 @@ export default {
             },
             headers: {
               "x-access-token": this.getLogCookie()
-            }
+            },
+            notiClass: this.$store.state.users.notificationClass
           };
           console.log(this.answerText);
           let newAnswer = {
@@ -1512,18 +1522,17 @@ export default {
             //Notificação para o criador da thread
             await main.http({
               url: `http://${main.ip}/data-api/users/addnotification/${
-                main.lg.id
+                main.th.userInfo.userid
               }`,
               method: "put",
               headers: main.headers,
               data: {
-                notification: {
-                  userInfo: {
-                    id: main.lg.id,
-                    name: main.lg.name
-                  },
-                  text: "respondeu à sua thread"
-                }
+                notification: new main.notiClass(
+                  main.th.id,
+                  "respondeu à sua thread",
+                  main.lg.name,
+                  main.lg.id
+                )
               }
             });
             //Notificação para os seguidores
@@ -1533,13 +1542,12 @@ export default {
               headers: main.headers,
               data: {
                 threadId: main.th.id,
-                notification: {
-                  userInfo: {
-                    id: main.lg.id,
-                    name: main.lg.name
-                  },
-                  text: "respondeu a uma thread que segue"
-                }
+                notification: new main.notiClass(
+                  main.th.id,
+                  "respondeu a uma thread que segue",
+                  main.lg.name,
+                  main.lg.id
+                )
               }
             }); //Não vai estar à espera de uma resposta, por agora, tem que ficar xD
 
@@ -1608,7 +1616,8 @@ export default {
         },
         headers: {
           "x-access-token": this.getLogCookie()
-        }
+        },
+        notiClass: this.$store.state.users.notificationClass
       };
 
       let newComment = {
@@ -1662,13 +1671,12 @@ export default {
             method: "put",
             headers: main.headers,
             data: {
-              notification: {
-                userInfo: {
-                  id: main.lg.id,
-                  name: main.lg.name
-                },
-                text: "comentou a sua answer"
-              }
+              notification: new main.notiClass(
+                main.th.id,
+                "comentou a sua answer",
+                main.lg.name,
+                main.lg.id
+              )
             }
           });
 
@@ -1679,13 +1687,12 @@ export default {
             method: "put",
             headers: main.headers,
             data: {
-              notification: {
-                userInfo: {
-                  id: main.lg.id,
-                  name: main.lg.name
-                },
-                text: "comentou uma resposta a uma thread sua"
-              }
+              notification: new main.notiClass(
+                main.th.id,
+                "comentou uma resposta a uma thread sua",
+                main.lg.name,
+                main.lg.id
+              )
             }
           });
 
@@ -1695,13 +1702,12 @@ export default {
             headers: main.headers,
             data: {
               threadId: main.th.id,
-              notification: {
-                userInfo: {
-                  id: main.lg.id,
-                  name: main.lg.name
-                },
-                text: "comentou uma resposta de uma thread que segue"
-              }
+              notification: new main.notiClass(
+                main.th.id,
+                "comentou uma resposta de uma thread que segue",
+                main.lg.name,
+                main.lg.id
+              )
             }
           });
 

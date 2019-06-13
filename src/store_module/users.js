@@ -163,11 +163,26 @@ class User {
   }
 }
 
+class Notification {
+  constructor(threadId, text, name, userId, id = 1) {
+    this.id = id
+    this.idThread = threadId,
+    this.text = text,
+    this.userInfo = {
+      name: name,
+      id: userId
+    },
+    this.visto = false,
+    this.date = new Date().toISOString()
+  }
+}
+
 /** VUEX */
 const users = {
   namespaced: true,
   state: {
     userClass: User,
+    notificationClass: Notification,
     /**
      * Não vai haver uma variável tipo (isLoggedIn),
      * vai se ver se o loggedUser é diferente de null
