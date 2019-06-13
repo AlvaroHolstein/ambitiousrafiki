@@ -11,40 +11,59 @@
     >
       <span class="navbar-toggler-icon"></span>
     </button>
-    <router-link :to="{name:'home'}">
-      <img alt="Vue logo" src="@/assets/logoR.png" style="width: 100px">
+    <router-link :to="{ name: 'home' }">
+      <img alt="Vue logo" src="@/assets/logoR.png" style="width: 100px" />
     </router-link>
     <div class="collapse navbar-collapse" id="navModal">
       <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
         <li class="nav-item">
-          <router-link :to="{ name: 'badges' }" :class="{ 'nav-link': true }">Badges</router-link>
+          <router-link :to="{ name: 'badges' }" :class="{ 'nav-link': true }"
+            >Badges</router-link
+          >
         </li>
         <li class="nav-item">
-          <router-link :to="{ name: 'stats' }" :class="{ 'nav-link': true }">Statistics</router-link>
+          <router-link :to="{ name: 'stats' }" :class="{ 'nav-link': true }"
+            >Statistics</router-link
+          >
         </li>
         <li class="nav-item">
-          <router-link :to="{ name: 'rankings' }" :class="{ 'nav-link': true }">Ranking</router-link>
+          <router-link :to="{ name: 'rankings' }" :class="{ 'nav-link': true }"
+            >Ranking</router-link
+          >
         </li>
         <li class="nav-item">
-          <router-link :to="{ name: 'users' }" :class="{ 'nav-link': true }">Users</router-link>
+          <router-link :to="{ name: 'users' }" :class="{ 'nav-link': true }"
+            >Users</router-link
+          >
         </li>
         <li class="nav-item">
-          <router-link :to="{ name: 'tags' }" :class="{ 'nav-link': true }">Tags</router-link>
+          <router-link :to="{ name: 'tags' }" :class="{ 'nav-link': true }"
+            >Tags</router-link
+          >
         </li>
         <li v-if="$store.state.users.loggedUser != null" class="nav-item">
           <a v-on:click="goToUserProfile()" class="nav-link pointer">Profile</a>
         </li>
         <li v-if="toBeOrNotToBeAdmin" class="nav-item">
-          <router-link :to="{name:'backoffice'}" :class="{'nav-link': true}">Back-Office</router-link>
+          <router-link
+            :to="{ name: 'backoffice' }"
+            :class="{ 'nav-link': true }"
+            >Back-Office</router-link
+          >
         </li>
         <li>
-          <hr>
+          <hr />
           <!-- Estilizar este hr, e confirmar se funciona mesmo -->
         </li>
       </ul>
-      <ul v-if="$store.state.users.loggedUser === null" class="navbar-nav ml-auto">
+      <ul
+        v-if="$store.state.users.loggedUser === null"
+        class="navbar-nav ml-auto"
+      >
         <li class="nav-item">
-          <router-link :to="{ name: 'login' }" :class="{ 'nav-link': true }">Login</router-link>
+          <router-link :to="{ name: 'login' }" :class="{ 'nav-link': true }"
+            >Login</router-link
+          >
         </li>
       </ul>
       <!-- <div  class="navbar-collapse collapse w-100 order-3 dual-collapse2"> -->
@@ -55,7 +74,7 @@
             alt="Ups"
             class="rounded-circle"
             style="height: 35px; width: auto;"
-          >
+          />
         </li>
         <li class="nav-item">
           <div class="dropdown dropleft">
@@ -67,7 +86,9 @@
             >
               <!-- O span vai se mostrar se houver notificações e o innerHTML do "sino" Vai ser o numero de notificações -->
               <span class="point">
-                <i class="fas fa-bell" style="color: #60CAE2;">{{notificationsLength}}</i>
+                <i class="fas fa-bell" style="color: #60CAE2;">{{
+                  notificationsLength
+                }}</i>
               </span>
             </a>
             <div id="drops" class="dropdown-menu">
@@ -77,13 +98,17 @@
                 v-on:click="seenNotification(noti.id)"
               >
                 <router-link
-                  v-bind:to="{name: 'thread', params: {threadid: noti.idThread}}"
+                  v-bind:to="{
+                    name: 'thread',
+                    params: { threadid: noti.idThread }
+                  }"
                   class="dropdown-item"
-                  v-bind:class="{ 'bgNoti': noti.visto, 'textNoti': noti.visto }"
+                  v-bind:class="{ bgNoti: noti.visto, textNoti: noti.visto }"
+                  v-if="!noti.visto"
                 >
                   <i class="far fa-flag ii"></i>
                   <!-- <span class="userName">{{users.find(us => us.id == noti.idUserFirst).name}}</span> -->
-                  {{noti.text}}
+                  {{ noti.text }}
                 </router-link>
               </div>
               <!-- <a href class="dropdown-item">oaoakodk</a>
@@ -93,12 +118,18 @@
               <div id="dropdown-footer" class="dropdown-item">
                 <ul class="list-inline viewPage">
                   <li class="list-inline-item helpers point viewPage">
-                   <router-link :to="{ name: 'notifications' }" :class="{ 'nav-link': true }">View More</router-link>
+                    <router-link
+                      :to="{ name: 'notifications' }"
+                      :class="{ 'nav-link': true }"
+                      >View More</router-link
+                    >
                   </li>
                   <li
                     v-on:click="markAsRead()"
                     class="list-inline-item helpers point"
-                  >Mark as read</li>
+                  >
+                    Mark as read
+                  </li>
                   <!-- Isto podia ficar com um icone de mesnsagem aberta e com um helper -->
                 </ul>
               </div>
@@ -237,8 +268,8 @@ export default {
 /* .navi {
   padding: 10px;
 } */
-.viewPage{
-  color:black !important;
+.viewPage {
+  color: black !important;
 }
 nav {
   margin-bottom: 2rem;

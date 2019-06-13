@@ -10,13 +10,17 @@
               type="text"
               class="form-control"
               id="inputTitle"
-              @focus="focusAt='title'"
+              @focus="focusAt = 'title'"
               v-model="title"
-            >
+            />
           </div>
           <div class="form-group">
             <label for="inputContent">Describe your question</label>
-            <vue-editor v-model="content" :editorToolbar="customToolbar" @focus="focusAt='body'"></vue-editor>
+            <vue-editor
+              v-model="content"
+              :editorToolbar="customToolbar"
+              @focus="focusAt = 'body'"
+            ></vue-editor>
           </div>
           <div class="form-group">
             <label for="inputTags">Related Tags</label>
@@ -27,8 +31,8 @@
               :tags="tags"
               :autocomplete-items="filteredItems"
               :add-on-key="[32]"
-              @tags-changed="newTags => tags = newTags"
-              @focus="focusAt='footer'"
+              @tags-changed="newTags => (tags = newTags)"
+              @focus="focusAt = 'footer'"
             />
           </div>
           <input
@@ -37,16 +41,16 @@
             :disabled="isDisabled"
             value="Make your question"
             @click="addThread"
-          >
+          />
         </div>
-        <div class="col-sm-4" v-if="focusAt!=''">
+        <div class="col-sm-4" v-if="focusAt != ''">
           <div class="card text-white bg-primary mb-3">
             <div class="card-header">
-              <h4>{{cardHeader}}</h4>
+              <h4>{{ cardHeader }}</h4>
             </div>
             <div class="card-body">
-              <h5 class="card-title">{{cardTitle}}</h5>
-              <p class="card-text">{{cardText}}</p>
+              <h5 class="card-title">{{ cardTitle }}</h5>
+              <p class="card-text">{{ cardText }}</p>
             </div>
           </div>
         </div>
@@ -168,9 +172,11 @@ export default {
       };
       this.$http.post(
         `http://${this.$store.getters.getIp}/data-api/threads`,
-        data,{
-        headers: headers
-        });
+        data,
+        {
+          headers: headers
+        }
+      );
       this.$router.push({
         name: "viewProfile",
         params: { userid: this.$store.state.users.loggedUser.id }

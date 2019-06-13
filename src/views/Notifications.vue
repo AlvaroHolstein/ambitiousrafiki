@@ -5,17 +5,21 @@
       v-for="(noti, cont) of userNotifications"
       v-bind:key="cont"
       v-on:click="seenNotification(noti.id)"
-      v-bind:class="{seen: noti.visto, NotSeen: !noti.visto}"
+      v-bind:class="{ seen: noti.visto, NotSeen: !noti.visto }"
     >
       <div class="container">
         <div>
           <router-link
-            v-bind:to="{name: 'thread', params: {threadid: noti.idThread}}"
+            v-bind:to="{ name: 'thread', params: { threadid: noti.idThread } }"
             class="dropdown-item"
-            v-bind:class="{ 'bgNoti': noti.visto, 'textNoti': noti.visto }"
+            v-bind:class="{ bgNoti: noti.visto, textNoti: noti.visto }"
           >
             <i class="far fa-flag ii"></i>
-            {{noti.userInfo != undefined ? noti.userInfo.name + " - " + noti.text : ""}}
+            {{
+              noti.userInfo != undefined
+                ? noti.userInfo.name + " - " + noti.text
+                : ""
+            }}
           </router-link>
         </div>
       </div>
@@ -46,24 +50,33 @@ export default {
   methods: {
     seenNotification(id) {
       let parsedCookie = cookie.parse(document.cookie);
-      let headers = {
-        "x-access-token": parsedCookie.login
-      };
-      console.log(parsedCookie.login, "PARSED COOOOOOOOOOOOOOOOOOOOOOOOOKIE")
-      this.$http
-        .put(`http://${this.$store.getters.getIp}/data-api/users/${this.user_.id}/updatenotification/${id}`, {
-          headers: headers
-        })
-        .then(res => { 
-          let notiChange = this.loggedUser.notifications.filter(noti => noti.id == id)
-          notiChange[0].visto = true
+
+      console.log(parsedCookie.login, "PARSED COOOOOOOOOOOOOOOOOOOOOOOOOKIE");
+      this.$http({
+        url: `http://${this.$store.getters.getIp}/data-api/users/${
+          this.user_.id
+        }/updatenotification/${id}`,
+        method: "put",
+        headers: { "x-access-token": parsedCookie.login }
+      })
+        .then(res => {
+          let notiChange = this.$store.state.users.loggedUser.notifications.filter(
+            noti => noti.id == id
+          );
+          notiChange[0].visto = true;
+          let index = this.$store.state.users.loggedUser.notifications.findIndex(
+            notification => notification.id == notiChange[0].id
+          );
+          this.$store.state.users.loggedUser.notifications.splice(index, 1);
+          this.$store.state.users.loggedUser.notifications.push(notiChange);
+          console.log(res);
         })
         .catch(err => console.log(err, "erro no updateNoti"));
 
       console.log(id, "seenNotification");
     },
     deleteNotification(id) {
-            /*let parsedCookie = cookie.parse(document.cookie);
+      /*let parsedCookie = cookie.parse(document.cookie);
       let headers = {
         "x-access-token": parsedCookie.login
       };
@@ -76,7 +89,6 @@ export default {
           notiChange[0].visto = true
         })
         .catch(err => console.log(err, "erro no updateNoti"));*/
-
     }
     /* notificacaoVista(id) {
       let indexUser = this.users.findIndex(us => us.id == this.loginUser.id);
