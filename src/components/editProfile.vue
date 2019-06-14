@@ -131,10 +131,17 @@ export default {
       this.user1.picture = "";
     },
     saveProfile() {
+      let sendUser={
+        name:this.user1.name,
+        picture:this.user1.picture,
+        course:this.user1.course,
+        description:this.user1.description,
+        year:this.user1.year
+      }
       let data = {
-        user: this.user1
+        user: sendUser
       };
-      console.log(data)
+      console.log(data,"USER A SER ENVIADO")
       let parsedCookie = cookie.parse(document.cookie);
       console.log(parsedCookie.login, "Parsed Cokiie no App.vue");
       let headers = {
