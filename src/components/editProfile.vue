@@ -134,6 +134,7 @@ export default {
       let data = {
         user: this.user1
       };
+      console.log(data)
       let parsedCookie = cookie.parse(document.cookie);
       console.log(parsedCookie.login, "Parsed Cokiie no App.vue");
       let headers = {
