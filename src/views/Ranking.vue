@@ -12,13 +12,13 @@
         </thead>
         <tbody>
           <tr
-            v-for="(user, cont) in orderedUsers"
+            v-for="(user, cont) in users"
             v-bind:key="user.id"
             v-bind:class="{'table-active':(user.id==userid)}"
           >
             <td scope="row">{{cont + 1}}</td>
             <td>{{user.name}}</td>
-            <td>{{user.experience}}</td>
+            <td>{{Math.floor(user.experience/100)+1}}</td>
             <td>{{user.course}}</td>
           </tr>
         </tbody>
