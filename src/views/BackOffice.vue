@@ -143,6 +143,15 @@
             </select>
           </label>
         </p>
+        <p v-if="badgeCat=='help'">
+          Specific:
+          <select v-model="badgeSpe">
+            <option>all</option>
+            <option>answers</option>
+            <option>comments</option>
+            <option>threads</option>
+          </select>
+        </p>
         <menu>
           <button @click="closeDialog('badges')">Cancel</button>
           <button @click="createBadge">Confirm</button>
@@ -281,6 +290,7 @@ export default {
       badgeGoal: "",
       badgeDesc: "",
       badgeCat: "",
+      badgeSpe: "",
       dialog: "",
       tagName: "",
       tags_: [],
@@ -477,7 +487,8 @@ export default {
         name: this.badgeName,
         goal: Number(this.badgeGoal),
         desc: this.badgeDesc,
-        category: this.badgeCat
+        category: this.badgeCat,
+        specific: this.badgeSpe
       });
     },
     getUserById(id) {

@@ -83,6 +83,7 @@ export default new Vuex.Store({
         .catch(err => console.log(err, "ERRO na ACTION delete_badge"));
     },
     create_badge(context, payload) {
+      console.log(payload.specific, "SPECIFFIIIIIIIIIIIIIIIIIIIIIIIIC")
       let parsedCookie = cookie.parse(document.cookie);
       let headers = {
         "x-access-token": parsedCookie.login
@@ -97,12 +98,15 @@ export default new Vuex.Store({
           name: payload.name,
           goal: payload.goal,
           desc: payload.desc,
-          category: payload.category
+          category: payload.category,
+          specific: payload.specific
         },
         headers: headers
       })
-        .then(function() {
+        .then(res=> {
+          
           console.log("BLAWWEWK"), context.commit("CREATE_BADGE", payload);
+          console.log(res)
         })
         .catch(err => console.log(err, "erro no create badges"));
     },
