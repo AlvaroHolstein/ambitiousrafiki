@@ -150,7 +150,7 @@ export default {
         )
         .then(res => {
           Swal({
-            title: "Perfil alterado com successo",
+            title: "Inglês",
             type: "success"
           });
         });
