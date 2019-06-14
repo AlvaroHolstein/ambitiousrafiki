@@ -278,6 +278,7 @@ const users = {
     },
     viewOrNotNotification(state, id) {
       let index = state.loggedUser.notifications.findIndex(nt => nt.id == id)
+      console.log(id, "assadasdasdasd")
       if (index != -1) state.loggedUser.notifications[index].visto = !state.loggedUser.notifications[index].visto
     }
   },

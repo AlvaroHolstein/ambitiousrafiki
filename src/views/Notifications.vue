@@ -5,6 +5,7 @@
       v-for="(noti, cont) of userNotifications"
       v-bind:key="cont"
       v-bind:class="{ 'seen': noti.visto, 'NotSeen': !noti.visto }"
+      v-if="$store.state.users.loggedUser.notifications.length != 0"
     >
       <div class="row">
         <div class="col-md-12">
@@ -34,6 +35,9 @@
           </ul>
         </div>
       </div>
+    </div>
+    <div v-else>
+      <h1 class="text-center">Não tens mais notificações</h1>
     </div>
     <div class="text-center" id="bottomDiv">
       <button
@@ -90,7 +94,7 @@ export default {
       if (notifi.visto != true) {
         let parsedCookie = cookie.parse(document.cookie);
 
-        // console.log(parsedCookie.login, "PARSED COOOOOOOOOOOOOOOOOOOOOOOOOKIE");
+        console.log(this.user_, "PARSED COOOOOOOOOOOOOOOOOOOOOOOOOKIE");
         this.$http({
           url: `http://${this.$store.getters.getIp}/data-api/users/${
             this.user_.id
@@ -99,7 +103,8 @@ export default {
           headers: { "x-access-token": parsedCookie.login }
         })
           .then(res => {
-            this.$store.commit("users/viewOrNotNotification", id)
+            console.log(id, "seenNotification");
+            this.$store.commit("users/viewOrNotNotification", id);
             // let notiChange = this.$store.state.users.loggedUser.notifications.filter(
             //   noti => noti.id == id
             // );
@@ -112,13 +117,12 @@ export default {
             // console.log(res);
           })
           .catch(err => console.log(err, "erro no updateNoti"));
-
-        console.log(id, "seenNotification");
       } else {
         console.log("Já Foi Vista");
       }
     },
-    deleteNotification(id) { // Passou a chamar se remove_notifications()
+    deleteNotification(id) {
+      // Passou a chamar se remove_notifications()
       /*let parsedCookie = cookie.parse(document.cookie);
       let headers = {
         "x-access-token": parsedCookie.login
