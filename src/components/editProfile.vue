@@ -3,15 +3,10 @@
   <!-- Text input-->
   <div class="row">
     <div class="col-md-3">
-      <img :src="user1.picture" class="picture img-fluid center" />
+      <img :src="user1.picture" class="picture img-fluid center">
       <!-- <button class="btnChange">Choose avatar</button> -->
       <div v-if="user1.picture.length == 0">
-        <input
-          type="file"
-          round
-          class="change-profile-image"
-          @change="onFileChange"
-        />
+        <input type="file" round class="change-profile-image" @change="onFileChange">
       </div>
       <div v-else>
         <button
@@ -19,9 +14,7 @@
           color="secondary"
           icon="delete"
           @click="removeImage"
-        >
-          Delete
-        </button>
+        >Delete</button>
       </div>
     </div>
     <div class="col-md-9">
@@ -37,7 +30,7 @@
               required
               type="text"
               v-model="user1.name"
-            />
+            >
           </div>
         </div>
         <!-- Text input-->
@@ -52,7 +45,7 @@
               required
               type="text"
               v-model="user1.course"
-            />
+            >
           </div>
           <label class="col-md-2 control-label" for="yearinput">Year</label>
           <div class="col-md-2">
@@ -64,7 +57,7 @@
               required
               type="number"
               v-model="user1.year"
-            />
+            >
           </div>
         </div>
 
@@ -89,9 +82,7 @@
               name="btnSave"
               class="btn btn-success"
               @click.prevent="saveProfile"
-            >
-              Save
-            </button>
+            >Save</button>
           </div>
         </div>
       </form>
@@ -100,6 +91,8 @@
 </template>
 <script>
 import cookie from "cookie";
+import Swal from "../../node_modules/sweetalert2/dist/sweetalert2.js";
+import "../../node_modules/sweetalert2/src/sweetalert2.scss";
 export default {
   props: ["user"],
   data() {
@@ -147,6 +140,7 @@ export default {
       let headers = {
         "x-access-token": parsedCookie.login
       };
+<<<<<<< HEAD
       this.$http.put(
         `http://${this.$store.getters.getIp}/data-api/users/${this.user1.id}`,
         data,
@@ -155,6 +149,26 @@ export default {
         }
       );
     location.reload()
+=======
+      this.$http
+        .put(
+          `http://${this.$store.getters.getIp}/data-api/users/${this.user1.id}`,
+          data,
+          {
+            headers: headers
+          }
+        )
+        .then(res => {
+          Swal({
+            title: "Perfil alterado com successo",
+            type: "success"
+          });
+        });
+      // this.$router.push({
+      //   name: "viewProfile",
+      //   params: { userid: this.user1.id }
+      // });
+>>>>>>> 05de2d6daf7712223b52829de698fee13475a4d9
     }
   }
 };
