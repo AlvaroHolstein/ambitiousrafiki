@@ -140,16 +140,6 @@ export default {
       let headers = {
         "x-access-token": parsedCookie.login
       };
-<<<<<<< HEAD
-      this.$http.put(
-        `http://${this.$store.getters.getIp}/data-api/users/${this.user1.id}`,
-        data,
-        {
-          headers: headers
-        }
-      );
-    location.reload()
-=======
       this.$http
         .put(
           `http://${this.$store.getters.getIp}/data-api/users/${this.user1.id}`,
@@ -168,7 +158,6 @@ export default {
       //   name: "viewProfile",
       //   params: { userid: this.user1.id }
       // });
->>>>>>> 05de2d6daf7712223b52829de698fee13475a4d9
     }
   }
 };
