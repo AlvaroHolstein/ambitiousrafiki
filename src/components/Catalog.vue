@@ -30,17 +30,17 @@
         class="text-center d-flex flex-column justify-content-center"
       >
         <p class="p-2">Search By Keyword</p>
-        <br />
+        <br>
         <input
           class="p-2 mx-auto"
           type="text"
           style="width:49%;"
           v-model="keyword"
           placeholder="Search By Keyword"
-        />
+        >
       </div>
     </div>
-    <br />
+    <br>
     <div class="table-responsive">
       <table class="table table-striped table-hover table-bordered">
         <thead class="thead-dark">
@@ -56,13 +56,11 @@
           <tr v-for="thread in filteredThreads" v-bind:key="thread.id">
             <td>
               <!-- v-on:click="" -->
-              <a v-on:click="goToThread(thread.id)" class="title">
-                {{ thread.title }}
-              </a>
+              <a v-on:click="goToThread(thread.id)" class="title">{{ thread.title }}</a>
             </td>
             <td>
               <!-- v-bind:src="" -->
-              <img v-bind:src="thread.userInfo.photo" class="img-fluid pic" />
+              <img v-bind:src="thread.userInfo.photo" class="img-fluid pic">
             </td>
             <td>{{ thread.views }}</td>
 
@@ -72,9 +70,7 @@
         </tbody>
       </table>
       <div class="text-center">
-        <button v-on:click="moreThreads()" class="btn btn-outline-dark">
-          View More
-        </button>
+        <button v-on:click="moreThreads()" class="btn btn-outline-dark">View More</button>
       </div>
     </div>
   </div>
@@ -229,27 +225,17 @@ export default {
     goToThread(id) {
       this.$http
         .put(`http://${this.$store.getters.getIp}/data-api/threads/${id}/view`)
-        .then(res => {
-          console.log(res);
-          let index = this.$store.state.threads_.findIndex(
-            thread => thread.id == id
-          );
-          let newThread = this.$store.state.threads_[index];
-          newThread.views += 1;
-          this.$store.state.threads_[index].splice(index, 1);
-          this.$store.state.threads_[index].push(newThread);
-          console.log(this.$store.state.threads_[index]);
-        })
+        .then()
         .catch(err => {
           if (err) throw err;
         });
-
-      this.$router.push({
-        name: "thread",
-        params: {
-          threadid: id
-        }
-      });
+         this.$store.dispatch("threads/add_view_thread", id);
+          this.$router.push({
+            name: "thread",
+            params: {
+              threadid: id
+            }
+          });
     }
   },
   filters: {

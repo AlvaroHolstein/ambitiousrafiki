@@ -176,11 +176,15 @@ export default {
         {
           headers: headers
         }
-      );
-      this.$router.push({
-        name: "viewProfile",
-        params: { userid: this.$store.state.users.loggedUser.id }
+      ).then(res=>{
+        let id= res.data.id
+                console.log(id)
+  this.$router.push({
+    name:"thread",
+    params:{threadid:id}
+  })
       });
+     
     }
   },
   computed: {

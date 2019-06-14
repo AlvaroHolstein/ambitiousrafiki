@@ -154,10 +154,7 @@ export default {
           headers: headers
         }
       );
-      this.$router.push({
-        name: "viewProfile",
-        params: { userid: this.user1.id }
-      });
+    location.reload()
     }
   }
 };

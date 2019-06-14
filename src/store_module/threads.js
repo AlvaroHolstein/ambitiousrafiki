@@ -15,6 +15,12 @@ const threads = {
     getInitialThreads(state, payload) {
       console.log(payload, "payload na MUTATION");
       state.threads_ = payload;
+    },
+    ADD_VIEW_THREAD(state,payload){
+      let index=state.threads_.findIndex(thread=>thread.id=payload)
+
+      state.threads_[index].views+=1
+      console.log(state.threads_[index].views,"Views Atualizado")
     }
   },
   actions: {
@@ -61,6 +67,9 @@ const threads = {
       }).catch(err => {
         throw err;
       });
+    },
+    add_view_thread(context,payload){
+      context.commit("ADD_VIEW_THREAD",payload)
     }
   }
 };
