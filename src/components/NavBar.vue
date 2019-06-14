@@ -101,14 +101,16 @@
               <div id="dropdown-footer" class="dropdown-item">
                 <ul class="list-inline viewPage">
                   <li class="list-inline-item helpers pointer viewPage">
-
                     <router-link
                       id="viewMore"
                       :to="{ name: 'notifications' }"
                       :class="{ 'nav-link': true }"
                     >View More</router-link>
                   </li>
-                  <li v-on:click="markAsRead()" class="list-inline-item helpers pointer">Mark as read</li>
+                  <li
+                    v-on:click="markAsRead()"
+                    class="list-inline-item helpers pointer"
+                  >Mark as read</li>
                   <!-- Isto podia ficar com um icone de mesnsagem aberta e com um helper -->
                 </ul>
               </div>
@@ -131,7 +133,9 @@ import "../../node_modules/sweetalert2/src/sweetalert2.scss";
 1;
 export default {
   data() {
-    return {};
+    return {
+      numberOfNots: 10
+    };
   },
   created() {
     // console.log(this.loginUser);
@@ -139,9 +143,17 @@ export default {
   methods: {
     seenNotification(id) {
       console.log(id, "seenNotification");
+      this.$store.commit("users/viewOrNotNotification", id);
     },
     markAsRead() {
       console.log("markasread");
+      for (let i = 0; i < this.numberOfNots; i++) {
+        if (
+          this.$store.state.users.loggedUser.notifications[i].visto == false
+        ) {
+          this.$store.commit("users/viewOrNotNotification", this.$store.state.users.loggedUser.notifications[i].id);
+        }
+      }
     },
     logout() {
       /**
@@ -235,10 +247,12 @@ export default {
         this.$store.state.users.loggedUser.notifications.length > 0 &&
         this.$store.state.users.loggedUser.notifications[0] != null
       )
-        return this.$store.state.users.loggedUser.notifications.filter((not, cont) => {
-          if(cont < 10) return true
-          return false
-        });
+        return this.$store.state.users.loggedUser.notifications.filter(
+          (not, cont) => {
+            if (cont < this.numberOfNots) return true;
+            return false;
+          }
+        );
 
       return [{}];
     }
