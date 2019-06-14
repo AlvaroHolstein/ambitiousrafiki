@@ -2,13 +2,7 @@
   <div class="container">
     <div class="row">
       <div class="col-md-6">
-        <apexchart
-          type="bar"
-          width="100%"
-          height="350"
-          :options="chartOptions"
-          :series="series"
-        />
+        <apexchart type="bar" width="100%" height="350" :options="chartOptions" :series="series"/>
       </div>
       <div class="col-md-6">
         <apexchart
@@ -22,13 +16,7 @@
     </div>
     <div class="row">
       <div class="col-md-12">
-        <apexchart
-          type="bar"
-          width="100%"
-          height="400"
-          :options="chartOptions3"
-          :series="series3"
-        />
+        <apexchart type="bar" width="100%" height="400" :options="chartOptions3" :series="series3"/>
       </div>
     </div>
   </div>
@@ -130,11 +118,7 @@ export default {
           }
         ]
       },
-      series3: [
-        {
-          data: []
-        }
-      ],
+      series3: [{ name: "Nº Comments", data: [] }],
       chartOptions3: {
         plotOptions: {
           bar: {
@@ -173,8 +157,16 @@ export default {
       .then(res => {
         for (let i = 0; i < res.data.length; i++) {
           this.chartOptions.xaxis.categories.push(res.data[i].title);
-          this.series[0].data.push(res.data[i].upvotes);
-          this.series[1].data.push(res.data[i].views);
+          if (res.data[i].upvotes != NaN) {
+            this.series[0].data.push(res.data[i].upvotes);
+          } else {
+            this.series[0].data.push(0);
+          }
+          if (res.data[i].views != NaN) {
+            this.series[1].data.push(res.data[i].views);
+          } else {
+            this.series[1].data.push(0);
+          }
         }
       });
     //Montar Gráfico de distribuição de XP
@@ -199,6 +191,8 @@ export default {
       )
       .then(res => {
         for (let i = 0; i < res.data.length; i++) {
+                    console.log(res.data[i])
+
           this.series3[0].data.push(res.data[i].number);
           this.chartOptions3.xaxis.categories.push(res.data[i].name);
         }
