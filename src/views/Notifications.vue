@@ -145,7 +145,7 @@ export default {
         this.$http({
           url: `http://${
             this.$store.getters.getIp
-          }/data-api/users/removeNotification/${
+          }/data-api/users/removenotification/${
             this.$store.state.users.loggedUser.id
           }`,
           method: "PUT",
@@ -157,7 +157,7 @@ export default {
           }
         }).then(res => {
           if (res.data.success) {
-            this.$store.commit("users/rmNotis", this.rmNotifications);
+            this.$store.commit("users/removeNotis", this.rmNotifications);
           }
         });
       }
