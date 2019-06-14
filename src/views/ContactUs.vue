@@ -57,7 +57,16 @@ export default {
         name:this.form.user_name,
         message:this.form.text,
         subject:this.form.subject,
-      }).then(res=>console.log(res))
+      }).then(res=>{
+         Swal({
+            title: "Thanks for contacting us. We will reply as fast as we can.",
+            type: "success"
+          });
+          this.form.user_email=""
+          this.form.user_name=""
+          this.form.text=""
+          this.form.subject=""
+      })
     }
   }
 };
