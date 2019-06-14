@@ -280,6 +280,10 @@ const users = {
       let index = state.loggedUser.notifications.findIndex(nt => nt.id == id)
       console.log(id, "assadasdasdasd")
       if (index != -1) state.loggedUser.notifications[index].visto = !state.loggedUser.notifications[index].visto
+    },
+    user_badges(state, payload) {
+      console.log(payload, "PAyload no user_badges LALALALA Commit")
+      state.loggedUser.badges = payload
     }
   },
   actions: {
