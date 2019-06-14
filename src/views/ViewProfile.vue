@@ -224,7 +224,7 @@ export default {
            */
           this.getThreads(this.user.id);
           tippy("#progressBar", {
-            content: `Level: ${this.user.experience}`,
+            content: `Experience: ${this.user.experience}`,
             placement: "bottom"
           });
         })
