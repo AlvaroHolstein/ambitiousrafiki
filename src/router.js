@@ -47,10 +47,11 @@ import tags from "@/views/Tags.vue";
 import badges from "@/views/Badges.vue";
 import contact from "@/views/ContactUs.vue";
 import stats from "@/views/stats.vue";
+import store from "./store.js";
 
 Vue.use(Router);
 
-export default new Router({
+const router= new Router({
   routes: [
     {
       /**
@@ -115,7 +116,10 @@ export default new Router({
     {
       path: "/createThread",
       name: "createThread",
-      component: createThread
+      component: createThread,
+      meta:{
+        needsAuth:true
+      }
     },
     {
       path: "/notifications",
@@ -131,14 +135,33 @@ export default new Router({
         admin: true
       }
     },
-    // {
-    //   path: "/about",
-    //   name: "about",
-    //   // route level code-splitting
-    //   // this generates a separate chunk (about.[hash].js) for this route
-    //   // which is lazy-loaded when the route is visited.
-    //   component: () =>
-    //     import(/* webpackChunkName: "about" */ "./views/Aboutd.vue")
-    // }
   ]
 });
+router.beforeEach((to,from,next)=>{
+  let auth=false
+  let id=0
+  if(store.state.users.loggedUser!=null){
+    auth=true
+    if(store.state.users.loggedUser.id==1){
+      id=1
+    }
+  }
+  
+
+  if (to.matched.some(record => record.meta.needsAuth) && !auth) {
+    alert("NOT LOGGED IN");
+    next("/");
+  } else{
+    next(); 
+  }
+  if (to.matched.some(record => record.meta.admin)) {
+    if(id!=1){
+      alert("Not Allowed In There")
+      router.go(-1)
+    }else{
+      next()
+    }
+  }
+})
+
+export default router;
