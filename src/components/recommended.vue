@@ -59,7 +59,7 @@ export default {
       .then(res => {
         console.log("RESPOSTA", res);
         this.relatedThreads = res.data;
-        this.relatedThreads.length = 5;
+        if (this.relatedThreads.length > 5) this.relatedThreads.length = 5;
       });
   },
   methods: {
