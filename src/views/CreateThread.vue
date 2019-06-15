@@ -12,15 +12,11 @@
               id="inputTitle"
               @focus="focusAt = 'title'"
               v-model="title"
-            />
+            >
           </div>
           <div class="form-group">
             <label for="inputContent">Describe your question</label>
-            <vue-editor
-              v-model="content"
-              :editorToolbar="customToolbar"
-              @focus="focusAt = 'body'"
-            ></vue-editor>
+            <vue-editor v-model="content" :editorToolbar="customToolbar" @focus="focusAt = 'body'"></vue-editor>
           </div>
           <div class="form-group">
             <label for="inputTags">Related Tags</label>
@@ -41,7 +37,7 @@
             :disabled="isDisabled"
             value="Make your question"
             @click="addThread"
-          />
+          >
         </div>
         <div class="col-sm-4" v-if="focusAt != ''">
           <div class="card text-white bg-primary mb-3">
@@ -87,7 +83,8 @@ export default {
       focusAt: "",
       tag: "",
       tags: [],
-      autocompleteItems: []
+      autocompleteItems: [],
+      createThreadValue: 2
     };
   },
   created() {
@@ -170,21 +167,31 @@ export default {
       let headers = {
         "x-access-token": parsedCookie.login
       };
-      this.$http.post(
-        `http://${this.$store.getters.getIp}/data-api/threads`,
-        data,
-        {
+      this.$http
+        .post(`http://${this.$store.getters.getIp}/data-api/threads`, data, {
           headers: headers
-        }
-      ).then(res=>{
-        let id= res.data.id
-                console.log(id)
-  this.$router.push({
-    name:"thread",
-    params:{threadid:id}
-  })
-      });
-     
+        })
+        .then(res => {
+          let id = res.data.id;
+          console.log(id);
+          this.$http({
+            url: `http://${
+              this.$store.getters.getIp
+            }/data-api/users/addexperience/${
+              this.$store.state.users.loggedUser.id
+            }`,
+            headers: {
+              "x-access-token": cookie.parse(document.cookie).login
+            },
+            data: {
+              exp: this.createThreadValue
+            }
+          });
+          this.$router.push({
+            name: "thread",
+            params: { threadid: id }
+          });
+        });
     }
   },
   computed: {

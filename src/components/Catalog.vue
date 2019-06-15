@@ -93,7 +93,8 @@ export default {
       autoComleteTags: [],
       threads: this.$store.state.threads,
       totalThreads: 2,
-      increment: 2
+      increment: 2,
+     
     };
   },
   created() {

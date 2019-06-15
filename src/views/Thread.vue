@@ -298,7 +298,13 @@ export default {
       answerText: "", //TExto para a resposta
       commentToAnswer: "",
       targetAns: 0, // Facilitar o comment Answer
-      replyUser: ""
+      replyUser: "",
+      followValue: 10,
+      upvThreadValue: 10,
+      upvAnswerValue: 15,
+      upvCommentValue: 5,
+      makeAnswerValue: 2,
+      makeCommentValue: 2
     };
   },
   created() {
@@ -354,6 +360,7 @@ export default {
             this.threadF.upv = false;
         }
       }
+      /** Fazer para ordenar as threads por data */
       return this.threadF || { userInfo: {} };
     },
     answers() {
@@ -427,7 +434,7 @@ export default {
         console.log(upv, "Porque não funcionas.....");
         return upv;
       }
-      return true
+      return true;
     },
     verifyAnsUpv(answer) {},
     fol_unfol() {
@@ -459,7 +466,7 @@ export default {
             author: this.threadF.userInfo,
             cookie: this.getLogCookie(),
             http: this.$http,
-            expValue: 5,
+            expValue: this.followValue,
             notiClass: this.$store.state.users.notificationClass
           };
           console.log(main);
@@ -600,7 +607,7 @@ export default {
             author: this.threadF.userInfo,
             cookie: this.getLogCookie(),
             http: this.$http,
-            expValue: -5,
+            expValue: -this.followValue,
             notiClass: this.$store.state.users.notificationClass
           };
           async function follow() {
@@ -724,7 +731,7 @@ export default {
             author: this.threadF.userInfo,
             cookie: this.getLogCookie(),
             http: this.$http,
-            expValue: 10,
+            expValue: this.upvThreadValue,
             upvote: {
               type: "thread",
               targetId: this.threadF.id
@@ -990,7 +997,7 @@ export default {
           author: answer.userInfo,
           cookie: this.getLogCookie(),
           http: this.$http,
-          expValue: 5, //Não esquecer de fazer math.abs()
+          expValue: this.upvAnswerValue, //Não esquecer de fazer math.abs()
           upvote: {
             type: "answer",
             targetId: answer.id
@@ -1268,7 +1275,7 @@ export default {
           author: comment.userInfo,
           cookie: this.getLogCookie(),
           http: this.$http,
-          expValue: 5, //Não esquecer de fazer math.abs()
+          expValue: this.upvoteComment, //Não esquecer de fazer math.abs()
           upvote: {
             type: "comment",
             targetId: comment.id
@@ -1483,7 +1490,7 @@ export default {
             // author: this.userInfo,
             cookie: this.getLogCookie(),
             http: this.$http,
-            expValue: 5, //Não esquecer de fazer math.abs()
+            expValue: this.makeAnswerValue, //Não esquecer de fazer math.abs()
             upvote: {
               type: "answer to thread",
               targetId: this.threadF.id
@@ -1623,7 +1630,7 @@ export default {
         // author: this.userInfo,
         cookie: this.getLogCookie(),
         http: this.$http,
-        expValue: 5, //Não esquecer de fazer math.abs()
+        expValue: this.makeCommentValue, //Não esquecer de fazer math.abs()
         ans: this.targetAns,
         upvote: {
           type: "comment to answer",

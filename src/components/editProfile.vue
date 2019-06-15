@@ -124,17 +124,17 @@ export default {
       this.user1.picture = "";
     },
     saveProfile() {
-      let sendUser={
-        name:this.user1.name,
-        picture:this.user1.picture,
-        course:this.user1.course,
-        description:this.user1.description,
-        year:this.user1.year
-      }
+      let sendUser = {
+        name: this.user1.name,
+        picture: this.user1.picture,
+        course: this.user1.course,
+        description: this.user1.description,
+        year: this.user1.year
+      };
       let data = {
         user: sendUser
       };
-      console.log(data,"USER A SER ENVIADO")
+      console.log(data, "USER A SER ENVIADO");
       let parsedCookie = cookie.parse(document.cookie);
       console.log(parsedCookie.login, "Parsed Cokiie no App.vue");
       let headers = {
@@ -149,10 +149,26 @@ export default {
           }
         )
         .then(res => {
-          Swal({
-            title: "Inglês",
-            type: "success"
-          });
+          this.$http({
+            method: "put",
+            url: `http://${
+              this.$store.getters.getIp
+            }/data-api/users/updateuserinfo/${
+              this.user1.id
+            }`,
+            headers: headers,
+            data: {
+              info: {
+                name: sendUser.name,
+                photo: sendUser.picture,
+                rank: sendUser.rank
+              }
+            }
+          })
+            .then(res => console.log(res))
+            .catch(err => {
+              throw err;
+            });
         });
       // this.$router.push({
       //   name: "viewProfile",
