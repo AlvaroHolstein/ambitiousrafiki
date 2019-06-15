@@ -92,7 +92,8 @@ export default {
       keyword: "",
       autoComleteTags: [],
       threads: this.$store.state.threads,
-      totalThreads: 2
+      totalThreads: 2,
+      increment: 2
     };
   },
   created() {
@@ -195,7 +196,7 @@ export default {
           this.totalThreads,
           "Ainda não vai ser preciso fazer pedidos"
         );
-        this.totalThreads *= 2;
+        this.totalThreads = this.totalThreads + this.increment;
       } else {
         this.getThreads_(alreadyHere);
       }
@@ -207,7 +208,7 @@ export default {
           {
             exclude: alreadyHere,
             /** Vai buscar o numero de threads a apresentar na tabela */
-            qty: this.totalThreads
+            qty: this.increment
           }
         )
         .then(res => {

@@ -23,7 +23,10 @@
                         <li class="news-title">
                           <i class="fa fa-folder-o text-danger"></i>
                           <a href="#">
-                            <small>asked {{ thread.date | filterDate }}</small>
+                            <small>
+                              <strong>asked</strong>
+                              {{ thread.date | filterDate }}
+                            </small>
                             <p></p>
                             <!-- Isto e o <p> de cima vão sair, é só para ver o id da thread -->
                           </a>
@@ -63,7 +66,7 @@
                             {{thread.upv ? "Upvote":"Downvote"}}
                           </a>
                         </span>
-                        {{ numberUpvotes }}
+                        <!-- {{ numberUpvotes }} -->
                         <button
                           v-bind:class="{'btn btn-primary': !aSeguir(), 'btn btn-secondary': aSeguir()}"
                           style="margin-left: 5px;"
@@ -71,10 +74,10 @@
                         >
                           <span class="badge">
                             <i class="fas fa-heart"></i>
+                            {{ numberFollowers }}
                           </span>
                           {{!aSeguir() ? "Follow" : "Unfollow"}}
                         </button>
-                        {{ numberFollowers }}
                       </div>
 
                       <div class="row news-author">
@@ -159,19 +162,19 @@
                     </a>
                     <a
                       class="float-right btn text-white btn-success ml-2"
-                      v-on:click="upvoteAns(ans, ans.upv)"
+                      v-on:click="upvoteAns(ans, $event)"
                     >
                       <i
                         v-bind:class="{'fas': true, 'fa-thumbs-up': !ans.upv, 'fa-thumbs-down': ans.upv}"
-                      >| {{ ans.upvotes == 0 ? "" : ans.upvotes }}</i>
+                      >{{ ans.upvotes == 0 ? "" : ans.upvotes }}</i>
                     </a>
                     <a
                       v-bind:id="ans.id + '_hide'"
-                      class="float-right btn text-white btn-danger"
+                      class="float-right btn text-white btn-primary"
                       v-on:click="hideComments($event, ans.id)"
                     >
-                      <i class="fas fa-caret-up">|</i>
-                      <i class="fas fa-sort-down"></i>
+                      <i class="fas fa-caret-up" style="padding-right: 1px"></i> |
+                      <i class="fas fa-sort-down" style="padding-left: 1px"></i>
                       <!-- <i v-bind:id="ans.id" v-bind:class="arrowCommentDirection"></i> -->
                     </a>
                   </p>
@@ -207,12 +210,11 @@
                             </a>-->
                             <a
                               v-bind:class="{'float-right': true, 'btn': true, 'text-white':true, 'btn-success':verifyUpv(com), 'ml-2': true, 'btn-danger': !verifyUpv(com)}"
-                              v-on:click="upvoteComment(com, ans)"
+                              v-on:click="upvoteComment(com, ans, $event)"
                             >
                               <i
                                 v-bind:class="{'fas fa-thumbs-up': verifyUpv(com), 'fas fa-thumbs-down': !verifyUpv(com)}"
                               >
-                                |
                                 {{
                                 com.upvotes == 0 ? "" : parseInt(com.upvotes)
                                 }}
@@ -231,7 +233,7 @@
         <div v-else>
           <h1 class="text-center">There's no answers yet</h1>
         </div>
-        <div class="row" v-show="isLoggedIn == true && !threadFechada == true">
+        <div class="row" v-show="!threadFechada == true">
           <div class="col-md-12 text-left">
             <h4>Answer</h4>
             <textarea
@@ -382,6 +384,7 @@ export default {
           for (let upv of this.$store.state.users.loggedUser.upvotes) {
             if (upv.type == "comment" && upv.targetId == com.id) {
               com.upv = false;
+              console.log("DOWNVTE::::::::");
             }
           }
         }
@@ -410,16 +413,23 @@ export default {
   },
   methods: {
     verifyUpv(comment) {
-      if (this.$store.state.users.loggedUsers != null) {
+      if (this.$store.state.users.loggedUser != null) {
+        console.log(comment);
+
         let upv = true;
         for (let upv of this.$store.state.users.loggedUser.upvotes) {
+          if (upv.type == "comment") console.log(upv);
+
           if (upv.type == "comment" && upv.targetId == comment.id) {
             upv = false;
           }
         }
+        console.log(upv, "Porque não funcionas.....");
         return upv;
       }
+      return true
     },
+    verifyAnsUpv(answer) {},
     fol_unfol() {
       //Não está a ser usado
       if (this.$store.state.users.loggedUser == null) return true;
@@ -970,8 +980,8 @@ export default {
         this.errorSwal("Tens que estar autenticado para poder dar upvote");
       }
     },
-    upvoteAns(answer) {
-      console.log(answer, "alalall");
+    upvoteAns(answer, event) {
+      console.log(event, "alalall");
       if (this.confirmAuth() == true) {
         let main = {
           ip: this.$store.getters.getIp,
@@ -1063,7 +1073,7 @@ export default {
                   }`,
                   method: "put",
                   headers: {
-                    "acess-token": main.cookie
+                    "x-access-token": main.cookie
                   },
                   data: {
                     notification: new main.notiClass(
@@ -1125,7 +1135,9 @@ export default {
             }
             if (res.insertUpvAns === true) {
               for (let ans of this.answersF) {
-                if (ans.id == answer.id) ans.upvotes++;
+                if (ans.id == answer.id) {
+                  ans.upvotes++;
+                }
               }
             }
           });
@@ -1239,7 +1251,7 @@ export default {
         this.errorSwal("Tens que estar autenticado para poder dar upvote");
       }
     },
-    upvoteComment(comment, answer) {
+    upvoteComment(comment, answer, event) {
       if (this.confirmAuth() == true) {
         let Upv = true;
 
