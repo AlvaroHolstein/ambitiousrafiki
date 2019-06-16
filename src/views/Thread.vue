@@ -421,7 +421,7 @@ export default {
   methods: {
     verifyUpv(comment) {
       if (this.$store.state.users.loggedUser != null) {
-        console.log(comment);
+        // console.log(comment);
 
         let upv = true;
         for (let upv of this.$store.state.users.loggedUser.upvotes) {
@@ -431,7 +431,6 @@ export default {
             upv = false;
           }
         }
-        console.log(upv, "Porque não funcionas.....");
         return upv;
       }
       return true;
@@ -1769,6 +1768,15 @@ export default {
             console.log(res.addComment);
             this.commentsF.push(res.addedComment);
             this.commentToAnswer = "";
+            if (this.checkBadges.length > 0) {
+              Swal.fire({
+                position: "top-end",
+                type: "success",
+                title: `Ganhas te o badge ${badge.name}`,
+                showConfirmButton: false,
+                timer: 1500
+              });
+            }
           }
         });
       } else {
@@ -1853,8 +1861,9 @@ export default {
       let badges1 = this.$store.state.loggedUser.badges;
       /** Badge Ganho */
       /** retorna o badge que ganhou,
-       * caso contrário retorna null ou undefined
+       * caso contrário retorna um array vazio
        */
+      console.log();
       this.$store.dispatch("users/user_badges").then(() => {
         console.log(
           this.$store.state.loggedUser.badges,
@@ -1863,6 +1872,7 @@ export default {
         if (this.$store.state.loggedUser.badges.length > badges1.length) {
           return this.$store.state.loggedUser.badges.filter(badge => {
             for (let i = 0; i < badges1.length; i++) {
+              console.log(badge[i], badge);
               if (badges1[i] == badge) return false;
               return true;
             }

@@ -91,7 +91,7 @@
                 >
                   <i class="far fa-flag ii"></i>
                   <!-- <span class="userName">{{users.find(us => us.id == noti.idUserFirst).name}}</span> -->
-                  {{ noti.text }}
+                  <strong>{{noti.userInfo.name}}</strong>{{ noti.text }}
                 </router-link>
               </div>
               <!-- <a href class="dropdown-item">oaoakodk</a>

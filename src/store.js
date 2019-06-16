@@ -72,12 +72,12 @@ export default new Vuex.Store({
       axios
         .delete(
           `http://${context.state.address +
-            context.state.port}/data-api/badges/${id}`,
+          context.state.port}/data-api/badges/${id}`,
           {
             headers: headers
           }
         )
-        .then(function() {
+        .then(function () {
           context.commit("DELETE_BADGE", id);
         })
         .catch(err => console.log(err, "ERRO na ACTION delete_badge"));
@@ -88,27 +88,36 @@ export default new Vuex.Store({
       let headers = {
         "x-access-token": parsedCookie.login
       };
+      let alreadExists = false
+      for (let badge of context.state.badges) {
+        if (badge.name == payload.category && badge.category == payload.category && badge.goal == payload.goal) alreadExists = true
+      }
       console.log(payload, "PAYLOAADDDDDDD");
-      axios({
-        method: "post",
-        url: `http://${context.state.address +
-          context.state.port}/data-api/badges`,
-        data: {
-          id: payload.id,
-          name: payload.name,
-          goal: payload.goal,
-          desc: payload.desc,
-          category: payload.category,
-          specific: payload.specific
-        },
-        headers: headers
-      })
-        .then(res=> {
-          
-          console.log("BLAWWEWK"), context.commit("CREATE_BADGE", payload);
-          console.log(res)
+      if (!alreadExists) {
+        axios({
+          method: "post",
+          url: `http://${context.state.address +
+            context.state.port}/data-api/badges`,
+          data: {
+            id: payload.id,
+            name: payload.name,
+            goal: payload.goal,
+            desc: payload.desc,
+            category: payload.category,
+            specific: payload.specific
+          },
+          headers: headers
         })
-        .catch(err => console.log(err, "erro no create badges"));
+          .then(res => {
+            if (res.data.success) {
+              console.log("BLAWWEWK")
+              context.commit("CREATE_BADGE", payload);
+
+            }
+            console.log(res)
+          })
+          .catch(err => console.log(err, "erro no create badges"));
+      }
     },
 
     search_tag(context, tag) {
