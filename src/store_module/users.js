@@ -45,13 +45,14 @@ class User {
     return Math.floor(this.experience / 100) + 1;
   }
 
-  getRank() {
-    //Vai ter que se fazer um switch para dar os nomes aos ranks
-    let rank = Math.floor(this.level / 10);
+  getRank(newlevel = null) {
+    let lvl = newlevel == null ? this.level : newlevel
+    let rank = Math.floor(lvl / 10);
     let trueRank = null;
-    // console.log(this.level);
+
+    /** Falta acrescentear ranks */
     switch (
-    rank //O calculo do rank deve estar mal....
+    rank
     ) {
       case 0:
         trueRank = "A começar";
@@ -64,18 +65,16 @@ class User {
         break;
     }
 
-    // console.log(trueRank);
-    // console.log(rank);
     return {
       rank: rank,
       trueRank: trueRank
     };
   }
-  getBadges(badgesArr, threadsArr, commentsArr, answersArr) {
+  getBadges(badgesArr, threadsArr, commentsArr, answersArr, userPos) {
     let badges = [];
     this.badges = [];
     // console.log(threadsArr);
-    let all = this.getTotContribution(threadsArr, commentsArr, answersArr); //Isto depois vai substituir a batota
+    let all = this.getTotContribution(threadsArr, commentsArr, answersArr);
     let numThreads = this.getTotThreads(threadsArr);
     let numAnswers = this.getTotAnswers(answersArr);
     let numComments = this.getTotComments(commentsArr);
@@ -88,26 +87,17 @@ class User {
       function badgeComparisson(goal, actual) {
         if (actual >= goal) gravar = true;
       }
-      console.log(badge, "badge");
-      console.log(this.experience, "experience");
+      // console.log(badge, "badge");
+      // console.log(this.experience, "experience");
       console.log(badge.goal);
 
-      if (badge.goal <= this.experience && badge.category == "rank") {
+      /** AHAHAHAHAHAHAAH, isto não pode ser calculado assim */
+      if (badge.category == "rank") {
         console.log("alalalalalal");
-        gravar = true;
+        if(badge.goal >= userPos) gravar = true;
       }
+      /** Ui que isto vai ser grande */
 
-      /**
-       * Os badges do tipo help vão ter um campo
-       * chamado specific (nome a mudar), para separar os badges
-       * de responder 10 vezes ou criar 10 threads por exemplo
-       * os valores do specific vão ser:
-       *  - answers
-       *  - threads
-       *  - comments
-       *  - all
-       *  - (acrescentar mais)
-       */
       if (badge.category == "help") {
         switch (badge.specific) {
           case "answers":
@@ -161,7 +151,17 @@ class User {
   tamanhoMaximo() {
     if (this.notifications.length == 6) this.notifications.shift();
   }
+  sortUsers(usersR) {
+    let users = usersR.sort((a, b) => {
+      if (a.experience > b.experience) return -1;
+      if (a.experience < b.experience) return 1;
+      else return 0;
+    });
+
+    return users;
+  }
 }
+
 
 class Notification {
   constructor(threadId, text, name, userId, id = 1) {
@@ -291,6 +291,16 @@ const users = {
     user_badges({ rootGetters, rootState, commit, state }) {
       async function aux() {
         try {
+          function sortUsers(usersR) {
+            let users = usersR.sort((a, b) => {
+              if (a.experience > b.experience) return -1;
+              if (a.experience < b.experience) return 1;
+              else return 0;
+            });
+    
+            return users;
+          }
+          
           let threads = await axios
             .get(
               `http://${rootGetters.getIp}/data-api/threads/userThreads/${
@@ -312,10 +322,16 @@ const users = {
               }`
             )
             .then(res => res.data);
+
+          let pos = await axios.get(`http://${rootGetters.getIp}/data-api/users`).then(res => {
+            let users = sortUsers(res.data);
+            return users.findIndex(user => user.id == state.loggedUser.id);
+          });
           return {
             th: threads,
             ans: answers,
-            com: comments
+            com: comments,
+            pos: pos
           };
         } catch (err) {
           console.log(err, "ERRO no users/user_badges!!!!!!!!!");
@@ -324,7 +340,7 @@ const users = {
       aux().then(res => {
         commit(
           "user_badges",
-          state.loggedUser.getBadges(rootState.badges, res.th, res.com, res.ans)
+          state.loggedUser.getBadges(rootState.badges, res.th, res.com, res.ans, res.pos)
         );
         return;
       });

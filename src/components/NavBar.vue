@@ -254,7 +254,7 @@ export default {
           }
         );
 
-      return [{}];
+      return [{ userInfo: {}}];
     }
   }
 };

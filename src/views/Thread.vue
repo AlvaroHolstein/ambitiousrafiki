@@ -340,10 +340,16 @@ export default {
           });
       }
     });
+    console.log(this.userRank, "lululululu");
   },
   computed: {
     /** é estas computed's que devolvem a informação que
       se foi buscar à api na created(). */
+    userRank() {
+      console.log("MAMASSSS");
+      if (this.$store.state.users.loggedUser != null)
+        return this.$store.state.users.loggedUser.rank.trueRank || null;
+    },
     thread() {
       console.log(this.threadF, "THREAD!!!!!!!");
       if (this.threadF != null && this.$store.state.users.loggedUser != null) {
@@ -425,7 +431,7 @@ export default {
 
         let upv = true;
         for (let upv of this.$store.state.users.loggedUser.upvotes) {
-          if (upv.type == "comment") console.log(upv);
+          // if (upv.type == "comment") console.log(upv);
 
           if (upv.type == "comment" && upv.targetId == comment.id) {
             upv = false;
@@ -453,371 +459,93 @@ export default {
     /** Follow/Unfollow */
     seguir(unfollow) {
       if (this.confirmAuth() === true) {
-        if (unfollow === false) {
-          let main = {
-            /* Estas variáveis têm que estar fora da
-             * async function, porque dentro desta
-             * o (this) é undefined
-             */
-            ip: this.$store.getters.getIp,
-            lg: this.$store.state.users.loggedUser,
-            th: this.threadF,
-            author: this.threadF.userInfo,
-            cookie: this.getLogCookie(),
-            http: this.$http,
-            expValue: this.followValue,
-            notiClass: this.$store.state.users.notificationClass
-          };
-          console.log(main);
-
-          async function follow() {
-            try {
-              // console.log(this.threadF, "alalalalala");
-              /** introduzir o follow no loggedUser */
-              let successFollow = await main
-                .http({
-                  //Follow para o user que o faz
-                  url: `http://${main.ip}/data-api/users/addfollow/${
-                    main.lg.id
-                  }`,
-                  method: "put",
-                  data: {
-                    follow: main.th.id
-                  }
-                })
-                .then(res => res.data.success);
-
-              /** Incrementar os follows na thread */
-              let successThread = await main
-                .http({
-                  url: `http://${main.ip}/data-api/threads/${
-                    main.th.id
-                  }/follow`,
-                  method: "put"
-                })
-                .then(res => res.data.success);
-
-              /** Incrementar experiencia no autor*/
-              let successExp = await main
-                .http({
-                  url: `http://${main.ip}/data-api/users/addexp/${
-                    main.author.userid
-                  }`,
-                  method: "put",
-                  data: {
-                    exp: main.expValue
-                  },
-                  headers: {
-                    "x-access-token": main.cookie
-                  }
-                })
-                .then(res => res.data.success);
-
-              /** Enviar notificação, podia se confirmar se a experriencia foi mesmo adicionada com um ifzito */
-              await main
-                .http({
-                  url: `http://${main.ip}/data-api/users/addnotification/${
-                    main.author.userid
-                  }`,
-                  method: "put",
-                  data: {
-                    notification: new main.notiClass(
-                      main.th.id,
-                      "Seguiu a sua Thread",
-                      main.lg.name,
-                      main.lg.id
-                    )
-                  },
-                  headers: {
-                    "x-access-token": main.cookie
-                  }
-                })
-                .then(res =>
-                  console.log(res.data, "Notificação adicionada com sucesso")
-                );
-              /** Enviar ExpLog */
-              await main.http({
-                url: `http://${main.ip}/data-api/explog/add`,
-                method: "post",
-                headers: {
-                  "x-access-token": main.cookie
-                },
-                data: {
-                  expLog: {
-                    targetId: main.th.id,
-                    targetType: "thread",
-                    logType: "follow",
-                    expValue: main.expValue,
-                    expUserInfo: {
-                      userId: main.author.userid,
-                      name: main.author.name,
-                      rank: main.author.rank
-                    },
-                    receiverUserInfo: {
-                      userId: main.lg.id,
-                      name: main.lg.name,
-                      rank: main.lg.rank.trueRank
-                    }
-                  }
-                }
-              });
-
-              // let
-              return {
-                insertFollowLg: successFollow,
-                incrementThread: successThread,
-                incrementExp: successExp
-              };
-            } catch (err) {
-              console.log(err, "Erro apanhado dentro do 1º catch !!!!!!!!");
-            }
-          }
-          follow().then(res => {
-            /** Atualizar aqui os valores locais,
-             * porque significa que não houve erros, penso eu de que
-             * UPDATE:
-             * Funciona fixe, mas é melhor confirmar um de cada vez,
-             * ou só se todos os campos forem true é que se atualiza localmente,
-             * - Acho melhor como está....
-             */
-            console.log(res);
-            if (res.insertFollowLg == true) {
-              console.log("biba caralho");
-              this.$store.commit("users/addFollow", this.threadF.id);
-            }
-            if (res.incrementThread === true) {
-              console.log("tamo jiunti");
-              this.threadF.follow++;
-            }
-            if (res.incrementExp === true) {
-              console.log("experiencia adicionada");
-            }
-          });
-        } else if (unfollow === true) {
-          /** REmover unfollow */
-          let main = {
-            /* Estas variáveis têm que estar fora da
-             * async function, porque dentro desta
-             * o (this) é undefined
-             */
-            ip: this.$store.getters.getIp,
-            lg: this.$store.state.users.loggedUser,
-            th: this.threadF,
-            author: this.threadF.userInfo,
-            cookie: this.getLogCookie(),
-            http: this.$http,
-            expValue: -this.followValue,
-            notiClass: this.$store.state.users.notificationClass
-          };
-          async function follow() {
-            try {
-              let successFollow = await main
-                .http({
-                  url: `http://${main.ip}/data-api/users/removefollow/${
-                    main.lg.id
-                  }`,
-                  method: "put",
-                  data: {
-                    follow: main.th.id
-                  }
-                })
-                .then(res => res.data.success);
-
-              let successThread = await main
-                .http({
-                  url: `http://${main.ip}/data-api/threads/${
-                    main.th.id
-                  }/unfollow`,
-                  method: "put"
-                })
-                .then(res => res.data.success);
-
-              let sucessExp = main
-                .http({
-                  url: `http://${main.ip}/data-api/users/rmexp/${
-                    main.author.userid
-                  }`,
-                  method: "put",
-                  data: {
-                    exp: Math.abs(main.expValue) // Tem que ir um valor positivo em todos estes pedidos
-                  },
-                  headers: {
-                    "x-access-token": main.cookie
-                  }
-                })
-                .then(res => res.data.success);
-
-              /**Não gera notificação, só expLog */
-              await main.http({
-                url: `http://${main.ip}/data-api/explog/add`,
-                method: "post",
-                headers: {
-                  "x-access-token": main.cookie
-                },
-                data: {
-                  expLog: {
-                    targetId: main.th.id,
-                    targetType: "thread",
-                    logType: "unfollow",
-                    expValue: main.expValue,
-                    expUserInfo: {
-                      userId: main.author.userid,
-                      name: main.author.name,
-                      rank: main.author.rank
-                    },
-                    receiverUserInfo: {
-                      userId: main.lg.id,
-                      name: main.lg.name,
-                      rank: main.lg.rank.trueRank
-                    }
-                  }
-                }
-              });
-              return {
-                insertFollowLg: successFollow,
-                incrementThread: successThread,
-                incrementExp: sucessExp
-              };
-            } catch (err) {
-              console.log(err, "Erro apanhado dentro do 1º catch !!!!!!!!");
-              throw err; // Para ir para o 2º catch tem que se fazer isto (throw err)
-            }
-          }
-          follow()
-            .then(res => {
-              /** Atualizar aqui os valores locais,
-               * porque significa que não houve erros, penso eu de que
+        if (
+          this.thread.userInfo.userid != this.$store.state.users.loggedUser.id
+        ) {
+          if (unfollow === false) {
+            let main = {
+              /* Estas variáveis têm que estar fora da
+               * async function, porque dentro desta
+               * o (this) é undefined
                */
-              console.log("akakakakaka");
-              console.log(res);
-              if (res.insertFollowLg) {
-                console.log("biba caralho");
-                this.$store.commit("users/removeFollow", this.threadF.id);
-              }
-              if (res.incrementThread) {
-                this.threadF.follow--;
-                this.aSeguir();
-              }
-              if (res.incrementExp) console.log("foi removida Experiencia");
-            })
-            .catch(err => {
-              /** Como a async function devolve uma promise,
-               * então deve dar para apanhar as merdas com isto e o then
-               * ---- E aqui não se faz nada com os pedidos, porque visto que alguma coisa correu mal,
-               * não há nada para atualizar
-               */
-              this.errorSwal(
-                "Foi um erro do nosso lado, pedimos desculpa!",
-                true
-              );
-              console.log(err, "Erro apanhado dentro do 2º catch ##########");
-            });
-        }
-      } else {
-        this.errorSwal("Tens que estar autenticado para poderes dar follow");
-      }
-    },
-    /** Upvotes */
-    upvoteThread(upvote) {
-      if (this.confirmAuth()) {
-        console.log(upvote, "Upvote (true/false)");
-        if (upvote) {
-          console.log("Vais dar UPVOTE!!!!");
-          let main = {
-            ip: this.$store.getters.getIp,
-            lg: this.$store.state.users.loggedUser,
-            th: this.threadF,
-            author: this.threadF.userInfo,
-            cookie: this.getLogCookie(),
-            http: this.$http,
-            expValue: this.upvThreadValue,
-            upvote: {
-              type: "thread",
-              targetId: this.threadF.id
-            },
-            notiClass: this.$store.state.users.notificationClass
-          };
-          console.log(main, "main");
-          async function upvoteTh() {
-            try {
-              let successUpv = await main
-                .http({
-                  url: `http://${main.ip}/data-api/users/addupvote/${
-                    main.lg.id
-                  }`,
-                  method: "put",
-                  headers: {
-                    "x-access-token": main.cookie
-                  },
-                  data: {
-                    upvote: main.upvote
-                  }
-                })
-                .then(res => res.data.success);
-              console.log("1");
-              let successUpvTh = await main
-                .http({
-                  url: `http://${main.ip}/data-api/threads/${
-                    main.th.id
-                  }/upvote`,
-                  method: "put",
-                  headers: {
-                    "x-access-token": main.cookie
-                  }
-                })
-                .then(res => res.data.success)
-                .catch(err => false);
-              console.log("2");
-              let addExp = await main
-                .http({
-                  url: `http://${main.ip}/data-api/users/addexp/${
-                    main.author.userid
-                  }`,
-                  method: "put",
-                  headers: {
-                    "x-access-token": main.cookie
-                  },
-                  data: {
-                    exp: main.expValue
-                  }
-                })
-                .then(res => res.data.success);
-              console.log("3");
-              /** notificações */
-              let noti = new main.notiClass(
-                main.th.id,
-                "deu upvote à sua thread",
-                main.lg.name,
-                main.lg.id
-              );
-              console.log(noti, "NOTIFICAÇAAAAAAAAAAAO");
-              await main
-                .http({
-                  url: `http://${main.ip}/data-api/users/addnotification/${
-                    main.author.userid
-                  }`,
-                  method: "put",
-                  headers: {
-                    "x-access-token": main.cookie
-                  },
-                  data: {
-                    notification: new main.notiClass(
-                      main.th.id,
-                      "deu upvote à sua thread",
-                      main.lg.name,
+              ip: this.$store.getters.getIp,
+              lg: this.$store.state.users.loggedUser,
+              th: this.threadF,
+              author: this.threadF.userInfo,
+              cookie: this.getLogCookie(),
+              http: this.$http,
+              expValue: this.followValue,
+              notiClass: this.$store.state.users.notificationClass
+            };
+            console.log(main);
+
+            async function follow() {
+              try {
+                // console.log(this.threadF, "alalalalala");
+                /** introduzir o follow no loggedUser */
+                let successFollow = await main
+                  .http({
+                    //Follow para o user que o faz
+                    url: `http://${main.ip}/data-api/users/addfollow/${
                       main.lg.id
-                    )
-                  }
-                })
-                .then(res =>
-                  res.data.success
-                    ? console.log(res.data, "Notificação adicionada")
-                    : console.log(res.data, "não adicionada")
-                );
-              console.log("4");
-              /** Add ExpLog */
-              await main
-                .http({
+                    }`,
+                    method: "put",
+                    data: {
+                      follow: main.th.id
+                    }
+                  })
+                  .then(res => res.data.success);
+
+                /** Incrementar os follows na thread */
+                let successThread = await main
+                  .http({
+                    url: `http://${main.ip}/data-api/threads/${
+                      main.th.id
+                    }/follow`,
+                    method: "put"
+                  })
+                  .then(res => res.data.success);
+
+                /** Incrementar experiencia no autor*/
+                let successExp = await main
+                  .http({
+                    url: `http://${main.ip}/data-api/users/addexp/${
+                      main.author.userid
+                    }`,
+                    method: "put",
+                    data: {
+                      exp: main.expValue
+                    },
+                    headers: {
+                      "x-access-token": main.cookie
+                    }
+                  })
+                  .then(res => res.data.success);
+
+                /** Enviar notificação, podia se confirmar se a experriencia foi mesmo adicionada com um ifzito */
+                await main
+                  .http({
+                    url: `http://${main.ip}/data-api/users/addnotification/${
+                      main.author.userid
+                    }`,
+                    method: "put",
+                    data: {
+                      notification: new main.notiClass(
+                        main.th.id,
+                        "Seguiu a sua Thread",
+                        main.lg.name,
+                        main.lg.id
+                      )
+                    },
+                    headers: {
+                      "x-access-token": main.cookie
+                    }
+                  })
+                  .then(res =>
+                    console.log(res.data, "Notificação adicionada com sucesso")
+                  );
+                /** Enviar ExpLog */
+                await main.http({
                   url: `http://${main.ip}/data-api/explog/add`,
                   method: "post",
                   headers: {
@@ -827,6 +555,583 @@ export default {
                     expLog: {
                       targetId: main.th.id,
                       targetType: "thread",
+                      logType: "follow",
+                      expValue: main.expValue,
+                      expUserInfo: {
+                        userId: main.author.userid,
+                        name: main.author.name,
+                        rank: main.author.rank
+                      },
+                      receiverUserInfo: {
+                        userId: main.lg.id,
+                        name: main.lg.name,
+                        rank: main.lg.rank.trueRank
+                      }
+                    }
+                  }
+                });
+
+                // let
+                return {
+                  insertFollowLg: successFollow,
+                  incrementThread: successThread,
+                  incrementExp: successExp
+                };
+              } catch (err) {
+                console.log(err, "Erro apanhado dentro do 1º catch !!!!!!!!");
+              }
+            }
+            follow().then(res => {
+              /** Atualizar aqui os valores locais,
+               * porque significa que não houve erros, penso eu de que
+               * UPDATE:
+               * Funciona fixe, mas é melhor confirmar um de cada vez,
+               * ou só se todos os campos forem true é que se atualiza localmente,
+               * - Acho melhor como está....
+               */
+              console.log(res);
+              if (res.insertFollowLg == true) {
+                console.log("biba caralho");
+                this.$store.commit("users/addFollow", this.threadF.id);
+              }
+              if (res.incrementThread === true) {
+                console.log("tamo jiunti");
+                this.threadF.follow++;
+              }
+              if (res.incrementExp === true) {
+                console.log("experiencia adicionada");
+              }
+            });
+          } else if (unfollow === true) {
+            /** REmover unfollow */
+            let main = {
+              /* Estas variáveis têm que estar fora da
+               * async function, porque dentro desta
+               * o (this) é undefined
+               */
+              ip: this.$store.getters.getIp,
+              lg: this.$store.state.users.loggedUser,
+              th: this.threadF,
+              author: this.threadF.userInfo,
+              cookie: this.getLogCookie(),
+              http: this.$http,
+              expValue: -this.followValue,
+              notiClass: this.$store.state.users.notificationClass
+            };
+            async function follow() {
+              try {
+                let successFollow = await main
+                  .http({
+                    url: `http://${main.ip}/data-api/users/removefollow/${
+                      main.lg.id
+                    }`,
+                    method: "put",
+                    data: {
+                      follow: main.th.id
+                    }
+                  })
+                  .then(res => res.data.success);
+
+                let successThread = await main
+                  .http({
+                    url: `http://${main.ip}/data-api/threads/${
+                      main.th.id
+                    }/unfollow`,
+                    method: "put"
+                  })
+                  .then(res => res.data.success);
+
+                let sucessExp = main
+                  .http({
+                    url: `http://${main.ip}/data-api/users/rmexp/${
+                      main.author.userid
+                    }`,
+                    method: "put",
+                    data: {
+                      exp: Math.abs(main.expValue) // Tem que ir um valor positivo em todos estes pedidos
+                    },
+                    headers: {
+                      "x-access-token": main.cookie
+                    }
+                  })
+                  .then(res => res.data.success);
+
+                /**Não gera notificação, só expLog */
+                await main.http({
+                  url: `http://${main.ip}/data-api/explog/add`,
+                  method: "post",
+                  headers: {
+                    "x-access-token": main.cookie
+                  },
+                  data: {
+                    expLog: {
+                      targetId: main.th.id,
+                      targetType: "thread",
+                      logType: "unfollow",
+                      expValue: main.expValue,
+                      expUserInfo: {
+                        userId: main.author.userid,
+                        name: main.author.name,
+                        rank: main.author.rank
+                      },
+                      receiverUserInfo: {
+                        userId: main.lg.id,
+                        name: main.lg.name,
+                        rank: main.lg.rank.trueRank
+                      }
+                    }
+                  }
+                });
+                return {
+                  insertFollowLg: successFollow,
+                  incrementThread: successThread,
+                  incrementExp: sucessExp
+                };
+              } catch (err) {
+                console.log(err, "Erro apanhado dentro do 1º catch !!!!!!!!");
+                throw err; // Para ir para o 2º catch tem que se fazer isto (throw err)
+              }
+            }
+            follow()
+              .then(res => {
+                /** Atualizar aqui os valores locais,
+                 * porque significa que não houve erros, penso eu de que
+                 */
+                console.log("akakakakaka");
+                console.log(res);
+                if (res.insertFollowLg) {
+                  console.log("biba caralho");
+                  this.$store.commit("users/removeFollow", this.threadF.id);
+                }
+                if (res.incrementThread) {
+                  this.threadF.follow--;
+                  this.aSeguir();
+                }
+                if (res.incrementExp) console.log("foi removida Experiencia");
+              })
+              .catch(err => {
+                /** Como a async function devolve uma promise,
+                 * então deve dar para apanhar as merdas com isto e o then
+                 * ---- E aqui não se faz nada com os pedidos, porque visto que alguma coisa correu mal,
+                 * não há nada para atualizar
+                 */
+                this.errorSwal(
+                  "Foi um erro do nosso lado, pedimos desculpa!",
+                  true
+                );
+                console.log(err, "Erro apanhado dentro do 2º catch ##########");
+              });
+          }
+        } else {
+          this.errorSwal(
+            "Não podes seguir a tua própria thread",
+            true,
+            "warning"
+          );
+        }
+      } else {
+        this.errorSwal("Tens que estar autenticado para poderes dar follow");
+      }
+    },
+    /** Upvotes */
+    upvoteThread(upvote) {
+      if (this.confirmAuth()) {
+        if (
+          this.thread.userInfo.userid != this.$store.state.users.loggedUser.id
+        ) {
+          console.log(upvote, "Upvote (true/false)");
+          if (upvote) {
+            console.log("Vais dar UPVOTE!!!!");
+            let main = {
+              ip: this.$store.getters.getIp,
+              lg: this.$store.state.users.loggedUser,
+              th: this.threadF,
+              author: this.threadF.userInfo,
+              cookie: this.getLogCookie(),
+              http: this.$http,
+              expValue: this.upvThreadValue,
+              upvote: {
+                type: "thread",
+                targetId: this.threadF.id
+              },
+              notiClass: this.$store.state.users.notificationClass
+            };
+            console.log(main, "main");
+            async function upvoteTh() {
+              try {
+                let successUpv = await main
+                  .http({
+                    url: `http://${main.ip}/data-api/users/addupvote/${
+                      main.lg.id
+                    }`,
+                    method: "put",
+                    headers: {
+                      "x-access-token": main.cookie
+                    },
+                    data: {
+                      upvote: main.upvote
+                    }
+                  })
+                  .then(res => res.data.success);
+                console.log("1");
+                let successUpvTh = await main
+                  .http({
+                    url: `http://${main.ip}/data-api/threads/${
+                      main.th.id
+                    }/upvote`,
+                    method: "put",
+                    headers: {
+                      "x-access-token": main.cookie
+                    }
+                  })
+                  .then(res => res.data.success)
+                  .catch(err => false);
+                console.log("2");
+                let addExp = await main
+                  .http({
+                    url: `http://${main.ip}/data-api/users/addexp/${
+                      main.author.userid
+                    }`,
+                    method: "put",
+                    headers: {
+                      "x-access-token": main.cookie
+                    },
+                    data: {
+                      exp: main.expValue
+                    }
+                  })
+                  .then(res => res.data.success);
+                console.log("3");
+                /** notificações */
+                let noti = new main.notiClass(
+                  main.th.id,
+                  "deu upvote à sua thread",
+                  main.lg.name,
+                  main.lg.id
+                );
+                console.log(noti, "NOTIFICAÇAAAAAAAAAAAO");
+                await main
+                  .http({
+                    url: `http://${main.ip}/data-api/users/addnotification/${
+                      main.author.userid
+                    }`,
+                    method: "put",
+                    headers: {
+                      "x-access-token": main.cookie
+                    },
+                    data: {
+                      notification: new main.notiClass(
+                        main.th.id,
+                        "deu upvote à sua thread",
+                        main.lg.name,
+                        main.lg.id
+                      )
+                    }
+                  })
+                  .then(res =>
+                    res.data.success
+                      ? console.log(res.data, "Notificação adicionada")
+                      : console.log(res.data, "não adicionada")
+                  );
+                console.log("4");
+                /** Add ExpLog */
+                await main
+                  .http({
+                    url: `http://${main.ip}/data-api/explog/add`,
+                    method: "post",
+                    headers: {
+                      "x-access-token": main.cookie
+                    },
+                    data: {
+                      expLog: {
+                        targetId: main.th.id,
+                        targetType: "thread",
+                        logType: "upvote",
+                        expValue: main.expValue,
+                        expUserInfo: {
+                          userId: main.author.userid,
+                          name: main.author.name,
+                          rank: main.author.rank
+                        },
+                        receiverUserInfo: {
+                          userId: main.lg.id,
+                          name: main.lg.name,
+                          rank: main.lg.rank.trueRank
+                        }
+                      }
+                    }
+                  })
+                  .then(res => console.log(res.data, "EXPLOG"));
+                return {
+                  insertUpv: successUpv,
+                  incrementUpvTh: successUpvTh,
+                  addExp: addExp
+                };
+              } catch (err) {
+                console.log(err, "erro ao dar upvote na thread");
+              }
+            }
+
+            /** Chamar a função */
+            upvoteTh().then(res => {
+              console.log(res, "Done!!!!!! (res)");
+              if (res.insertUpv === true) {
+                /** Mutation */
+                this.$store.commit("users/addUpvote", main.upvote);
+              }
+              if (res.incrementUpvTh === true) {
+                this.threadF.upvotes++;
+              }
+              if (res.addExp === true) {
+                console.log("added Exp");
+              }
+            });
+          } else {
+            console.log("Vais tirar UPVOTE!!!!");
+            let main = {
+              ip: this.$store.getters.getIp,
+              lg: this.$store.state.users.loggedUser,
+              th: this.threadF,
+              author: this.threadF.userInfo,
+              cookie: this.getLogCookie(),
+              http: this.$http,
+              expValue: -10, //Não esquecer de fazer math.abs()
+              upvote: {
+                type: "thread",
+                targetId: this.threadF.id
+              },
+              notiClass: this.$store.state.users.notificationClass
+            };
+            console.log(main, "main");
+
+            async function removeUpvTh() {
+              try {
+                let successUpv = await main
+                  .http({
+                    url: `http://${main.ip}/data-api/users/removeupvote/${
+                      main.lg.id
+                    }`,
+                    method: "put",
+                    headers: {
+                      "x-access-token": main.cookie
+                    },
+                    data: {
+                      upvote: main.upvote
+                    }
+                  })
+                  .then(res => res.data.success);
+                console.log("1");
+                let removeUpvTh = await main
+                  .http({
+                    url: `http://${main.ip}/data-api/threads/${
+                      main.th.id
+                    }/downvote`,
+                    method: "put",
+                    headers: {
+                      "x-access-token": main.cookie
+                    }
+                  })
+                  .then(res => res.data.success)
+                  .catch(err => false);
+                console.log("2");
+                /** REmve experience */
+                await main
+                  .http({
+                    url: `http://${main.ip}/data-api/users/rmexp/${
+                      main.author.userid
+                    }`,
+                    method: "put",
+                    headers: {
+                      "x-access-token": main.cookie
+                    },
+                    data: {
+                      exp: Math.abs(main.expValue)
+                    }
+                  })
+                  .then(res => console.log(res.data, "Experiencia removida"));
+                console.log("3");
+                /** Add Explog */
+                await main
+                  .http({
+                    url: `http://${main.ip}/data-api/explog/add`,
+                    method: "post",
+                    headers: {
+                      "x-access-token": main.cookie
+                    },
+                    data: {
+                      expLog: {
+                        targetId: main.th.id,
+                        targetType: "thread",
+                        logType: "downvote",
+                        expValue: main.expValue,
+                        expUserInfo: {
+                          userId: main.author.userid,
+                          name: main.author.name,
+                          rank: main.author.rank
+                        },
+                        receiverUserInfo: {
+                          userId: main.lg.id,
+                          name: main.lg.name,
+                          rank: main.lg.rank.trueRank
+                        }
+                      }
+                    }
+                  })
+                  .then(res => console.log(res.data, "EXPLOG"));
+                return {
+                  removeUpv: successUpv,
+                  rmUpvTh: removeUpvTh
+                };
+              } catch (err) {
+                console.log(
+                  err,
+                  `Ocorreu um erro ao elimnar o upvote (${
+                    main.upvote.targetId
+                  }) - (${main.upvote.type}) do user`
+                );
+              }
+            }
+
+            removeUpvTh().then(res => {
+              if (res.removeUpv === true) {
+                this.$store.commit("users/removeUpvote", main.upvote);
+              }
+              if (res.rmUpvTh === true) {
+                this.threadF.upvotes--;
+              }
+            });
+          }
+        } else {
+          this.errorSwal(
+            "Não podes dar upvote na tua própria thread",
+            true,
+            "warning"
+          );
+        }
+      } else {
+        this.errorSwal("Tens que estar autenticado para poder dar upvote");
+      }
+    },
+    upvoteAns(answer, event) {
+      console.log(event, "alalall");
+      if (this.confirmAuth() == true) {
+        if (answer.userInfo.userid != this.$store.state.users.loggedUser.id) {
+          let main = {
+            ip: this.$store.getters.getIp,
+            lg: this.$store.state.users.loggedUser,
+            th: this.threadF,
+            author: answer.userInfo,
+            cookie: this.getLogCookie(),
+            http: this.$http,
+            expValue: this.upvAnswerValue, //Não esquecer de fazer math.abs()
+            upvote: {
+              type: "answer",
+              targetId: answer.id
+            },
+            notiClass: this.$store.state.users.notificationClass
+          };
+          let upvote = true;
+          for (let ans of this.answersF) {
+            for (let upv of this.$store.state.users.loggedUser.upvotes) {
+              console.log(ans, upv);
+              if (upv.type == "answer" && upv.targetId == answer.id)
+                upvote = false;
+            }
+          }
+          console.log(answer, upvote);
+          if (upvote == true) {
+            console.log("Vais dar upvote!!!!");
+            async function addUpvote() {
+              try {
+                let successUpv = await main
+                  .http({
+                    url: `http://${main.ip}/data-api/users/addupvote/${
+                      main.lg.id
+                    }`,
+                    method: "put",
+                    headers: {
+                      "x-access-token": main.cookie
+                    },
+                    data: {
+                      upvote: main.upvote
+                    }
+                  })
+                  .then(res => res.data.success)
+                  .catch(err => {
+                    // if (err.response.status == 500) {
+                    //   document.cookie = `login=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;`;
+                    //   this.$store.commit("users/unLoggedUser");
+                    //   this.$router.push({
+                    //     name: "home"
+                    //   });
+                    // }
+                  });
+
+                let successUpvAns = await main
+                  .http({
+                    url: `http://${main.ip}/data-api/threads/${
+                      main.th.id
+                    }/answers/${answer.id}/upvote`,
+                    method: "put",
+                    headers: {
+                      "x-access-token": main.cookie
+                    }
+                  })
+                  .then(res => res.data.success);
+
+                /** Experiencia  ao autor */
+                await main
+                  .http({
+                    url: `http://${main.ip}/data-api/users/addexp/${
+                      main.author.userid
+                    }`,
+                    method: "put",
+                    headers: {
+                      "x-access-token": main.cookie
+                    },
+                    data: {
+                      exp: main.expValue
+                    }
+                  })
+                  .then(res => console.log("adicionada exp!!!"))
+                  .catch(err => console.log(err));
+
+                /** Notificação autor da thread(userInfo) e criador,
+                 * só para o criador da answer.....
+                 */
+                await main
+                  .http({
+                    url: `http://${main.ip}/data-api/users/addnotification/${
+                      main.author.userid
+                    }`,
+                    method: "put",
+                    headers: {
+                      "x-access-token": main.cookie
+                    },
+                    data: {
+                      notification: new main.notiClass(
+                        main.th.id,
+                        "deu upvote à sua resposta",
+                        main.lg.name,
+                        main.lg.id
+                      )
+                    }
+                  })
+                  .then(res =>
+                    console.log("notificação autor da thread adicionada")
+                  )
+                  .catch(err => console.log(err));
+                /** Experience Log */
+                await main.http({
+                  url: `http://${main.ip}/data-api/explog/add`,
+                  method: "post",
+                  headers: {
+                    "x-access-token": main.cookie
+                  },
+                  data: {
+                    expLog: {
+                      targetId: answer.id,
+                      targetType: "answer",
                       logType: "upvote",
                       expValue: main.expValue,
                       expUserInfo: {
@@ -841,99 +1146,91 @@ export default {
                       }
                     }
                   }
-                })
-                .then(res => console.log(res.data, "EXPLOG"));
-              return {
-                insertUpv: successUpv,
-                incrementUpvTh: successUpvTh,
-                addExp: addExp
-              };
-            } catch (err) {
-              console.log(err, "erro ao dar upvote na thread");
+                });
+                return {
+                  insertUpv: successUpv,
+                  insertUpvAns: successUpvAns
+                };
+              } catch (err) {
+                console.log(
+                  err,
+                  `Ocorreu um erro ao adicionar o upvote (${
+                    main.upvote.targetId
+                  }) - (${main.upvote.type}) do user`
+                );
+              }
             }
-          }
 
-          /** Chamar a função */
-          upvoteTh().then(res => {
-            console.log(res, "Done!!!!!! (res)");
-            if (res.insertUpv === true) {
-              /** Mutation */
-              this.$store.commit("users/addUpvote", main.upvote);
-            }
-            if (res.incrementUpvTh === true) {
-              this.threadF.upvotes++;
-            }
-            if (res.addExp === true) {
-              console.log("added Exp");
-            }
-          });
-        } else {
-          console.log("Vais tirar UPVOTE!!!!");
-          let main = {
-            ip: this.$store.getters.getIp,
-            lg: this.$store.state.users.loggedUser,
-            th: this.threadF,
-            author: this.threadF.userInfo,
-            cookie: this.getLogCookie(),
-            http: this.$http,
-            expValue: -10, //Não esquecer de fazer math.abs()
-            upvote: {
-              type: "thread",
-              targetId: this.threadF.id
-            },
-            notiClass: this.$store.state.users.notificationClass
-          };
-          console.log(main, "main");
+            addUpvote().then(res => {
+              console.log(res);
+              if (res.insertUpv === true) {
+                this.$store.commit("users/addUpvote", main.upvote);
+              }
+              if (res.insertUpvAns === true) {
+                for (let ans of this.answersF) {
+                  if (ans.id == answer.id) {
+                    ans.upvotes++;
+                  }
+                }
+              }
+            });
+          } else {
+            console.log("Vais tirar upvote!!!!");
+            async function removeUpv() {
+              try {
+                let successUpv = await main
+                  .http({
+                    url: `http://${main.ip}/data-api/users/removeupvote/${
+                      main.lg.id
+                    }`,
+                    method: "put",
+                    headers: {
+                      "x-access-token": main.cookie
+                    },
+                    data: {
+                      upvote: main.upvote
+                    }
+                  })
+                  .then(res => res.data.success)
+                  .catch(err => {
+                    // if (err.response.status == 500) {
+                    //   document.cookie = `login=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;`;
+                    //   this.$store.commit("users/unLoggedUser");
+                    //   this.$router.push({
+                    //     name: "home"
+                    //   });
+                    // }
+                  });
+                let successUpvAns = await main
+                  .http({
+                    url: `http://${main.ip}/data-api/threads/${
+                      main.th.id
+                    }/answers/${answer.id}/downvote`,
+                    method: "put",
+                    headers: {
+                      "x-access-token": main.cookie
+                    }
+                  })
+                  .then(res => res.data.success)
+                  .catch(err => console.log(err));
 
-          async function removeUpvTh() {
-            try {
-              let successUpv = await main
-                .http({
-                  url: `http://${main.ip}/data-api/users/removeupvote/${
-                    main.lg.id
-                  }`,
-                  method: "put",
-                  headers: {
-                    "x-access-token": main.cookie
-                  },
-                  data: {
-                    upvote: main.upvote
-                  }
-                })
-                .then(res => res.data.success);
-              console.log("1");
-              let removeUpvTh = await main
-                .http({
-                  url: `http://${main.ip}/data-api/threads/${
-                    main.th.id
-                  }/downvote`,
-                  method: "put",
-                  headers: {
-                    "x-access-token": main.cookie
-                  }
-                })
-                .then(res => res.data.success)
-                .catch(err => false);
-              console.log("2");
-              /** REmve experience */
-              await main
-                .http({
-                  url: `http://${main.ip}/data-api/users/rmexp/${
-                    main.author.userid
-                  }`,
-                  method: "put",
-                  headers: {
-                    "x-access-token": main.cookie
-                  },
-                  data: {
-                    exp: Math.abs(main.expValue)
-                  }
-                })
-                .then(res => console.log(res.data, "Experiencia removida"));
-              console.log("3");
-              /** Add Explog */
-              await main
-                .http({
+                await main
+                  .http({
+                    url: `http://${main.ip}/data-api/users/rmexp/${
+                      main.author.userid
+                    }`,
+                    method: "put",
+                    headers: {
+                      "x-access-token": main.cookie
+                    },
+                    data: {
+                      exp: main.expValue
+                    }
+                  })
+                  .then(res => console.log("Exp removida"))
+                  .catch(err => console.log(err));
+                /** Criar expLog */
+                await main.http({
                   url: `http://${main.ip}/data-api/explog/add`,
                   method: "post",
                   headers: {
@@ -941,10 +1238,10 @@ export default {
                   },
                   data: {
                     expLog: {
-                      targetId: main.th.id,
-                      targetType: "thread",
+                      targetId: answer.id,
+                      targetType: "answer",
                       logType: "downvote",
-                      expValue: main.expValue,
+                      expValue: -main.expValue,
                       expUserInfo: {
                         userId: main.author.userid,
                         name: main.author.name,
@@ -957,154 +1254,141 @@ export default {
                       }
                     }
                   }
-                })
-                .then(res => console.log(res.data, "EXPLOG"));
-              return {
-                removeUpv: successUpv,
-                rmUpvTh: removeUpvTh
-              };
-            } catch (err) {
-              console.log(
-                err,
-                `Ocorreu um erro ao elimnar o upvote (${
-                  main.upvote.targetId
-                }) - (${main.upvote.type}) do user`
-              );
+                });
+                return {
+                  removeUpv: successUpv,
+                  removeUpvAns: successUpvAns
+                };
+              } catch (err) {
+                console.log(
+                  err,
+                  `Ocorreu um erro ao elimnar o upvote (${
+                    main.upvote.targetId
+                  }) - (${main.upvote.type}) do user`
+                );
+              }
             }
+            removeUpv().then(res => {
+              console.log(res);
+              if (res.removeUpv === true) {
+                this.$store.commit("users/removeUpvote", main.upvote);
+              }
+              if (res.removeUpvAns === true) {
+                for (let ans of this.answersF) {
+                  if (ans.id == answer.id) ans.upvotes--;
+                }
+              }
+            });
           }
-
-          removeUpvTh().then(res => {
-            if (res.removeUpv === true) {
-              this.$store.commit("users/removeUpvote", main.upvote);
-            }
-            if (res.rmUpvTh === true) {
-              this.threadF.upvotes--;
-            }
-          });
+        } else {
+          this.errorSwal(
+            "Não podes dar upvote na tua própria resposta",
+            true,
+            "warning"
+          );
         }
       } else {
         this.errorSwal("Tens que estar autenticado para poder dar upvote");
       }
     },
-    upvoteAns(answer, event) {
-      console.log(event, "alalall");
+    upvoteComment(comment, answer, event) {
       if (this.confirmAuth() == true) {
-        let main = {
-          ip: this.$store.getters.getIp,
-          lg: this.$store.state.users.loggedUser,
-          th: this.threadF,
-          author: answer.userInfo,
-          cookie: this.getLogCookie(),
-          http: this.$http,
-          expValue: this.upvAnswerValue, //Não esquecer de fazer math.abs()
-          upvote: {
-            type: "answer",
-            targetId: answer.id
-          },
-          notiClass: this.$store.state.users.notificationClass
-        };
-        let upvote = true;
-        for (let ans of this.answersF) {
-          for (let upv of this.$store.state.users.loggedUser.upvotes) {
-            console.log(ans, upv);
-            if (upv.type == "answer" && upv.targetId == answer.id)
-              upvote = false;
+        if (comment.userInfo.userid != this.$store.state.users.loggedUser.id) {
+          let Upv = true;
+
+          console.log(answer);
+          console.log(comment, "Comentário e em cima answer");
+          for (let com of this.$store.state.users.loggedUser.upvotes) {
+            if (com.type == "comment" && com.targetId == comment.id)
+              Upv = false;
           }
-        }
-        console.log(answer, upvote);
-        if (upvote == true) {
-          console.log("Vais dar upvote!!!!");
-          async function addUpvote() {
-            try {
+
+          let main = {
+            ip: this.$store.getters.getIp,
+            lg: this.$store.state.users.loggedUser,
+            th: this.threadF,
+            author: comment.userInfo,
+            cookie: this.getLogCookie(),
+            http: this.$http,
+            expValue: this.upvoteComment, //Não esquecer de fazer math.abs()
+            upvote: {
+              type: "comment",
+              targetId: comment.id
+            },
+            headers: {
+              "x-access-token": this.getLogCookie()
+            },
+            notiClass: this.$store.state.users.notificationClass
+          };
+
+          if (Upv) {
+            console.log("Vais adicionar upv");
+            async function addUpvCom() {
+              /** Adicionar Upvote */
               let successUpv = await main
                 .http({
                   url: `http://${main.ip}/data-api/users/addupvote/${
                     main.lg.id
                   }`,
                   method: "put",
-                  headers: {
-                    "x-access-token": main.cookie
-                  },
+                  headers: main.headers,
                   data: {
                     upvote: main.upvote
                   }
                 })
-                .then(res => res.data.success)
-                .catch(err => {
-                  // if (err.response.status == 500) {
-                  //   document.cookie = `login=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;`;
-                  //   this.$store.commit("users/unLoggedUser");
-                  //   this.$router.push({
-                  //     name: "home"
-                  //   });
-                  // }
-                });
+                .then(res => res.data.success);
 
-              let successUpvAns = await main
+              /** Icrementar Upvote comment */
+              let successUpvCom = await main
                 .http({
                   url: `http://${main.ip}/data-api/threads/${
                     main.th.id
-                  }/answers/${answer.id}/upvote`,
+                  }/answers/${answer.id}/comments/${comment.id}/upvote`,
                   method: "put",
-                  headers: {
-                    "x-access-token": main.cookie
-                  }
+                  headers: main.headers
                 })
                 .then(res => res.data.success);
-
-              /** Experiencia  ao autor */
+              /** Adicionar experiencia ao autor do comentário */
               await main
                 .http({
                   url: `http://${main.ip}/data-api/users/addexp/${
                     main.author.userid
                   }`,
                   method: "put",
-                  headers: {
-                    "x-access-token": main.cookie
-                  },
+                  headers: main.headers,
                   data: {
                     exp: main.expValue
                   }
                 })
-                .then(res => console.log("adicionada exp!!!"))
-                .catch(err => console.log(err));
-
-              /** Notificação autor da thread(userInfo) e criador,
-               * só para o criador da answer.....
-               */
-              await main
-                .http({
-                  url: `http://${main.ip}/data-api/users/addnotification/${
-                    main.author.userid
-                  }`,
-                  method: "put",
-                  headers: {
-                    "x-access-token": main.cookie
-                  },
-                  data: {
-                    notification: new main.notiClass(
-                      main.th.id,
-                      "deu upvote à sua resposta",
-                      main.lg.name,
-                      main.lg.id
-                    )
-                  }
-                })
                 .then(res =>
-                  console.log("notificação autor da thread adicionada")
-                )
-                .catch(err => console.log(err));
-              /** Experience Log */
+                  console.log("experiencia adicionada com suucesso")
+                );
+              /** Adicionar Notificação ao autor do comentário */
+              await main.http({
+                url: `http://${main.ip}/data-api/users/addNotification/${
+                  main.author.userid
+                }`,
+                method: "put",
+                headers: main.headers,
+                data: {
+                  notification: new main.notiClass(
+                    main.th.id,
+                    "deu upvote no seu comentário",
+                    main.lg.name,
+                    main.lg.id
+                  )
+                }
+              });
+
+              /** Adicionar ExpLog */
               await main.http({
                 url: `http://${main.ip}/data-api/explog/add`,
                 method: "post",
-                headers: {
-                  "x-access-token": main.cookie
-                },
+                headers: main.headers,
                 data: {
                   expLog: {
-                    targetId: answer.id,
-                    targetType: "answer",
+                    targetId: comment.id,
+                    targetType: "comment",
                     logType: "upvote",
                     expValue: main.expValue,
                     expUserInfo: {
@@ -1120,99 +1404,74 @@ export default {
                   }
                 }
               });
+              /** Devolver objeto */
               return {
-                insertUpv: successUpv,
-                insertUpvAns: successUpvAns
+                upvUser: successUpv,
+                addUpvCom: successUpvCom
               };
-            } catch (err) {
-              console.log(
-                err,
-                `Ocorreu um erro ao adicionar o upvote (${
-                  main.upvote.targetId
-                }) - (${main.upvote.type}) do user`
-              );
             }
-          }
 
-          addUpvote().then(res => {
-            console.log(res);
-            if (res.insertUpv === true) {
-              this.$store.commit("users/addUpvote", main.upvote);
-            }
-            if (res.insertUpvAns === true) {
-              for (let ans of this.answersF) {
-                if (ans.id == answer.id) {
-                  ans.upvotes++;
+            addUpvCom().then(res => {
+              console.log(res, "res do addUpvCom()");
+              if (res.upvUser) {
+                this.$store.commit("users/addUpvote", main.upvote);
+              }
+              if (res.addUpvCom) {
+                for (let com of this.commentsF) {
+                  if (com.id == comment.id) com.upvotes++;
                 }
               }
-            }
-          });
-        } else {
-          console.log("Vais tirar upvote!!!!");
-          async function removeUpv() {
-            try {
+            });
+          } else {
+            console.log("Vais remover upv");
+            async function rmUpvCom() {
+              /** Remover Upvote */
               let successUpv = await main
                 .http({
                   url: `http://${main.ip}/data-api/users/removeupvote/${
                     main.lg.id
                   }`,
                   method: "put",
-                  headers: {
-                    "x-access-token": main.cookie
-                  },
+                  headers: main.headers,
                   data: {
                     upvote: main.upvote
                   }
                 })
-                .then(res => res.data.success)
-                .catch(err => {
-                  // if (err.response.status == 500) {
-                  //   document.cookie = `login=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;`;
-                  //   this.$store.commit("users/unLoggedUser");
-                  //   this.$router.push({
-                  //     name: "home"
-                  //   });
-                  // }
-                });
-              let successUpvAns = await main
+                .then(res => res.data.success);
+              /** tirar upvote commnet */
+
+              let successUpvCom = await main
                 .http({
                   url: `http://${main.ip}/data-api/threads/${
                     main.th.id
-                  }/answers/${answer.id}/downvote`,
+                  }/answers/${answer.id}/comments/${comment.id}/downvote`,
                   method: "put",
-                  headers: {
-                    "x-access-token": main.cookie
-                  }
+                  headers: main.headers
                 })
-                .then(res => res.data.success)
-                .catch(err => console.log(err));
-
+                .then(res => res.data.success);
+              /** Remover exp autor do comment */
               await main
                 .http({
                   url: `http://${main.ip}/data-api/users/rmexp/${
                     main.author.userid
                   }`,
                   method: "put",
-                  headers: {
-                    "x-access-token": main.cookie
-                  },
+                  headers: main.headers,
                   data: {
                     exp: main.expValue
                   }
                 })
-                .then(res => console.log("Exp removida"))
-                .catch(err => console.log(err));
-              /** Criar expLog */
+                .then(res => console.log("experiencia removida com suucesso"));
+
+              /** Adicionar explog */
               await main.http({
                 url: `http://${main.ip}/data-api/explog/add`,
                 method: "post",
-                headers: {
-                  "x-access-token": main.cookie
-                },
+                headers: main.headers,
                 data: {
                   expLog: {
-                    targetId: answer.id,
-                    targetType: "answer",
+                    targetId: comment.id,
+                    targetType: "comment",
                     logType: "downvote",
                     expValue: -main.expValue,
                     expUserInfo: {
@@ -1228,243 +1487,31 @@ export default {
                   }
                 }
               });
+              /** Devolver objeto */
               return {
-                removeUpv: successUpv,
-                removeUpvAns: successUpvAns
+                rmUpvUser: successUpv,
+                rmUpvCom: successUpvCom
               };
-            } catch (err) {
-              console.log(
-                err,
-                `Ocorreu um erro ao elimnar o upvote (${
-                  main.upvote.targetId
-                }) - (${main.upvote.type}) do user`
-              );
             }
-          }
-          removeUpv().then(res => {
-            console.log(res);
-            if (res.removeUpv === true) {
-              this.$store.commit("users/removeUpvote", main.upvote);
-            }
-            if (res.removeUpvAns === true) {
-              for (let ans of this.answersF) {
-                if (ans.id == answer.id) ans.upvotes--;
+
+            rmUpvCom().then(res => {
+              console.log(res, "res do rmUpvcom()");
+              if (res.rmUpvUser) {
+                this.$store.commit("users/removeUpvote", main.upvote);
               }
-            }
-          });
-        }
-      } else {
-        this.errorSwal("Tens que estar autenticado para poder dar upvote");
-      }
-    },
-    upvoteComment(comment, answer, event) {
-      if (this.confirmAuth() == true) {
-        let Upv = true;
-
-        console.log(answer);
-        console.log(comment, "Comentário e em cima answer");
-        for (let com of this.$store.state.users.loggedUser.upvotes) {
-          if (com.type == "comment" && com.targetId == comment.id) Upv = false;
-        }
-
-        let main = {
-          ip: this.$store.getters.getIp,
-          lg: this.$store.state.users.loggedUser,
-          th: this.threadF,
-          author: comment.userInfo,
-          cookie: this.getLogCookie(),
-          http: this.$http,
-          expValue: this.upvoteComment, //Não esquecer de fazer math.abs()
-          upvote: {
-            type: "comment",
-            targetId: comment.id
-          },
-          headers: {
-            "x-access-token": this.getLogCookie()
-          },
-          notiClass: this.$store.state.users.notificationClass
-        };
-
-        if (Upv) {
-          console.log("Vais adicionar upv");
-          async function addUpvCom() {
-            /** Adicionar Upvote */
-            let successUpv = await main
-              .http({
-                url: `http://${main.ip}/data-api/users/addupvote/${main.lg.id}`,
-                method: "put",
-                headers: main.headers,
-                data: {
-                  upvote: main.upvote
-                }
-              })
-              .then(res => res.data.success);
-
-            /** Icrementar Upvote comment */
-            let successUpvCom = await main
-              .http({
-                url: `http://${main.ip}/data-api/threads/${
-                  main.th.id
-                }/answers/${answer.id}/comments/${comment.id}/upvote`,
-                method: "put",
-                headers: main.headers
-              })
-              .then(res => res.data.success);
-            /** Adicionar experiencia ao autor do comentário */
-            await main
-              .http({
-                url: `http://${main.ip}/data-api/users/addexp/${
-                  main.author.userid
-                }`,
-                method: "put",
-                headers: main.headers,
-                data: {
-                  exp: main.expValue
-                }
-              })
-              .then(res => console.log("experiencia adicionada com suucesso"));
-            /** Adicionar Notificação ao autor do comentário */
-            await main.http({
-              url: `http://${main.ip}/data-api/users/addNotification/${
-                main.author.userid
-              }`,
-              method: "put",
-              headers: main.headers,
-              data: {
-                notification: new main.notiClass(
-                  main.th.id,
-                  "deu upvote no seu comentário",
-                  main.lg.name,
-                  main.lg.id
-                )
-              }
-            });
-
-            /** Adicionar ExpLog */
-            await main.http({
-              url: `http://${main.ip}/data-api/explog/add`,
-              method: "post",
-              headers: main.headers,
-              data: {
-                expLog: {
-                  targetId: comment.id,
-                  targetType: "comment",
-                  logType: "upvote",
-                  expValue: main.expValue,
-                  expUserInfo: {
-                    userId: main.author.userid,
-                    name: main.author.name,
-                    rank: main.author.rank
-                  },
-                  receiverUserInfo: {
-                    userId: main.lg.id,
-                    name: main.lg.name,
-                    rank: main.lg.rank.trueRank
-                  }
+              if (res.rmUpvCom) {
+                for (let com of this.commentsF) {
+                  if (com.id == comment.id) com.upvotes--;
                 }
               }
             });
-            /** Devolver objeto */
-            return {
-              upvUser: successUpv,
-              addUpvCom: successUpvCom
-            };
           }
-
-          addUpvCom().then(res => {
-            console.log(res, "res do addUpvCom()");
-            if (res.upvUser) {
-              this.$store.commit("users/addUpvote", main.upvote);
-            }
-            if (res.addUpvCom) {
-              for (let com of this.commentsF) {
-                if (com.id == comment.id) com.upvotes++;
-              }
-            }
-          });
         } else {
-          console.log("Vais remover upv");
-          async function rmUpvCom() {
-            /** Remover Upvote */
-            let successUpv = await main
-              .http({
-                url: `http://${main.ip}/data-api/users/removeupvote/${
-                  main.lg.id
-                }`,
-                method: "put",
-                headers: main.headers,
-                data: {
-                  upvote: main.upvote
-                }
-              })
-              .then(res => res.data.success);
-            /** tirar upvote commnet */
-
-            let successUpvCom = await main
-              .http({
-                url: `http://${main.ip}/data-api/threads/${
-                  main.th.id
-                }/answers/${answer.id}/comments/${comment.id}/downvote`,
-                method: "put",
-                headers: main.headers
-              })
-              .then(res => res.data.success);
-            /** Remover exp autor do comment */
-            await main
-              .http({
-                url: `http://${main.ip}/data-api/users/rmexp/${
-                  main.author.userid
-                }`,
-                method: "put",
-                headers: main.headers,
-                data: {
-                  exp: main.expValue
-                }
-              })
-              .then(res => console.log("experiencia removida com suucesso"));
-
-            /** Adicionar explog */
-            await main.http({
-              url: `http://${main.ip}/data-api/explog/add`,
-              method: "post",
-              headers: main.headers,
-              data: {
-                expLog: {
-                  targetId: comment.id,
-                  targetType: "comment",
-                  logType: "downvote",
-                  expValue: -main.expValue,
-                  expUserInfo: {
-                    userId: main.author.userid,
-                    name: main.author.name,
-                    rank: main.author.rank
-                  },
-                  receiverUserInfo: {
-                    userId: main.lg.id,
-                    name: main.lg.name,
-                    rank: main.lg.rank.trueRank
-                  }
-                }
-              }
-            });
-            /** Devolver objeto */
-            return {
-              rmUpvUser: successUpv,
-              rmUpvCom: successUpvCom
-            };
-          }
-
-          rmUpvCom().then(res => {
-            console.log(res, "res do rmUpvcom()");
-            if (res.rmUpvUser) {
-              this.$store.commit("users/removeUpvote", main.upvote);
-            }
-            if (res.rmUpvCom) {
-              for (let com of this.commentsF) {
-                if (com.id == comment.id) com.upvotes--;
-              }
-            }
-          });
+          this.errorSwal(
+            "Não podes dar upvote no teu próprio comentário",
+            true,
+            "warning"
+          );
         }
       } else {
         this.errorSwal("Tens que estar autenticado para poder dar upvote");
@@ -1607,6 +1654,32 @@ export default {
               console.log(res.add, "'resposta' vinda da api");
               this.answersF.push(res.add);
               this.answerText = "";
+
+              this.checkBadges(
+                this.$store.state.users.loggedUser,
+                this.$store.getters.getIp,
+                this.$store.state.badges
+              ).then(res => {
+                console.log(res, "RESULTTTTTTTTTTTTTT!!!!! THEBADGE ANSWER");
+
+                console.log(res.updt.length, res.old);
+                if (
+                  res.updt.length >
+                  res.old.length
+                ) {
+                  this.$store.dispatch("users/user_badges");
+                  Swal.fire({
+                    position: "top-end",
+                    type: "success",
+                    title: `Ganhas um badge de ${
+                      res.updt[res.updt.length - 1].category
+                    }`, // Pde ser que resulte
+                    showConfirmButton: false,
+                    timer: 1500
+                  });
+                  this.checkRank(main.expValue);
+                }
+              });
             }
           });
         }
@@ -1651,134 +1724,160 @@ export default {
         comment: this.commentToAnswer
       };
       if (this.confirmAuth()) {
-        async function addComment() {
-          /** Adicionar resposta */
-          let com = await main
-            .http({
-              url: `http://${main.ip}/data-api/threads/${main.th.id}/answers/${
-                main.ans.id
-              }/comments`,
-              method: "post",
-              headers: main.headers,
-              data: {
-                comment: newComment
-              }
-            })
-            .then(res => res.data.comment);
+        if (this.commentToAnswer != "") {
+          async function addComment() {
+            /** Adicionar resposta */
+            let com = await main
+              .http({
+                url: `http://${main.ip}/data-api/threads/${
+                  main.th.id
+                }/answers/${main.ans.id}/comments`,
+                method: "post",
+                headers: main.headers,
+                data: {
+                  comment: newComment
+                }
+              })
+              .then(res => res.data.comment);
 
-          /** Adicionar experiencia */
-          await main
-            .http({
-              url: `http://${main.ip}/data-api/users/addexp/${
+            /** Adicionar experiencia */
+            await main
+              .http({
+                url: `http://${main.ip}/data-api/users/addexp/${
+                  main.ans.userInfo.userid
+                }`,
+                method: "put",
+                headers: main.headers,
+                data: {
+                  exp: main.expValue
+                }
+              })
+              .then(res => console.log(res, "experiencia adicionada"));
+
+            /** Adicionar notificação
+             * autor da answer,
+             * criador thread,
+             * followers
+             */
+            await main.http({
+              url: `http://${main.ip}/data-api/users/addnotification/${
                 main.ans.userInfo.userid
               }`,
               method: "put",
               headers: main.headers,
               data: {
-                exp: main.expValue
+                notification: new main.notiClass(
+                  main.th.id,
+                  "comentou a sua answer",
+                  main.lg.name,
+                  main.lg.id
+                )
               }
-            })
-            .then(res => console.log(res, "experiencia adicionada"));
+            });
 
-          /** Adicionar notificação
-           * autor da answer,
-           * criador thread,
-           * followers
-           */
-          await main.http({
-            url: `http://${main.ip}/data-api/users/addnotification/${
-              main.ans.userInfo.userid
-            }`,
-            method: "put",
-            headers: main.headers,
-            data: {
-              notification: new main.notiClass(
-                main.th.id,
-                "comentou a sua answer",
-                main.lg.name,
-                main.lg.id
-              )
-            }
-          });
+            await main.http({
+              url: `http://${main.ip}/data-api/users/addnotification/${
+                main.th.userInfo.userid
+              }`,
+              method: "put",
+              headers: main.headers,
+              data: {
+                notification: new main.notiClass(
+                  main.th.id,
+                  "comentou uma resposta a uma thread sua",
+                  main.lg.name,
+                  main.lg.id
+                )
+              }
+            });
 
-          await main.http({
-            url: `http://${main.ip}/data-api/users/addnotification/${
-              main.th.userInfo.userid
-            }`,
-            method: "put",
-            headers: main.headers,
-            data: {
-              notification: new main.notiClass(
-                main.th.id,
-                "comentou uma resposta a uma thread sua",
-                main.lg.name,
-                main.lg.id
-              )
-            }
-          });
+            await main.http({
+              url: `http://${main.ip}/data-api/users/multiplenotis`,
+              method: "put",
+              headers: main.headers,
+              data: {
+                threadId: main.th.id,
+                notification: new main.notiClass(
+                  main.th.id,
+                  "comentou uma resposta de uma thread que segue",
+                  main.lg.name,
+                  main.lg.id
+                )
+              }
+            });
 
-          await main.http({
-            url: `http://${main.ip}/data-api/users/multiplenotis`,
-            method: "put",
-            headers: main.headers,
-            data: {
-              threadId: main.th.id,
-              notification: new main.notiClass(
-                main.th.id,
-                "comentou uma resposta de uma thread que segue",
-                main.lg.name,
-                main.lg.id
-              )
-            }
-          });
-
-          /** Adicionar expLog */
-          await main.http({
-            url: `http://${main.ip}/data-api/explog/add`,
-            method: "post",
-            headers: main.headers,
-            data: {
-              expLog: {
-                targetId: main.th.id,
-                targetType: "comment",
-                logType: "comment to answer",
-                expValue: main.expValue,
-                receiverUserInfo: {
-                  // Isto não deve estar a fazer sentido
-                  userId: main.ans.userInfo.userid,
-                  name: main.ans.userInfo.name,
-                  rank: main.ans.userInfo.rank
-                },
-                expUserInfo: {
-                  userId: main.lg.id,
-                  name: main.lg.name,
-                  rank: main.lg.rank.trueRank
+            /** Adicionar expLog */
+            await main.http({
+              url: `http://${main.ip}/data-api/explog/add`,
+              method: "post",
+              headers: main.headers,
+              data: {
+                expLog: {
+                  targetId: main.th.id,
+                  targetType: "comment",
+                  logType: "comment to answer",
+                  expValue: main.expValue,
+                  receiverUserInfo: {
+                    // Isto não deve estar a fazer sentido
+                    userId: main.ans.userInfo.userid,
+                    name: main.ans.userInfo.name,
+                    rank: main.ans.userInfo.rank
+                  },
+                  expUserInfo: {
+                    userId: main.lg.id,
+                    name: main.lg.name,
+                    rank: main.lg.rank.trueRank
+                  }
                 }
               }
-            }
-          });
+            });
 
-          return {
-            addedComment: com
-          };
-        }
-        addComment().then(res => {
-          /** Adicionar comentario localmente */
-          if (res.addedComment) {
-            console.log(res.addComment);
-            this.commentsF.push(res.addedComment);
-            this.commentToAnswer = "";
-            if (this.checkBadges.length > 0) {
-              Swal.fire({
-                position: "top-end",
-                type: "success",
-                title: `Ganhas te o badge ${badge.name}`,
-                showConfirmButton: false,
-                timer: 1500
+            return {
+              addedComment: com
+            };
+          }
+          addComment().then(res => {
+            /** Adicionar comentario localmente */
+            if (res.addedComment) {
+              console.log(res.addComment);
+              this.commentsF.push(res.addedComment);
+              this.commentToAnswer = "";
+              this.checkBadges(
+                this.$store.state.users.loggedUser,
+                this.$store.getters.getIp,
+                this.$store.state.badges
+              ).then(res => {
+                console.log(res, "RESULTTTTTTTTTTTTTT!!!!! THEBADGE ANSWER");
+
+                let updatedBadges = this.$store.state.badges.filter(badge => {
+                  for (let i = 0; i < res.length; i++) {
+                    if (res[i] == badge.id) return true;
+                  }
+                });
+
+                console.log(res.updt.length, res.old);
+                if (
+                  res.updt.length >
+                  res.old.length
+                ) {
+                  this.$store.dispatch("users/user_badges");
+                  Swal.fire({
+                    position: "top-end",
+                    type: "success",
+                    title: `Ganhas um badge de ${
+                      res.updt[res.updt.length - 1].category
+                    }`, // Pde ser que resulte
+                    showConfirmButton: false,
+                    timer: 1500
+                  });
+                  this.checkRank(main.expValue);
+                }
               });
             }
-          }
-        });
+          });
+        } else {
+          this.errorSwal("Tens que escrever alguma coisa", true, "warning");
+        }
       } else {
         this.errorSwal("Tens que estar autenticado para poder dar comentar");
       }
@@ -1857,33 +1956,87 @@ export default {
      * - Ranking e Help,
      * VAi ser usado no respoinder o comentar, para o loggedUser
      */
-    checkBadges() {
-      let badges1 = this.$store.state.loggedUser.badges;
+    async checkBadges(theUser, ip, allBadges) {
+      let badges1 = this.$store.state.users.loggedUser.badges;
       /** Badge Ganho */
       /** retorna o badge que ganhou,
        * caso contrário retorna um array vazio
        */
-      console.log();
-      this.$store.dispatch("users/user_badges").then(() => {
-        console.log(
-          this.$store.state.loggedUser.badges,
-          "User badges no then do checkBadges !=!=!=!=!="
-        );
-        if (this.$store.state.loggedUser.badges.length > badges1.length) {
-          return this.$store.state.loggedUser.badges.filter(badge => {
-            for (let i = 0; i < badges1.length; i++) {
-              console.log(badge[i], badge);
-              if (badges1[i] == badge) return false;
-              return true;
-            }
-          });
-        }
+      console.log(badges1, "BADGES1!!!!!!!!!!!!!!!!!");
+      function sortUsers(usersR) {
+        let users = usersR.sort((a, b) => {
+          if (a.experience > b.experience) return -1;
+          if (a.experience < b.experience) return 1;
+          else return 0;
+        });
+
+        return users;
+      }
+      let axios2 = this.$http;
+      let userThreads = await axios2
+        .get(`http://${ip}/data-api/threads/userThreads/${theUser.id}`)
+        .then(res => res.data);
+      let userAnswers = await axios2
+        .get(`http://${ip}/data-api/userAnswers/${theUser.id}`)
+        .then(res => res.data);
+      let userComments = await axios2
+        .get(`http://${ip}/data-api/userComments/${theUser.id}`)
+        .then(res => res.data);
+
+      let pos = await axios2.get(`http://${ip}/data-api/users`).then(res => {
+        let users = sortUsers(res.data);
+        return users.findIndex(user => user.id == theUser.id);
       });
+
+      return {
+        updt: theUser.getBadges(
+          allBadges,
+          userThreads,
+          userComments,
+          userAnswers,
+          pos
+        ),
+        old: badges1
+      };
     },
     getLogCookie() {
       let logCok = cookie.parse(document.cookie).login;
       console.log(logCok);
       return logCok; //Só para confirmar, depois pode ser reduzida
+    },
+    checkRank(exp) {
+      if (
+        this.userRank !=
+        this.$store.state.users.loggedUser.getRank(exp).trueRank
+      ) {
+        this.$http({
+          url: `http://${
+            this.$store.getters.getIp
+          }/data-api/users/updateuserinfo/${
+            this.$store.state.users.loggedUser.id
+          }`,
+          method: "put",
+          headers: {
+            "x-access-token": cookie.parse(document.cookie).login
+          },
+          data: {
+            info: {
+              name: null,
+              photo: null,
+              rank: this.$store.state.users.loggedUser.getRank(exp).trueRank
+            }
+          }
+        });
+        Swal.fire({
+          position: "top-end",
+          type: "success",
+          title: `Subiste de Rank <br/> Rank Atual - <strong>${
+            this.$store.state.users.loggedUser.getRank(exp).trueRank
+          }</strong>`,
+          showConfirmButton: false,
+          timer: 1500
+        });
+      }
     }
   },
   filters: {

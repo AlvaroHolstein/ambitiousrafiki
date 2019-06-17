@@ -45,6 +45,7 @@
       <table class="table table-striped table-hover table-bordered">
         <thead class="thead-dark">
           <tr>
+            <th>#</th>
             <th>Topic</th>
             <th>Owner</th>
             <th>Views</th>
@@ -53,7 +54,8 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="thread in filteredThreads" v-bind:key="thread.id">
+          <tr v-for="(thread, cont) in filteredThreads" v-bind:key="thread.id">
+            <td>{{cont+1}}</td>
             <td>
               <!-- v-on:click="" -->
               <a v-on:click="goToThread(thread.id)" class="title">{{ thread.title }}</a>
@@ -92,8 +94,8 @@ export default {
       keyword: "",
       autoComleteTags: [],
       threads: this.$store.state.threads,
-      totalThreads: 2,
-      increment: 2,
+      totalThreads: 10,
+      increment: 10,
      
     };
   },
@@ -177,13 +179,7 @@ export default {
   },
   methods: {
     moreThreads() {
-      /* Array para guardar os id's das threads que já temos
-       * que depois vai ser enviado para a API,
-       * as threads que forem carregadas aqui no Catalog
-       * vão ficar na store, mas as threads que forem carregadas na SearchThing
-       * fica só no próprio componente.
-       * Enviar o numero de threads a ir buscar pelo body.
-       */
+
       let alreadyHere = this.$store.state.threads.threads_.map(
         (thread, cont) => {
           return thread.id;
@@ -191,14 +187,13 @@ export default {
       );
       console.log(alreadyHere);
       if (alreadyHere.length > this.totalThreads) {
-        /** Sim smi sim, era mais fácil fazer sempre pedidos e "esvaziar" o array */
         console.log(
           alreadyHere,
           this.totalThreads,
           "Ainda não vai ser preciso fazer pedidos"
         );
         this.totalThreads = this.totalThreads + this.increment;
-      } else {
+      } else { 
         this.getThreads_(alreadyHere);
       }
     },

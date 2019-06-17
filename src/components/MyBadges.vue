@@ -82,7 +82,16 @@ export default {
     // function fillBadges(badges) {
     //   this.myBadges = badges;
     // }
-    async function getItems() {
+    async function getItems(userid) {
+      function sortUsers(usersR) {
+        let users = usersR.sort((a, b) => {
+          if (a.experience > b.experience) return -1;
+          if (a.experience < b.experience) return 1;
+          else return 0;
+        });
+
+        return users;
+      }
       let userThreads = await axios
         .get(`http://${ip}/data-api/threads/userThreads/${theUser.id}`)
         .then(res => res.data);
@@ -92,6 +101,10 @@ export default {
       let userComments = await axios
         .get(`http://${ip}/data-api/userComments/${theUser.id}`)
         .then(res => res.data);
+      let pos = await axios.get(`http://${ip}/data-api/users`).then(res => {
+        let users = sortUsers(res.data);
+        return users.findIndex(user => user.id == userid);
+      });
       // console.log(userThreads, "UserThreads MYBADGES");
       // console.log(userAnswers, "Answers MYBADGES");
       // console.log(userComments, "Comments MYBADGES");
@@ -101,10 +114,11 @@ export default {
         allBadges,
         userThreads,
         userComments,
-        userAnswers
+        userAnswers,
+        pos
       );
     }
-    getItems().then(res => {
+    getItems(this.$route.params.userid).then(res => {
       this.myBadges = this.$store.state.badges.filter(badge => {
         for (let i = 0; i < res.length; i++) {
           if (res[i] == badge.id) return true;
