@@ -1,9 +1,9 @@
 <template>
   <div>
-    <div class="bs-callout bs-callout-danger">
+    <div class="bs-callout bs-callout-danger text-center">
       <h4>Education</h4>
       <table class="table table-striped table-responsive">
-        <thead>
+        <thead> 
           <tr>
             <th>Course</th>
             <th>Year</th>

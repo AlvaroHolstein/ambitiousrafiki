@@ -175,9 +175,10 @@ export default {
           let id = res.data.id;
           console.log(id);
           this.$http({
+            method: "put",
             url: `http://${
               this.$store.getters.getIp
-            }/data-api/users/addexperience/${
+            }/data-api/users/addexp/${
               this.$store.state.users.loggedUser.id
             }`,
             headers: {

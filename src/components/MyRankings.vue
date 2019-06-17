@@ -13,6 +13,7 @@
           v-for="user in users"
           v-bind:key="user.id"
           v-bind:class="{ 'table-active': user.id == $route.params.userid }"
+          v-if="user != undefined"
         >
           <th scope="row">{{ user.rank }}</th>
           <td>{{ user.name }}</td>
@@ -56,7 +57,7 @@ export default {
           console.log("Abaixo do top 5");
           let ranks = [];
           for (let i = pos; i >= 0; i--) {
-            ranks.push(this.users[i]);
+            if(this.users[i] != undefined) ranks.push(this.users[i]);
           }
           ranks.reverse();
           this.users = [];
@@ -71,7 +72,7 @@ export default {
             return newObj;
           });
           for (let i = pos + 1 - 5; i < pos + 1; i++) {
-            this.users.push(ranks[i]);
+            if(ranks[i] != undefined) this.users.push(ranks[i]);
           }
           console.log("Ranks", ranks);
         }

@@ -53,11 +53,11 @@
                       <div class="news-likes">
                         <span>
                           <a
-                            v-bind:class="{'btn': true, 'text-white': true, 'btn-success': thread.upv, 'btn-danger': !thread.upv}"
+                            v-bind:class="{'btn': true, 'text-white': true, 'btn-success': thread.upv || $store.state.users.loggedUser == null, 'btn-danger': $store.state.users.loggedUser != null && !thread.upv}"
                             v-on:click="upvoteThread(thread.upv)"
                           >
                             <i
-                              v-bind:class="{'fas fa-thumbs-up': thread.upv, 'fas fa-thumbs-down': !thread.upv}"
+                              v-bind:class="{'fas fa-thumbs-up': thread.upv || $store.state.users.loggedUser == null, 'fas fa-thumbs-down': $store.state.users.loggedUser != null && !thread.upv}"
                             >
                               {{
                               thread.upvotes == 0 ? "" : thread.upvotes
@@ -1663,17 +1663,12 @@ export default {
                 console.log(res, "RESULTTTTTTTTTTTTTT!!!!! THEBADGE ANSWER");
 
                 console.log(res.updt.length, res.old);
-                if (
-                  res.updt.length >
-                  res.old.length
-                ) {
+                if (res.updt.length > res.old.length) {
                   this.$store.dispatch("users/user_badges");
                   Swal.fire({
                     position: "top-end",
                     type: "success",
-                    title: `Ganhas um badge de ${
-                      res.updt[res.updt.length - 1].category
-                    }`, // Pde ser que resulte
+                    title: "Ganhas te um badge",
                     showConfirmButton: false,
                     timer: 1500
                   });
@@ -1856,17 +1851,12 @@ export default {
                 });
 
                 console.log(res.updt.length, res.old);
-                if (
-                  res.updt.length >
-                  res.old.length
-                ) {
+                if (res.updt.length > res.old.length) {
                   this.$store.dispatch("users/user_badges");
                   Swal.fire({
                     position: "top-end",
                     type: "success",
-                    title: `Ganhas um badge de ${
-                      res.updt[res.updt.length - 1].category
-                    }`, // Pde ser que resulte
+                    title: "Ganhas te um badge",
                     showConfirmButton: false,
                     timer: 1500
                   });

@@ -4,7 +4,7 @@
       style="padding: 0 0 0 5; padding-inline-start: 20px"
       class="list-group"
     >
-      <div v-for="thread in hotTopics" v-bind:key="thread.id">
+      <div v-for="thread in hotTopics" v-bind:key="thread.id"  v-if="thread != null">
         <a
           style="width:100%"
           class="list-group-item"

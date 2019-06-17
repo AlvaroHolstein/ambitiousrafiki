@@ -165,7 +165,9 @@ export default {
               }
             }
           })
-            .then(res => console.log(res))
+            .then(res => {
+              Swal.fire("Gravado", "Perfil alterado", "success")
+            })
             .catch(err => {
               throw err;
             });
